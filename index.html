@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestiona el contenido de tus pantallas de TV Corporativa de forma remota. Sube archivos, crea playlists y controla tus pantallas desde un solo lugar.">
+    <title>NexusPlay - Panel de Control</title>
+    
+    <link id="favicon" rel="icon" href="assets/Sync (3).png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <div id="loader" class="fixed inset-0 bg-gray-100 bg-opacity-80 flex items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-violet-600"></div>
+    </div>
+
+    <div id="auth-container" style="display: none;" class="min-h-screen flex items-center justify-center";">
+        <div class="w-full max-w-md p-8 space-y-6 bg-neutral-800 bg-opacity-70 rounded-xl shadow-lg form-container border border-violet-500/30">
+            <div class="flex justify-center mb-4">
+                <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-22 w-auto">
+            </div>
+            <div id="login-form-container">
+                <h2 class="text-3xl font-bold text-center text-white" data-lang="loginTitle">Iniciar Sesión</h2>
+                <form id="login-form" class="mt-8 space-y-6">
+                    <input id="login-email" type="email" required class="w-full px-4 py-3 rounded-lg bg-neutral-700 border border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="emailPlaceholder">
+                    <input id="login-password" type="password" required class="w-full px-4 py-3 rounded-lg bg-neutral-700 border border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="passwordPlaceholder">
+                    <button type="submit" class="w-full py-3 px-4 text-white font-semibold rounded-lg bg-violet-600 hover:bg-violet-700 transition-all duration-300 transform hover:scale-105 shadow-lg" data-lang="loginButton">Entrar</button>
+                </form>
+                <p class="mt-6 text-center text-sm text-neutral-300"><span data-lang="noAccount">¿No tienes cuenta?</span> <a href="#" id="show-register" class="font-medium text-[#4b0082] hover:text-violet-300" data-lang="registerLink">Regístrate</a></p>
+            </div>
+            <div id="register-form-container" class="hidden">
+                <h2 class="text-3xl font-bold text-center text-white" data-lang="registerTitle">Crear Cuenta</h2>
+                <form id="register-form" class="mt-8 space-y-6">
+                    <input id="register-email" type="email" required class="w-full px-4 py-3 rounded-lg bg-neutral-700 border border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="emailPlaceholder">
+                    <input id="register-password" type="password" required class="w-full px-4 py-3 rounded-lg bg-neutral-700 border border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="passwordPlaceholder6Chars">
+                    <button type="submit" class="w-full py-3 px-4 text-white font-semibold rounded-lg bg-[#00FFF7] hover:bg-[#00B3AD] transition-all duration-300 transform hover:scale-105 shadow-lg" data-lang="registerButton">Registrar</button>
+                </form>
+
+                <div class="my-4 flex items-center">
+                    <div class="flex-grow border-t border-neutral-600"></div>
+                    <span class="mx-4 text-neutral-400 text-sm" data-lang="or">o</span>
+                    <div class="flex-grow border-t border-neutral-600"></div>
+                </div>
+        
+                        <button id="google-signin-btn" class="w-full py-3 px-4 flex justify-center items-center gap-3 text-white font-semibold rounded-lg bg-[#DB4437] hover:bg-[#C23327] transition-colors duration-300">
+                            <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C42.012,36.49,44,30.638,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
+                            <span data-lang="googleSignIn">Iniciar sesión con Google</span>
+                        </button>
+                        
+
+                <p class="mt-6 text-center text-sm text-neutral-300"><span data-lang="hasAccount">¿Ya tienes cuenta?</span> <a href="#" id="show-login" class="font-medium text-[#00FFF7] hover:text-[#00B3AD]" data-lang="loginLink">Inicia sesión</a></p>
+            </div>
+            <div id="verify-email-container" class="hidden text-center">
+                <h2 class="text-3xl font-bold text-white" data-lang="verifyEmailTitle">Verifica tu Correo</h2>
+                <p class="mt-4 text-neutral-300" data-lang="verifyEmailMessage">Te hemos enviado un enlace de verificación. Por
+                    favor, revisa tu bandeja de entrada (y la carpeta de spam) para poder acceder.</p>
+                <button id="logout-verification-button"
+                    class="mt-6 w-full py-3 px-4 text-white font-semibold rounded-lg bg-violet-600 hover:bg-violet-700"
+                    data-lang="logoutButton">Cerrar Sesión</button>
+            </div>
+            <div id="message-box" class="mt-4 text-center p-3 rounded-lg text-white hidden"></div>
+            <div class="mt-6 pt-4 border-t border-neutral-600/50">
+                <div class="lang-selector flex justify-center items-center space-x-4">
+                    <img src="https://flagcdn.com/es.svg" width="30" alt="Español" data-lang-id="es" class="active">
+                    <img src="https://flagcdn.com/gb.svg" width="30" alt="English" data-lang-id="en">
+                    <img src="https://flagcdn.com/br.svg" width="30" alt="Português" data-lang-id="pt">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-container" style="display: none;" class="h-screen flex flex-col">
+        <header class="lg:hidden bg-neutral-800 text-white flex items-center justify-between p-4 shadow-md z-20">
+            <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-10 w-auto">
+            <button id="hamburger-btn" class="p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden">
+            <aside id="sidebar" class="fixed inset-y-0 left-0 bg-neutral-800 text-neutral-300 flex flex-col flex-shrink-0 w-64 border-r border-neutral-700/50 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out z-30">
+                <div class="h-22 hidden lg:flex items-center justify-center border-b border-neutral-700 px-4">
+                    <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-18 w-auto">
+                </div>
+                <nav id="main-nav" class="flex-1 px-4 py-6 space-y-2">
+                    <a href="#dashboard" class="nav-link flex items-center px-4 py-2.5 rounded-lg bg-neutral-700 text-white"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg><span data-lang="navDashboard">Dashboard</span></a>
+                    <a href="#media" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span data-lang="navMedia">Medios</span></a>
+                    <a href="#playlists" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span data-lang="navPlaylists">Playlists</span></a>
+                    
+
+                    <a href="#music-playlists" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700">
+                        <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                        </svg>
+                        <span data-lang="navMusicPlaylists">Playlists de Música</span>
+                    </a>
+
+
+                    <a href="#screens" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-lang="navScreens">Pantallas</span></a>
+                </nav>
+                <div class="px-4 py-6 border-t border-neutral-700">
+                    <div id="user-info" class="flex items-center"></div>
+                    <div class="mt-4 pt-4 border-t border-neutral-700/50">
+                        <div class="lang-selector flex justify-around items-center">
+                            <img src="https://flagcdn.com/es.svg" width="30" alt="Español" data-lang-id="es" class="active">
+                            <img src="https://flagcdn.com/gb.svg" width="30" alt="English" data-lang-id="en">
+                            <img src="https://flagcdn.com/br.svg" width="30" alt="Português" data-lang-id="pt">
+                        </div>
+                    </div>
+                    <button id="logout-button" class="w-full mt-4 flex items-center justify-center px-4 py-2.5 rounded-lg text-red-400 hover:bg-[#4b0082] hover:text-white transition duration-200"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span data-lang="logoutButton">Cerrar Sesión</span></button>
+                </div>
+            </aside>
+            <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden lg:hidden z-20"></div>
+
+            <main class="flex-1 p-6 lg:p-10 overflow-y-auto">
+                <div id="dashboard-section" class="page-section">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="dashboardTitle">Dashboard</h2>
+                    <p class="mt-2 text-gray-500" data-lang="dashboardWelcome">Bienvenido a tu panel de control.</p>
+                </div>
+                <div id="media-section" class="page-section hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="mediaTitle">Gestión de Medios</h2>
+                        <label for="file-upload" class="btn-primary cursor-pointer mt-4 sm:mt-0">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            <span data-lang="uploadFile">Subir Archivo</span>
+                        </label>
+                        <input id="file-upload" type="file" class="hidden" accept="image/jpeg,image/png,video/mp4,audio/mpeg,.mp3,audio/wav,.wav">
+                    </div>
+                    <div id="upload-progress-container" class="mt-4 w-full bg-gray-200 rounded-full h-2.5 hidden">
+                        <div id="upload-progress-bar" class="bg-violet-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div id="media-gallery" class="mt-8 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6"></div>
+                </div>
+
+                <div id="playlists-section" class="page-section hidden h-full flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="playlistsTitle">Playlists</h2>
+                        <button id="add-playlist-btn" class="btn-primary mt-4 sm:mt-0">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                                </path>
+                            </svg>
+                            <span data-lang="createPlaylist">Crear Playlist</span>
+                        </button>
+                    </div>
+                
+                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden">
+                
+                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4" data-lang="myPlaylists">Mis Playlists</h3>
+                            <div id="playlists-list"
+                                class="space-y-2 pr-2 bg-gray-50 rounded-md p-2 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                            </div>
+                        </div>
+                
+                        <div class="w-full lg:w-2/3 xl:w-3/4 flex flex-col">
+                            <div id="playlist-editor" class="flex-1 flex-col hidden h-full">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 id="playlist-editor-title" class="text-2xl font-bold text-gray-800"></h3>
+                                    <button id="delete-playlist-btn"
+                                        class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-transform transform hover:scale-110"><svg
+                                            class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg></button>
+                                </div>
+                
+                                <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden">
+                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                        <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="mediaLibrary">Biblioteca de
+                                            Medios</h4>
+                                        <div class="bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
+                                            <div id="playlist-media-library" class="grid grid-cols-2 gap-3"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                        <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="playlistContent">Contenido de la
+                                            Playlist</h4>
+                                        <div id="playlist-content-area"
+                                            class="space-y-2 bg-gray-50 rounded-md p-10 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div id="playlist-placeholder"
+                                class="flex-1 flex items-center justify-center bg-white rounded-lg shadow-md">
+                                <p class="text-gray-500 text-center p-4" data-lang="playlistPlaceholder">Selecciona una playlist para
+                                    editar o crea una nueva.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div id="music-playlists-section" class="page-section hidden h-full flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="musicPlaylistsTitle">Playlists de Música
+                        </h2>
+                        <button id="add-music-playlist-btn" class="btn-primary mt-4 sm:mt-0">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                                </path>
+                            </svg>
+                            <span data-lang="createMusicPlaylist">Crear Playlist de Música</span>
+                        </button>
+                    </div>
+                
+                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden">
+                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4" data-lang="myMusicPlaylists">Mis Playlists de Música
+                            </h3>
+                            <div id="music-playlists-list"
+                                class="space-y-2 pr-2 bg-gray-50 rounded-md p-2 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                            </div>
+                        </div>
+                
+                        <div class="w-full lg:w-2/3 xl:w-3/4 flex flex-col">
+                            <div id="music-playlist-editor" class="flex-1 flex-col hidden h-full">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 id="music-playlist-editor-title" class="text-2xl font-bold text-gray-800"></h3>
+                                    <button id="delete-music-playlist-btn"
+                                        class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-transform transform hover:scale-110"><svg
+                                            class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg></button>
+                                </div>
+                
+                                <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden">
+                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                        <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="audioLibrary">Biblioteca de
+                                            Audio</h4>
+                                        <div class="bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
+                                            <div id="music-playlist-media-library" class="grid grid-cols-2 gap-3"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                        <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="musicPlaylistContent">Contenido
+                                            de la Playlist</h4>
+                                        <div id="music-playlist-content-area"
+                                            class="space-y-2 bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div id="music-playlist-placeholder"
+                                class="flex-1 flex items-center justify-center bg-white rounded-lg shadow-md">
+                                <p class="text-gray-500 text-center p-4" data-lang="musicPlaylistPlaceholder">Selecciona una playlist de
+                                    música para editar o crea una nueva.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="screens-section" class="page-section hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="screensTitle">Gestión de Pantallas</h2>
+                        <button id="add-screen-btn" class="btn-primary mt-4 sm:mt-0">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            <span data-lang="addScreen">Añadir Pantalla</span>
+                        </button>
+                    </div>
+                    <div id="screens-list" class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm">
+            <h3 id="confirm-modal-title" class="text-lg font-medium text-gray-900" data-lang="confirmAction">Confirmar Acción</h3>
+            <p id="confirm-modal-body" class="mt-2 text-sm text-gray-600">¿Estás seguro?</p>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button id="confirm-modal-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
+                <button id="confirm-modal-confirm" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" data-lang="confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    <div id="add-playlist-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm">
+            <h3 class="text-lg font-medium text-gray-900" data-lang="createPlaylistTitle">Crear Nueva Playlist</h3>
+            <form id="add-playlist-form">
+                <label for="new-playlist-name" class="sr-only">Nombre de la Playlist</label>
+                <input id="new-playlist-name" name="new-playlist-name" type="text" required class="mt-4 w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="playlistNamePlaceholder">
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" id="add-playlist-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" data-lang="save">Guardar</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    <div id="add-music-playlist-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm">
+            <h3 class="text-lg font-medium text-gray-900" data-lang="createMusicPlaylist">Crear Playlist de Música</h3>
+            <form id="add-music-playlist-form">
+                <label for="new-music-playlist-name" class="sr-only">Nombre de la Playlist de Música</label>
+                <input id="new-music-playlist-name" name="new-music-playlist-name" type="text" required
+                    class="mt-4 w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    data-lang-placeholder="playlistNamePlaceholder">
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" id="add-music-playlist-cancel"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                        data-lang="cancel">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700"
+                        data-lang="save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="add-screen-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm">
+            <h3 class="text-lg font-medium text-gray-900" data-lang="addScreenTitle">Añadir Nueva Pantalla</h3>
+            <form id="add-screen-form">
+                <label for="new-screen-name" class="sr-only">Nombre de la Pantalla</label>
+                <input id="new-screen-name" name="new-screen-name" type="text" required class="mt-4 w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="screenNamePlaceholder">
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" id="add-screen-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" data-lang="save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="pairing-code-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-11/12 max-w-sm text-center">
+            <h3 class="text-lg font-medium text-gray-900" data-lang="screenCreatedTitle">Pantalla Creada</h3>
+            <p class="mt-2 text-sm text-gray-600" data-lang="pairingCodeInstruction">Usa el siguiente código para emparejar tu dispositivo:</p>
+            <p id="pairing-code-display" class="my-4 text-5xl font-bold text-violet-600 tracking-widest bg-gray-100 p-4 rounded-lg"></p>
+            <button id="pairing-code-close" class="w-full px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900" data-lang="gotIt">Entendido</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js" defer></script>
+
+</body>
+</html>

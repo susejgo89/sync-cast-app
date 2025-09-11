@@ -1,0 +1,187 @@
+body { font-family: 'Inter', sans-serif;
+     background-image: url('assets/background.png'); /* Make sure your image is named background.jpg */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Keeps the background static on scroll */
+ }
+        .form-container { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        /* Hide number input arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        .dragging { opacity: 0.5; border: 2px dashed #7c3aed; }
+        .drag-over { background-color: rgba(124, 58, 237, 0.1); }
+        /* Custom modal styles with transitions */
+        .modal { 
+            display: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal.active { 
+            display: flex; 
+            opacity: 1;
+            transform: scale(1);
+        }
+        .btn-primary {
+            @apply bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+        }
+        .card {
+            @apply bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+        }
+        .lang-selector img {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s ease-in-out;
+        }
+        .lang-selector img:hover, .lang-selector img.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        /* --- General Body Styles --- */
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* --- Glassmorphism Effect for Auth Form --- */
+.form-container { 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+}
+
+/* --- Hide Number Input Arrows (for duration input) --- */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+input[type=number] { 
+    -moz-appearance: textfield; 
+}
+
+/* --- Drag and Drop Styles --- */
+.dragging { 
+    opacity: 0.5; 
+    border: 2px dashed #7c3aed; 
+}
+.drag-over { 
+    background-color: rgba(124, 58, 237, 0.1); 
+}
+
+/* --- Custom Modal Styles with Transitions --- */
+.modal { 
+    display: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: scale(0.95);
+}
+.modal.active { 
+    display: flex; 
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* --- Reusable Component-like Classes --- */
+.btn-primary {
+    @apply bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+}
+
+.card {
+    @apply bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+/* --- Language Selector Styles --- */
+.lang-selector img {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.2s ease-in-out;
+}
+.lang-selector img:hover, .lang-selector img.active {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* --- NEW: Animated Gradient Background --- */
+/* --- General Body Styles --- */
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* --- Glassmorphism Effect for Auth Form --- */
+.form-container { 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+}
+
+/* --- Hide Number Input Arrows (for duration input) --- */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+input[type=number] { 
+    -moz-appearance: textfield; 
+}
+
+/* --- Drag and Drop Styles --- */
+.dragging { 
+    opacity: 0.5; 
+    border: 2px dashed #7c3aed; 
+}
+.drag-over { 
+    background-color: rgba(124, 58, 237, 0.1); 
+}
+
+/* --- Custom Modal Styles with Transitions --- */
+.modal { 
+    display: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: scale(0.95);
+}
+.modal.active { 
+    display: flex; 
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* --- Reusable Component-like Classes --- */
+.btn-primary {
+    @apply bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+}
+
+.card {
+    @apply bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+/* --- Language Selector Styles --- */
+.lang-selector img {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.2s ease-in-out;
+}
+.lang-selector img:hover, .lang-selector img.active {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* --- NEW: Static Image Background --- */
+main {
+    position: relative; /* Needed for the overlay */
+    z-index: 1;
+   
+}
+
+/* This adds a semi-transparent overlay so the text is readable */
+main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8); /* White overlay with 80% opacity */
+    z-index: -1;
+}
+
+

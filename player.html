@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusPlay - Reproductor</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="player.css">
+</head>
+<body class="bg-neutral-900 text-white antialiased">
+
+    <div id="pairing-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md p-8 space-y-6 bg-neutral-800 rounded-xl shadow-lg text-center border border-violet-500/30">
+            
+            <div class="flex justify-center mb-4">
+                <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-20 w-auto">
+            </div>
+
+            <h2 class="text-3xl font-bold text-center text-white" data-lang="pairingTitle">Enlazar esta Pantalla</h2>
+            <p class="text-neutral-400" data-lang="pairingInstruction">Introduce el código de 6 dígitos que aparece en tu panel de control.</p>
+
+            <div id="pairing-code-inputs" class="flex justify-center gap-2 sm:gap-4 my-8">
+                <input type="text" maxlength="1" class="pairing-input">
+                <input type="text" maxlength="1" class="pairing-input">
+                <input type="text" maxlength="1" class="pairing-input">
+                <span class="text-2xl font-bold text-neutral-500">-</span>
+                <input type="text" maxlength="1" class="pairing-input">
+                <input type="text" maxlength="1" class="pairing-input">
+                <input type="text" maxlength="1" class="pairing-input">
+            </div>
+
+            <div id="player-message-box" class="mt-4 text-center p-3 rounded-lg text-white hidden"></div>
+
+            <button id="pair-btn" class="w-full py-3 px-4 text-white font-semibold rounded-lg bg-violet-600 hover:bg-violet-700 transition-all duration-300 transform hover:scale-105 shadow-lg hidden" data-lang="pairDeviceBtn">
+                Enlazar Dispositivo
+            </button>
+
+        </div>
+    </div>
+
+    <div id="content-screen" class="hidden h-screen w-screen bg-black">
+        </div>
+
+    <script type="module" src="player.js"></script>
+
+</body>
+</html>
