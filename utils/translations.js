@@ -64,6 +64,8 @@ export const translations = {
                 musicPlaylistPlaceholder: "Selecciona una playlist de música para editar o crea una nueva.",
                 emptyAudioLibrary: "No hay archivos de audio en tu biblioteca.",
                 editingMusicPlaylist: "Editando Playlist de Música",
+                visualPlaylist: "Playlist Visual",
+                musicPlaylist: "Playlist de Música",
             },
             en: {
                 loginTitle: "Login",
@@ -130,6 +132,8 @@ export const translations = {
                 musicPlaylistPlaceholder: "Select a music playlist to edit or create a new one.",
                 emptyAudioLibrary: "There are no audio files in your library.",
                 editingMusicPlaylist: "Editing Music Playlist",
+                visualPlaylist: "Visual Playlist",
+                musicPlaylist: "Music Playlist",
             },
             pt: {
                 loginTitle: "Entrar",
@@ -196,5 +200,7 @@ export const translations = {
                 musicPlaylistPlaceholder: "Selecione uma playlist de música para editar ou crie uma nova.",
                 emptyAudioLibrary: "Não há arquivos de áudio em sua biblioteca.",
                 editingMusicPlaylist: "Editando Playlist de Música",
+                visualPlaylist: "Playlist Visual",
+                musicPlaylist: "Playlist de Música",
             }
         };

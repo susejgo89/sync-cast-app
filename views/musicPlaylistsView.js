@@ -33,43 +33,39 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
     let userMusicPlaylists = [];
     let listenersAttached = false;
     let currentUserId = userId;
+    let draggedItem = null; 
 
     // --- Lógica de Renderizado y Manipulación de Items ---
 
-    // Función para manejar la eliminación de un item de la playlist
-    async function handleRemoveItem(itemToRemove) {
-        if (!activePlaylistId) return;
-
-        const lang = getLang();
-        showConfirmModal(
-            translations[lang].confirmRemoveItemTitle,
-            `${translations[lang].confirmRemoveItemMsg} "${itemToRemove.name}"?`,
-            async () => {
-                const playlistRef = doc(db, 'musicPlaylists', activePlaylistId);
-                await updateDoc(playlistRef, {
-                    items: arrayRemove(itemToRemove) // Usa arrayRemove para quitar el objeto exacto del array
-                });
-            }
-        );
-    }
-
-    // Crea el elemento HTML para un solo audio en la lista de la playlist
-    function createAudioPlaylistItemElement(item, index) {
+    // Crea un elemento de lista compacto para un audio, con drag-and-drop y botón de eliminar.
+    function createCompactAudioItem(mediaData, index, onDeleteCallback) {
         const el = document.createElement('div');
-        el.className = 'flex items-center justify-between bg-gray-200 p-2 rounded-lg';
+        el.className = 'flex items-center justify-between bg-gray-200 p-2 rounded-lg cursor-grab';
         el.dataset.index = index;
+        el.draggable = true;
 
         el.innerHTML = `
             <div class="flex items-center min-w-0">
-                <svg class="w-8 h-8 text-gray-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path></svg>
-                <p class="text-sm truncate text-gray-700" title="${item.name}">${item.name}</p>
+                <svg class="w-6 h-6 text-gray-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path></svg>
+                <p class="text-sm truncate text-gray-700" title="${mediaData.name}">${mediaData.name}</p>
             </div>
             <button class="remove-item-btn text-red-400 hover:text-red-600 p-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         `;
         
-        el.querySelector('.remove-item-btn').addEventListener('click', () => handleRemoveItem(item));
+        el.querySelector('.remove-item-btn').addEventListener('click', onDeleteCallback);
+
+        el.addEventListener('dragstart', (e) => {
+            draggedItem = el;
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => el.classList.add('opacity-50'), 0);
+        });
+
+        el.addEventListener('dragend', () => {
+            draggedItem = null;
+            el.classList.remove('opacity-50');
+        });
 
         return el;
     }
@@ -112,15 +108,46 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
         });
     }
 
-    // Dibuja la lista de audios que pertenecen a la playlist activa
-    function renderPlaylistItems(items) {
+async function renderPlaylistItems(itemIds) {
         playlistContentArea.innerHTML = '';
-        if (items && items.length > 0) {
-            items.forEach((item, index) => {
-                playlistContentArea.appendChild(createAudioPlaylistItemElement(item, index));
-            });
-        } else {
-            playlistContentArea.innerHTML = `<p class="text-gray-500 text-center p-4">Arrastra audios aquí para añadirlos a la playlist.</p>`;
+        if (!itemIds || itemIds.length === 0) {
+            playlistContentArea.innerHTML = `<p class="text-gray-500 text-center p-4">Arrastra audios aquí.</p>`;
+            return;
+        };
+
+        // Usamos un bucle for...of con índice para manejar el async/await correctamente
+        let index = 0;
+        for (const item of itemIds) {
+            const idToFetch = (typeof item === 'string') ? item : item.id;
+
+            if (!idToFetch) {
+                index++;
+                continue;
+            }
+
+            const mediaDoc = await getDoc(doc(db, 'media', idToFetch));
+            
+            if (mediaDoc.exists()) {
+                const mediaData = { id: mediaDoc.id, ...mediaDoc.data() };
+
+                const onDelete = () => {
+                    const lang = getLang();
+                    showConfirmModal(
+                        translations[lang].confirmRemoveItemTitle || "Quitar Audio", 
+                        `${translations[lang].confirmRemoveItemMsg || '¿Seguro que quieres quitar este audio de la playlist?'}`,
+                        () => {
+                            const playlistRef = doc(db, 'musicPlaylists', activePlaylistId);
+                            // Usamos el ID para eliminarlo del array
+                            updateDoc(playlistRef, { items: arrayRemove(idToFetch) });
+                        }
+                    );
+                };
+
+                // Usamos la nueva función para crear un elemento compacto
+                const itemElement = createCompactAudioItem(mediaData, index, onDelete);
+                playlistContentArea.appendChild(itemElement);
+            }
+            index++;
         }
     }
 
@@ -181,29 +208,40 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
     playlistContentArea.addEventListener('drop', async e => {
         e.preventDefault();
         playlistContentArea.classList.remove('drag-over');
-        const mediaInfoStr = e.dataTransfer.getData('application/json');
-
-        if (mediaInfoStr && activePlaylistId) {
-            const mediaInfo = JSON.parse(mediaInfoStr);
-
-            if (!mediaInfo.type.startsWith('audio')) {
-                alert("Solo puedes añadir archivos de audio a esta playlist.");
-                return;
-            }
-
-            // Preparamos un objeto limpio para guardar en la playlist
-            const itemToAdd = {
-                id: mediaInfo.id,
-                name: mediaInfo.name,
-                url: mediaInfo.url,
-                type: mediaInfo.type
-            };
-
-            const playlistRef = doc(db, 'musicPlaylists', activePlaylistId);
-            await updateDoc(playlistRef, {
-                items: arrayUnion(itemToAdd) // Usamos arrayUnion para añadir el objeto al array de forma segura
-            });
+    
+        if (!activePlaylistId) return;
+    
+        const playlistRef = doc(db, 'musicPlaylists', activePlaylistId);
+    
+        // CASO 1: REORDENANDO UN AUDIO QUE YA ESTÁ EN LA LISTA
+        if (draggedItem) {
+            const activePlaylist = userMusicPlaylists.find(p => p.id === activePlaylistId);
+            if (!activePlaylist) return;
+            // Creamos una copia mutable del array de items desde el estado local
+            let items = [...(activePlaylist.items || [])];
+    
+            const fromIndex = parseInt(draggedItem.dataset.index);
+            const toEl = e.target.closest('[data-index]');
+            const toIndex = toEl ? parseInt(toEl.dataset.index) : items.length;
+    
+            const [removed] = items.splice(fromIndex, 1);
+            items.splice(toIndex, 0, removed);
+    
+            await updateDoc(playlistRef, { items: items });
         }
+        // CASO 2: AÑADIENDO UN NUEVO AUDIO DESDE LA BIBLIOTECA
+        else {
+            const mediaInfoStr = e.dataTransfer.getData('application/json');
+            if (mediaInfoStr) {
+                const mediaInfo = JSON.parse(mediaInfoStr);
+                if (!mediaInfo.type.startsWith('audio')) {
+                    alert("Solo puedes añadir archivos de audio a esta playlist.");
+                    return;
+                }
+                await updateDoc(playlistRef, { items: arrayUnion(mediaInfo.id) });
+            }
+        }
+        draggedItem = null;
     });
 
     listenersAttached = true;
@@ -214,6 +252,9 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
         userMusicPlaylists = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() }))
             .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); // Ordena por fecha de creación
+
+        // Notifica al script principal que los datos han cambiado
+        onUpdateCallback(userMusicPlaylists);
 
         renderMusicPlaylists();
         

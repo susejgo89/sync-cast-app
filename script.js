@@ -247,8 +247,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             });
             unsubscribeMusicPlaylists = initMusicPlaylistsView(userId, () => currentLang, (musicPlaylists) => {
                 userMusicPlaylistsData = musicPlaylists;
+                if (screensViewInstance) screensViewInstance.rerender();
             }, () => userMediaData);
-            screensViewInstance = initScreensView(userId, () => userPlaylistsData, () => currentLang);
+            screensViewInstance = initScreensView(userId, () => userPlaylistsData, () => userMusicPlaylistsData, () => currentLang);
         }
 
         // --- Navigation Logic ---

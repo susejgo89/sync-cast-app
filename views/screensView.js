@@ -20,42 +20,56 @@ const screensListContainer = document.getElementById('screens-list');
 let currentUserId = null;
 let listenersAttached = false;
 
-function renderScreens(screens, playlists, currentLang) {
+function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang) {
     screensListContainer.innerHTML = screens.length === 0 ? `<p class="text-gray-500 col-span-full text-center">No hay pantallas registradas.</p>` : '';
     screens.forEach(screen => {
-        const playlistOptions = playlists.map(p => `<option value="${p.id}" ${screen.playlistId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+        const visualOptions = visualPlaylists.map(p => `<option value="${p.id}" ${screen.playlistId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+        // --- LÍNEA NUEVA ---
+        const musicOptions = musicPlaylists.map(p => `<option value="${p.id}" ${screen.musicPlaylistId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
 
         const card = document.createElement('div');
         card.className = 'card p-5 flex flex-col';
+        
+        // --- HTML MODIFICADO ---
         card.innerHTML = `
             <div class="flex justify-between items-start">
                 <div>
                     <h4 class="text-xl font-bold text-gray-800">${screen.name}</h4>
-                    <p class="text-sm text-gray-500 mt-1"><span data-lang="code">${translations[currentLang].code}</span>: <span class="font-mono bg-gray-200 px-2 py-1 rounded">${screen.pairingCode}</span></p>
+                    <p class="text-sm text-gray-500 mt-1"><span data-lang="code">${translations[currentLang].code}</span>: <span class="font-mono bg-gray-200 px-2 py-1 rounded">${screen.pairingCode || 'Enlazada'}</span></p>
                 </div>
-                <button data-screen-id="${screen.id}" class="delete-screen-btn text-gray-400 hover:text-red-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                <button data-screen-id="${screen.id}" class="delete-screen-btn text-gray-400 hover:text-red-600">...</button>
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <label class="block text-sm font-medium text-gray-700" data-lang="assignedPlaylist">${translations[currentLang].assignedPlaylist}</label>
-                <select data-screen-id="${screen.id}" class="playlist-select mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-violet-500 focus:border-violet-500 sm:text-sm rounded-md">
-                    <option value="">${translations[currentLang].none}</option>
-                    ${playlistOptions}
-                </select>
+            <div class="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">${translations[currentLang].visualPlaylist || 'Playlist Visual'}</label>
+                    <select data-screen-id="${screen.id}" class="playlist-select mt-1 block w-full ... rounded-md">
+                        <option value="">${translations[currentLang].none}</option>
+                        ${visualOptions}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">${translations[currentLang].musicPlaylist || 'Playlist de Música'}</label>
+                    <select data-screen-id="${screen.id}" class="music-playlist-select mt-1 block w-full ... rounded-md">
+                        <option value="">${translations[currentLang].none}</option>
+                        ${musicOptions}
+                    </select>
+                </div>
             </div>
         `;
         screensListContainer.appendChild(card);
     });
 }
 
-function loadScreens(userId, playlists, currentLang) {
+function loadScreens(userId, visualPlaylists, musicPlaylists, currentLang) {
     const q = query(collection(db, 'screens'), where('userId', '==', userId));
     return onSnapshot(q, (snapshot) => {
         const screens = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderScreens(screens, playlists, currentLang);
+        // Ahora pasamos todos los parámetros a la función que dibuja
+        renderScreens(screens, visualPlaylists, musicPlaylists, currentLang);
     });
 }
 
-export function initScreensView(userId, getPlaylists, getLang) {
+export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang) {
     currentUserId = userId;
 
     if (!listenersAttached) {
@@ -133,22 +147,31 @@ export function initScreensView(userId, getPlaylists, getLang) {
         });
 
         screensListContainer.addEventListener('change', (e) => {
-            if (e.target.classList.contains('playlist-select')) {
-                const screenId = e.target.dataset.screenId;
-                const playlistId = e.target.value || null;
-                updateDoc(doc(db, 'screens', screenId), { playlistId });
-            }
-        });
+    const screenId = e.target.dataset.screenId;
+    const screenRef = doc(db, 'screens', screenId);
+    
+    // Si se cambió el menú de playlist visual
+    if (e.target.classList.contains('playlist-select')) {
+        const playlistId = e.target.value || null;
+        updateDoc(screenRef, { playlistId });
+    }
+
+    // Si se cambió el menú de playlist de música
+    if (e.target.classList.contains('music-playlist-select')) {
+        const musicPlaylistId = e.target.value || null;
+        updateDoc(screenRef, { musicPlaylistId });
+    }
+});
         listenersAttached = true;
     }
 
-    let unsubscribe = loadScreens(userId, getPlaylists(), getLang());
+    let unsubscribe = loadScreens(userId, getPlaylists(), getMusicPlaylists(), getLang());
 
     return {
         unsubscribe: () => unsubscribe(),
         rerender: () => {
             unsubscribe();
-            unsubscribe = loadScreens(userId, getPlaylists(), getLang());
+            unsubscribe = loadScreens(userId, getPlaylists(), getMusicPlaylists(), getLang());
         }
     };
 }
