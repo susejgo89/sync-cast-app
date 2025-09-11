@@ -162,6 +162,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     } else {
         // CASO 3: Usuario NO logueado -> Muestra el login
         // (Tu código original para cuando no hay usuario va aquí)
+        document.body.classList.add('auth-bg');
         currentUserId = null;
         authContainer.style.display = 'flex';
         dashboardContainer.style.display = 'none';

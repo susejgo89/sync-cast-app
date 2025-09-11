@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, doc, updateDoc, onSnapshot, getDoc} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { collection, query, where, getDocs, doc, updateDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { translations } from './utils/translations.js';
 
 // --- DOM Elements ---
@@ -14,7 +14,13 @@ const messageBox = document.getElementById('player-message-box');
 let currentPlaylistItems = [];
 let currentItemIndex = 0;
 let unsubscribeScreenListener = null; 
-let unsubscribePlaylistListener = null;// Para detener el listener si es necesario
+let unsubscribePlaylistListener = null;
+let unsubscribeMusicPlaylistListener = null; // Listener para la playlist de música
+
+let currentMusicPlaylistItems = [];
+let currentMusicItemIndex = 0;
+const audioPlayer = new Audio(); // Nuestro reproductor de música dedicado
+audioPlayer.loop = false; // El bucle lo manejaremos con código
 
 // --- Language Function ---
 function setLanguage(lang) {
@@ -28,52 +34,104 @@ function setLanguage(lang) {
     });
 }
 
+async function playNextMusicItem() {
+    if (currentMusicPlaylistItems.length === 0) {
+        audioPlayer.pause();
+        return;
+    }
+    if (currentMusicItemIndex >= currentMusicPlaylistItems.length) {
+        currentMusicItemIndex = 0; // Reinicia el bucle
+    }
+
+    const itemId = currentMusicPlaylistItems[currentMusicItemIndex];
+    currentMusicItemIndex++; // Incrementa para la siguiente llamada
+
+    if (!itemId) {
+        // Si el item es inválido, salta al siguiente
+        playNextMusicItem();
+        return;
+    }
+
+    try {
+        const mediaDoc = await getDoc(doc(db, 'media', itemId));
+        if (mediaDoc.exists()) {
+            audioPlayer.src = mediaDoc.data().url;
+            // El evento 'onended' se encargará de llamar a la siguiente canción
+            await audioPlayer.play();
+        } else {
+            console.warn(`Audio con ID ${itemId} no encontrado. Saltando.`);
+            // Si el audio no existe, intenta reproducir el siguiente inmediatamente
+            playNextMusicItem();
+        }
+    } catch (error) {
+        console.error("Error al intentar reproducir audio:", error);
+        // En caso de error, intenta con el siguiente tras un breve retraso
+        setTimeout(playNextMusicItem, 1000);
+    }
+}
+audioPlayer.onended = playNextMusicItem;
+
 // --- Playback Logic ---
 
 // Función principal que inicia la reproducción del contenido
 function startContentPlayback(screenId) {
     pairingScreen.classList.add('hidden');
     contentScreen.classList.remove('hidden');
-
     const screenDocRef = doc(db, 'screens', screenId);
-
     if (unsubscribeScreenListener) unsubscribeScreenListener();
 
-    // 1. PRIMER LISTENER: Vigila el documento de la PANTALLA
     unsubscribeScreenListener = onSnapshot(screenDocRef, (screenSnap) => {
-        // Si el listener de la playlist ya está activo, lo detenemos para reiniciarlo.
+        // Cada vez que el documento de la pantalla cambia, limpiamos los listeners de playlists
         if (unsubscribePlaylistListener) unsubscribePlaylistListener();
+        if (unsubscribeMusicPlaylistListener) unsubscribeMusicPlaylistListener();
 
         if (!screenSnap.exists()) {
-            console.error("Error: La pantalla con este ID fue eliminada. Reiniciando.");
             localStorage.removeItem('nexusplay_screen_id');
             window.location.reload();
             return;
         }
 
-        const playlistId = screenSnap.data().playlistId;
+        const screenData = screenSnap.data();
+        const playlistId = screenData.playlistId;
+        const musicPlaylistId = screenData.musicPlaylistId;
+        
+        // --- Cargar Playlist de Música ---
+        if (musicPlaylistId) {
+            const musicPlaylistDocRef = doc(db, 'musicPlaylists', musicPlaylistId);
+            unsubscribeMusicPlaylistListener = onSnapshot(musicPlaylistDocRef, (musicPlaylistSnap) => {
+                if (musicPlaylistSnap.exists()) {
+                    currentMusicPlaylistItems = musicPlaylistSnap.data().items || [];
+                    currentMusicItemIndex = 0;
+                    playNextMusicItem(); // Inicia o reinicia el bucle de música
+                } else {
+                    audioPlayer.pause();
+                    currentMusicPlaylistItems = [];
+                }
+            });
+        } else {
+            audioPlayer.pause();
+            currentMusicPlaylistItems = [];
+        }
 
+        // --- Cargar Playlist Visual ---
         if (playlistId) {
             const playlistDocRef = doc(db, 'playlists', playlistId);
-
-            // 2. SEGUNDO LISTENER: Vigila el documento de la PLAYLIST asignada
             unsubscribePlaylistListener = onSnapshot(playlistDocRef, (playlistSnap) => {
                 if (playlistSnap.exists()) {
                     currentPlaylistItems = playlistSnap.data().items || [];
                     currentItemIndex = 0;
-
                     if (currentPlaylistItems.length > 0) {
-                        console.log("Playlist actualizada. Reiniciando reproducción.");
-                        playNextItem();
+                        playNextItem(); // Inicia o reinicia la reproducción visual
                     } else {
-                        displayMessage("La playlist está vacía.");
+                        displayMessage("La playlist visual está vacía.");
                     }
                 } else {
-                    displayMessage("Error: La playlist asignada no fue encontrada.");
+                    displayMessage("Error: La playlist visual no fue encontrada.");
                 }
             });
         } else {
-            displayMessage("No hay ninguna playlist asignada a esta pantalla.");
+            displayMessage("No hay ninguna playlist visual asignada.");
+            currentPlaylistItems = [];
         }
     });
 }
@@ -100,27 +158,30 @@ function playNextItem() { // Ya no necesita ser 'async'
 
 // Muestra un archivo (imagen o video) en la pantalla
 function displayMedia(item) {
-    contentScreen.innerHTML = ''; // Limpiamos la pantalla
+    contentScreen.innerHTML = ''; 
 
     if (item.type.startsWith('image')) {
+        audioPlayer.volume = 1; // Aseguramos que la música suene
         const img = document.createElement('img');
         img.src = item.url;
-        img.className = 'w-full h-full object-contain'; // object-contain para que se vea completa
+        img.className = 'w-full h-full object-contain';
         contentScreen.appendChild(img);
         
-        // Esperamos la duración definida y luego pasamos al siguiente item
         const durationInSeconds = item.duration || 10;
         setTimeout(playNextItem, durationInSeconds * 1000);
 
     } else if (item.type.startsWith('video')) {
+        audioPlayer.volume = 0; // SILENCIAMOS la música de fondo
         const video = document.createElement('video');
         video.src = item.url;
         video.className = 'w-full h-full object-contain';
         video.autoplay = true;
-        video.muted = true; // El autoplay en navegadores a menudo requiere que el video esté silenciado
+        video.muted = false; // Permitimos el sonido del video
         
-        // Cuando el video termina, pasamos al siguiente item
-        video.onended = playNextItem;
+        video.onended = () => {
+            audioPlayer.volume = 1; // RESTAURAMOS el volumen de la música
+            playNextItem();
+        };
         
         contentScreen.appendChild(video);
     }

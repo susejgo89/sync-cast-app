@@ -1,187 +1,168 @@
-body { font-family: 'Inter', sans-serif;
-     background-image: url('assets/background.png'); /* Make sure your image is named background.jpg */
+/* --- General Body & Typography --- */
+body { 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* --- Background for Auth Screen --- */
+body.auth-bg {
+    background-image: url('assets/background.png');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* Keeps the background static on scroll */
- }
-        .form-container { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        /* Hide number input arrows */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        .dragging { opacity: 0.5; border: 2px dashed #7c3aed; }
-        .drag-over { background-color: rgba(124, 58, 237, 0.1); }
-        /* Custom modal styles with transitions */
-        .modal { 
-            display: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        .modal.active { 
-            display: flex; 
-            opacity: 1;
-            transform: scale(1);
-        }
-        .btn-primary {
-            @apply bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
-        }
-        .card {
-            @apply bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-        }
-        .lang-selector img {
-            cursor: pointer;
-            opacity: 0.6;
-            transition: all 0.2s ease-in-out;
-        }
-        .lang-selector img:hover, .lang-selector img.active {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-        /* --- General Body Styles --- */
-body { 
-    font-family: 'Inter', sans-serif; 
+    background-attachment: fixed;
 }
 
 /* --- Glassmorphism Effect for Auth Form --- */
 .form-container { 
-    backdrop-filter: blur(10px); 
-    -webkit-backdrop-filter: blur(10px); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* --- Hide Number Input Arrows (for duration input) --- */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin: 0; 
+/* --- Page Section Transitions --- */
+@keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
-input[type=number] { 
-    -moz-appearance: textfield; 
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.page-section:not(.hidden) {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* --- Custom Styled Select Dropdowns --- */
+select.custom-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem; /* Make space for the arrow */
+    /* Replicating Tailwind classes */
+    width: 100%;
+    background-color: #F9FAFB; /* bg-gray-50 */
+    border: 1px solid #D1D5DB; /* border-gray-300 */
+    color: #111827; /* text-gray-900 */
+    font-size: 0.875rem; /* text-sm */
+    border-radius: 0.5rem; /* rounded-lg */
+    padding: 0.625rem; /* p-2.5 */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+select.custom-select:focus {
+    outline: none;
+    border-color: #8b5cf6; /* focus:border-violet-500 */
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); /* focus:ring-violet-500 */
+}
+
+/* --- Improved Card Styles --- */
+.card {
+    background-color: #fff;
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
+    transform: translateY(-0.25rem); /* -translate-y-1 */
+}
+
+/* --- Improved Button Styles --- */
+.btn-primary {
+    background-color: #7c3aed; /* bg-violet-600 */
+    color: white;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+.btn-primary:hover {
+    background-color: #6d28d9; /* hover:bg-violet-700 */
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transform: translateY(-2px);
 }
 
 /* --- Drag and Drop Styles --- */
 .dragging { 
-    opacity: 0.5; 
-    border: 2px dashed #7c3aed; 
+    opacity: 0.4; 
+    border: 2px dashed #8b5cf6;
+    transform: scale(0.95);
 }
 .drag-over { 
-    background-color: rgba(124, 58, 237, 0.1); 
+    background-color: rgba(139, 92, 246, 0.05); 
+    border: 2px dashed rgba(139, 92, 246, 0.4);
 }
 
-/* --- Custom Modal Styles with Transitions --- */
+/* --- Modal Transitions --- */
 .modal { 
     display: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.3s ease;
     opacity: 0;
-    transform: scale(0.95);
 }
 .modal.active { 
     display: flex; 
     opacity: 1;
-    transform: scale(1);
 }
-
-/* --- Reusable Component-like Classes --- */
-.btn-primary {
-    @apply bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
-}
-
-.card {
-    @apply bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-}
-
-/* --- Language Selector Styles --- */
-.lang-selector img {
-    cursor: pointer;
-    opacity: 0.6;
-    transition: all 0.2s ease-in-out;
-}
-.lang-selector img:hover, .lang-selector img.active {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-/* --- NEW: Animated Gradient Background --- */
-/* --- General Body Styles --- */
-body { 
-    font-family: 'Inter', sans-serif; 
-}
-
-/* --- Glassmorphism Effect for Auth Form --- */
-.form-container { 
-    backdrop-filter: blur(10px); 
-    -webkit-backdrop-filter: blur(10px); 
-}
-
-/* --- Hide Number Input Arrows (for duration input) --- */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin: 0; 
-}
-input[type=number] { 
-    -moz-appearance: textfield; 
-}
-
-/* --- Drag and Drop Styles --- */
-.dragging { 
-    opacity: 0.5; 
-    border: 2px dashed #7c3aed; 
-}
-.drag-over { 
-    background-color: rgba(124, 58, 237, 0.1); 
-}
-
-/* --- Custom Modal Styles with Transitions --- */
-.modal { 
-    display: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 0;
+.modal > div { /* Animate the inner content */
+    transition: transform 0.3s ease;
     transform: scale(0.95);
 }
-.modal.active { 
-    display: flex; 
-    opacity: 1;
+.modal.active > div {
     transform: scale(1);
 }
 
-/* --- Reusable Component-like Classes --- */
-.btn-primary {
-    @apply bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
-}
-
-.card {
-    @apply bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-}
-
-/* --- Language Selector Styles --- */
+/* --- Language Selector Polish --- */
 .lang-selector img {
     cursor: pointer;
     opacity: 0.6;
     transition: all 0.2s ease-in-out;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0px rgba(139, 92, 246, 0.5);
 }
-.lang-selector img:hover, .lang-selector img.active {
+.lang-selector img:hover {
     opacity: 1;
     transform: scale(1.1);
 }
+.lang-selector img.active {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.5);
+}
 
-/* --- NEW: Static Image Background --- */
+/* --- Main content area background --- */
 main {
-    position: relative; /* Needed for the overlay */
-    z-index: 1;
-   
+    position: relative; /* Needed for the pseudo-element */
+    z-index: 0; /* Ensure content stays on top */
+    background-color: #f9fafb; /* bg-gray-50, fallback color */
 }
 
-/* This adds a semi-transparent overlay so the text is readable */
 main::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8); /* White overlay with 80% opacity */
-    z-index: -1;
+    position: fixed; /* Change to fixed to cover the viewport */
+    inset: 0;
+    z-index: -1; /* Place it behind the content */
+    
+    /* The animated gradient */
+    background: linear-gradient(-45deg, #4b0082, #8a2be2, #4169e1, #00ced1);
+    background-size: 400% 400%;
+    animation: gradient-animation 18s ease infinite;
+    opacity: 0.25; /* Adjust for desired transparency */
 }
 
-
+/* --- Hide Number Input Arrows --- */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+input[type=number] { 
+    -moz-appearance: textfield; 
+}
