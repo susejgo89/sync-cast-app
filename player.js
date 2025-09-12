@@ -282,6 +282,44 @@ function handleNewsWidget(settings) {
     newsIntervals.fetch = setInterval(fetchAndParseRss, 30 * 60 * 1000); // Refresca cada 30 mins
 }
 
+// --- QR Code Widget ---
+const qrCodeWidget = document.createElement('div');
+qrCodeWidget.id = 'qr-code-widget';
+qrCodeWidget.style.cssText = `
+    position: fixed;
+    bottom: 120px; /* Aumentado para no superponerse con el widget de noticias */
+    left: 20px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+`;
+qrCodeWidget.innerHTML = `
+    <div id="player-qrcode"></div>
+    <p id="qr-code-text" style="font-weight: 600; color: #374151; text-align: center;"></p>
+`;
+document.body.appendChild(qrCodeWidget);
+
+function handleQrCodeWidget(screenId, settings) {
+    const { show, enabled } = settings;
+    const lang = document.documentElement.lang || 'es';
+    const qrContainer = document.getElementById('player-qrcode');
+
+    if (show && enabled) {
+        qrContainer.innerHTML = ''; // Limpia el QR anterior para evitar duplicados
+        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?id=${screenId}`, width: 128, height: 128 });
+        document.getElementById('qr-code-text').textContent = translations[lang]?.scanForMenu || "Escanea para más info";
+        qrCodeWidget.style.display = 'flex';
+    } else {
+        qrCodeWidget.style.display = 'none';
+    }
+}
+
 // --- State ---
 let currentPlaylistItems = [];
 let currentItemIndex = 0;
@@ -356,6 +394,9 @@ function startContentPlayback(screenId) {
     const screenDocRef = doc(db, 'screens', screenId);
     if (unsubscribeScreenListener) unsubscribeScreenListener();
 
+    // Estado para rastrear cambios y evitar recargas innecesarias
+    let currentQrSettings = null;
+
     unsubscribeScreenListener = onSnapshot(screenDocRef, (screenSnap) => {
         // Cada vez que el documento de la pantalla cambia, limpiamos los listeners de playlists
         if (unsubscribePlaylistListener) unsubscribePlaylistListener();
@@ -373,6 +414,13 @@ function startContentPlayback(screenId) {
         const showClock = screenData.showClock;
         const showWeather = screenData.showWeather;
         const weatherLocation = screenData.weatherLocation;
+
+        // --- Controlar Widget de QR ---
+        const newQrSettings = JSON.stringify({ show: screenData.showQrOnPlayer, enabled: screenData.qrEnabled });
+        if (newQrSettings !== currentQrSettings) {
+            currentQrSettings = newQrSettings;
+            handleQrCodeWidget(screenId, { show: screenData.showQrOnPlayer, enabled: screenData.qrEnabled });
+        }
 
         // --- Controlar Widget de Noticias ---
         handleNewsWidget({ show: screenData.showNews, url: screenData.newsRssUrl, limit: screenData.newsLimit, speed: screenData.newsSpeed });

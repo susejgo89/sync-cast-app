@@ -1,0 +1,16 @@
+{
+    "name": "Visor de Contenido",
+    "short_name": "Contenido",
+    "start_url": "/viewer.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4f46e5",
+    "description": "Visor de contenido interactivo.",
+    "icons": [
+        {
+            "src": "assets/icons/generic-icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor de Contenido</title>
+
+    <!-- PWA Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="assets/icons/generic-icon-192x192.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="viewer.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <header id="viewer-header" class="bg-white p-4 shadow-md text-center sticky top-0 z-10">
+        <h1 id="screen-name" class="text-2xl font-bold text-gray-800">Cargando...</h1>
+    </header>
+
+    <main id="content-viewer" class="p-4 grid grid-cols-1 gap-4"></main>
+
+    <script type="module" src="viewer.js"></script>
+</body>
+</html>

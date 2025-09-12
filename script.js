@@ -27,7 +27,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 hamburgerBtn.addEventListener('click', toggleSidebar);
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
-        });
 
         // --- DOM Elements ---
         const loader = document.getElementById('loader');
@@ -58,11 +57,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let unsubscribeMedia = null;
         let playlistsViewInstance = null;
         let unsubscribeMusicPlaylists = null;
-        let unsubscribeScreens = null;
+        let screensViewInstance = null;
         let currentUserId = null;
         let activePlaylistId = null;
         let draggedItem = null;
-        let screensViewInstance = null;
+        
 
         
 
@@ -96,6 +95,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             // Re-render views that depend on language
             if (activePlaylistId) selectPlaylist(activePlaylistId, currentLang);
             if (screensViewInstance) screensViewInstance.rerender();
+            updateDashboardCards(); // Actualiza el dashboard al cambiar idioma
         }
 
         langSelectors.forEach(selector => {
@@ -170,7 +170,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         if (unsubscribeMedia) unsubscribeMedia();
         if (playlistsViewInstance) playlistsViewInstance.unsubscribe();
         if (unsubscribeMusicPlaylists) unsubscribeMusicPlaylists();
-        if (unsubscribeScreens) unsubscribeScreens();
+        if (screensViewInstance) screensViewInstance.unsubscribe();
     }
     
     loader.style.display = 'none';
@@ -237,6 +237,56 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             verifyContainer.style.display = 'none';
             loginFormContainer.style.display = 'block'; // Usamos el nombre correcto
         });
+
+        function updateDashboardCards() {
+            // Card de Medios
+            const mediaCountEl = document.getElementById('media-count');
+            if (mediaCountEl) mediaCountEl.textContent = userMediaData.length;
+
+            // Card de Playlists
+            const visualPlaylistCountEl = document.getElementById('visual-playlist-count');
+            if (visualPlaylistCountEl) visualPlaylistCountEl.textContent = userPlaylistsData.length;
+            
+            const musicPlaylistCountEl = document.getElementById('music-playlist-count');
+            if (musicPlaylistCountEl) musicPlaylistCountEl.textContent = userMusicPlaylistsData.length;
+
+            // Card de Estado de Pantallas
+            const onlineCountEl = document.getElementById('online-count');
+            const offlineCountEl = document.getElementById('offline-count');
+            if (onlineCountEl && offlineCountEl) {
+                let onlineCount = 0;
+                userScreensData.forEach(screen => {
+                    const lastSeen = screen.lastSeen?.toDate();
+                    const isOnline = lastSeen && (new Date().getTime() - lastSeen.getTime()) < 150000; // 2.5 minutos
+                    if (isOnline) onlineCount++;
+                });
+                onlineCountEl.textContent = onlineCount;
+                offlineCountEl.textContent = userScreensData.length - onlineCount;
+            }
+
+            // Card de Archivos Recientes
+            const recentUploadsContainer = document.getElementById('recent-uploads-container');
+            if (recentUploadsContainer) {
+                const sortedMedia = [...userMediaData].sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                const recentMedia = sortedMedia.slice(0, 3);
+
+                recentUploadsContainer.innerHTML = '';
+                if (recentMedia.length > 0) {
+                    recentMedia.forEach(media => {
+                        const isVideo = media.type.startsWith('video');
+                        const thumb = document.createElement(isVideo ? 'video' : 'img');
+                        thumb.src = media.url;
+                        thumb.title = media.name;
+                        thumb.className = 'recent-upload-thumb';
+                        if (isVideo) thumb.muted = true; // Videos must be muted to maybe autoplay
+                        thumb.onerror = () => { thumb.src = 'https://placehold.co/100x60/EEE/31343C?text=Error'; };
+                        recentUploadsContainer.appendChild(thumb);
+                    });
+                } else {
+                    recentUploadsContainer.innerHTML = `<p class="text-xs text-gray-400 col-span-3 text-center" data-lang="dashboardNoRecentUploads">${translations[currentLang].dashboardNoRecentUploads || 'No hay archivos recientes.'}</p>`;
+                }
+            }
+        }
         
         function loadInitialData(userId) {
             unsubscribeMedia = initMediaView(userId, () => currentLang, (media) => {
@@ -244,16 +294,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (playlistsViewInstance) {
                     playlistsViewInstance.rerenderLibrary();
                 }
+                updateDashboardCards();
             });
             playlistsViewInstance = initPlaylistsView(userId, () => currentLang, (playlists) => {
                 userPlaylistsData = playlists;
                 if (screensViewInstance) screensViewInstance.rerender();
+                updateDashboardCards();
             }, () => userMediaData);
             unsubscribeMusicPlaylists = initMusicPlaylistsView(userId, () => currentLang, (musicPlaylists) => {
                 userMusicPlaylistsData = musicPlaylists;
                 if (screensViewInstance) screensViewInstance.rerender();
+                updateDashboardCards();
             }, () => userMediaData);
-            screensViewInstance = initScreensView(userId, () => userPlaylistsData, () => userMusicPlaylistsData, () => currentLang);
+            screensViewInstance = initScreensView(userId, () => userPlaylistsData, () => userMusicPlaylistsData, () => currentLang, () => userMediaData, (screens) => {
+                userScreensData = screens;
+                updateDashboardCards();
+            });
         }
 
         // --- Navigation Logic ---
@@ -264,3 +320,42 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const linkText = link.querySelector('span').textContent;
         document.title = `${linkText} - NexusPlay`;
     }); });
+        navLinks.forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                
+                pageSections.forEach(s => s.classList.add('hidden'));
+                navLinks.forEach(l => l.classList.remove('bg-neutral-700', 'text-white'));
+                
+                document.getElementById(`${targetId}-section`).classList.remove('hidden');
+                link.classList.add('bg-neutral-700', 'text-white');
+                
+                const linkText = link.querySelector('span').textContent;
+                document.title = `${linkText} - NexusPlay`;
+            });
+        });
+
+    document.querySelectorAll('.dashboard-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector(`a.nav-link[href="${link.getAttribute('href')}"]`).click();
+        });
+    });
+
+    // --- Quick Actions Logic ---
+    const quickAddScreenBtn = document.getElementById('quick-add-screen');
+    if (quickAddScreenBtn) {
+        quickAddScreenBtn.addEventListener('click', () => {
+            document.getElementById('add-screen-modal').classList.add('active');
+        });
+    }
+
+    const quickAddPlaylistBtn = document.getElementById('quick-add-playlist');
+    if (quickAddPlaylistBtn) {
+        quickAddPlaylistBtn.addEventListener('click', () => {
+            document.getElementById('add-playlist-modal').classList.add('active');
+        });
+    }
+
+});

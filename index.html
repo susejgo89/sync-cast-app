@@ -120,8 +120,74 @@
 
             <main class="flex-1 p-6 lg:p-10 overflow-y-auto">
                 <div id="dashboard-section" class="page-section">
-                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="dashboardTitle">Dashboard</h2>
-                    <p class="mt-2 text-gray-500" data-lang="dashboardWelcome">Bienvenido a tu panel de control.</p>
+                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-6" data-lang="dashboardTitle">Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Card: Estado de Pantallas -->
+                        <div class="card p-6 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardScreenStatus">Estado de Pantallas</h3>
+                                <div class="flex items-baseline gap-6 mt-4">
+                                    <div class="text-center">
+                                        <p id="online-count" class="text-4xl font-bold text-green-600">0</p>
+                                        <p class="text-sm text-gray-500 flex items-center gap-2"><span class="status-dot status-dot-online"></span> <span data-lang="online">Online</span></p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p id="offline-count" class="text-4xl font-bold text-red-600">0</p>
+                                        <p class="text-sm text-gray-500 flex items-center gap-2"><span class="status-dot status-dot-offline"></span> <span data-lang="offline">Offline</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#screens" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardManageScreens">Gestionar Pantallas &rarr;</a>
+                        </div>
+                        <!-- Card: Playlists -->
+                        <div class="card p-6 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardPlaylists">Playlists</h3>
+                                <div class="mt-4 space-y-2">
+                                    <p class="text-gray-600"><strong id="visual-playlist-count" class="text-2xl font-bold text-gray-800">0</strong> <span data-lang="dashboardVisualPlaylists">Playlists Visuales</span></p>
+                                    <p class="text-gray-600"><strong id="music-playlist-count" class="text-2xl font-bold text-gray-800">0</strong> <span data-lang="dashboardMusicPlaylists">Playlists de Música</span></p>
+                                </div>
+                            </div>
+                            <a href="#playlists" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardCreatePlaylist">Crear Nueva Playlist &rarr;</a>
+                        </div>
+                        <!-- Card: Medios -->
+                        <div class="card p-6 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardMediaLibrary">Biblioteca de Medios</h3>
+                                <div class="mt-4">
+                                    <p class="text-gray-600"><strong id="media-count" class="text-4xl font-bold text-gray-800">0</strong> <span data-lang="dashboardTotalFiles">Archivos Totales</span></p>
+                                    <!-- Futuro: <p class="text-sm text-gray-500 mt-2">1.2 GB / 5 GB usados</p> -->
+                                </div>
+                            </div>
+                            <a href="#media" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardUploadFile">Subir Nuevo Archivo &rarr;</a>
+                        </div>
+                        <!-- Card: Accesos Rápidos -->
+                        <div class="card p-6">
+                            <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardQuickActions">Accesos Rápidos</h3>
+                            <div class="mt-4 space-y-3">
+                                <button id="quick-add-screen" class="btn-dashboard-action">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    <span data-lang="addScreen">Añadir Pantalla</span>
+                                </button>
+                                <button id="quick-add-playlist" class="btn-dashboard-action">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <span data-lang="createPlaylist">Crear Playlist</span>
+                                </button>
+                                <label for="file-upload" class="btn-dashboard-action cursor-pointer">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                    <span data-lang="uploadFile">Subir Archivo</span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Card: Archivos Recientes -->
+                        <div class="card p-6">
+                            <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentUploads">Archivos Recientes</h3>
+                            <div id="recent-uploads-container" class="mt-4 grid grid-cols-3 gap-3">
+                                <!-- Thumbnails will be injected here -->
+                                <p class="text-xs text-gray-400 col-span-3 text-center" data-lang="dashboardNoRecentUploads">No hay archivos recientes.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div id="media-section" class="page-section hidden">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
@@ -356,6 +422,32 @@
             <p class="mt-2 text-sm text-gray-600" data-lang="pairingCodeInstruction">Usa el siguiente código para emparejar tu dispositivo:</p>
             <p id="pairing-code-display" class="my-4 text-5xl font-bold text-violet-600 tracking-widest bg-gray-100 p-4 rounded-lg"></p>
             <button id="pairing-code-close" class="w-full px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900" data-lang="gotIt">Entendido</button>
+        </div>
+    </div>
+
+    <div id="qr-content-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl h-[90vh] flex flex-col">
+            <h3 class="text-xl font-bold text-gray-900 mb-4" data-lang="qrMenuContent">Contenido del Menú QR</h3>
+            <div id="qr-content-media-library" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 bg-gray-100 rounded-lg">
+                <!-- Media cards with checkboxes will be injected here -->
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="qr-content-cancel" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
+                <button type="button" id="qr-content-save" class="px-5 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" data-lang="save">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-content-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl h-[90vh] flex flex-col">
+            <h3 class="text-xl font-bold text-gray-900 mb-4" data-lang="qrMenuContent">Contenido del QR</h3>
+            <div id="qr-content-media-library" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 bg-gray-100 rounded-lg">
+                <!-- Media cards with checkboxes will be injected here -->
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="qr-content-cancel" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
+                <button type="button" id="qr-content-save" class="px-5 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" data-lang="save">Guardar</button>
+            </div>
         </div>
     </div>
 

@@ -16,12 +16,19 @@ const pairingCodeModal = document.getElementById('pairing-code-modal');
 const pairingCodeDisplay = document.getElementById('pairing-code-display');
 const pairingCodeCloseBtn = document.getElementById('pairing-code-close');
 const screensListContainer = document.getElementById('screens-list');
+const qrContentModal = document.getElementById('qr-content-modal');
+const qrContentMediaLibrary = document.getElementById('qr-content-media-library');
+const qrContentCancelBtn = document.getElementById('qr-content-cancel');
+const qrContentSaveBtn = document.getElementById('qr-content-save');
 
 // State
 let currentUserId = null;
 let listenersAttached = false;
+let allUserMedia = [];
+let currentScreenForQr = null;
 
-function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang) {
+function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, userMedia) {
+    allUserMedia = userMedia;
     screensListContainer.innerHTML = screens.length === 0 ? `<p class="text-gray-500 col-span-full text-center">No hay pantallas registradas.</p>` : '';
     screens.forEach(screen => {
         const visualOptions = visualPlaylists.map(p => `<option value="${p.id}" ${screen.playlistId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
@@ -113,22 +120,42 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang) {
                     </div>
                 </div>
             </div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="flex items-center justify-between mb-2">
+                    <label for="qr-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].enableQrMenu}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="qr-toggle-${screen.id}" data-screen-id="${screen.id}" class="qr-toggle-checkbox" ${screen.qrEnabled ? 'checked' : ''}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="space-y-3 ${screen.qrEnabled ? '' : 'hidden'}">
+                    <div class="flex items-center justify-between mt-2">
+                        <label for="show-qr-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showQrOnScreen}</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-qr-toggle-${screen.id}" data-screen-id="${screen.id}" class="show-qr-toggle-checkbox" ${screen.showQrOnPlayer ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <button data-screen-id="${screen.id}" class="select-qr-content-btn w-full btn-secondary mt-2">${translations[currentLang].selectQrContent}</button>
+                </div>
+            </div>
         `;
         screensListContainer.appendChild(card);
 
     });
 }
 
-function loadScreens(userId, visualPlaylists, musicPlaylists, currentLang) {
+function loadScreens(userId, visualPlaylists, musicPlaylists, currentLang, userMedia, onUpdate) {
     const q = query(collection(db, 'screens'), where('userId', '==', userId));
     return onSnapshot(q, (snapshot) => {
         const screens = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         // Ahora pasamos todos los parámetros a la función que dibuja
-        renderScreens(screens, visualPlaylists, musicPlaylists, currentLang);
+        renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, userMedia);
+        onUpdate(screens); // Notificamos al script principal sobre los cambios
     });
 }
 
-export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang) {
+export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang, getMedia, onUpdateCallback) {
     currentUserId = userId;
 
     if (!listenersAttached) {
@@ -177,6 +204,8 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                     userId: currentUserId,
                     name: screenName,
                     pairingCode: pairingCode,
+                    qrEnabled: false,
+                    qrCodeItems: [], // Inicializamos el campo para el contenido del QR
                     playlistId: null,
                     isPaired: false,
                     createdAt: serverTimestamp()
@@ -190,6 +219,50 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
             } catch (error) {
                 console.error("Error al añadir pantalla:", error);
                 alert("Hubo un error al intentar añadir la pantalla.");
+            }
+        });
+
+        qrContentCancelBtn.addEventListener('click', () => qrContentModal.classList.remove('active'));
+
+        qrContentSaveBtn.addEventListener('click', async () => {
+            if (!currentScreenForQr) return;
+
+            const selectedIds = [];
+            qrContentMediaLibrary.querySelectorAll('.qr-media-card.selected input').forEach(checkbox => {
+                selectedIds.push(checkbox.dataset.mediaId);
+            });
+
+            const screenRef = doc(db, 'screens', currentScreenForQr);
+            await updateDoc(screenRef, { qrCodeItems: selectedIds });
+
+            qrContentModal.classList.remove('active');
+        });
+
+        screensListContainer.addEventListener('click', async (e) => {
+            const selectBtn = e.target.closest('.select-qr-content-btn');
+            if (selectBtn) {
+                const screenId = selectBtn.dataset.screenId;
+                currentScreenForQr = screenId;
+
+                const screenRef = doc(db, 'screens', screenId);
+                const screenSnap = await getDoc(screenRef);
+                const existingIds = screenSnap.data()?.qrCodeItems || [];
+
+                const visualMedia = allUserMedia.filter(media => !media.type.startsWith('audio/'));
+                qrContentMediaLibrary.innerHTML = '';
+                visualMedia.forEach(media => {
+                    const isSelected = existingIds.includes(media.id);
+                    const card = document.createElement('div');
+                    card.className = `qr-media-card ${isSelected ? 'selected' : ''}`;
+                    card.innerHTML = `
+                        <img src="${media.url}" class="w-full h-32 object-cover">
+                        <div class="checkbox-overlay"></div>
+                        <input type="checkbox" data-media-id="${media.id}" class="hidden" ${isSelected ? 'checked' : ''}>
+                    `;
+                    card.addEventListener('click', () => card.classList.toggle('selected'));
+                    qrContentMediaLibrary.appendChild(card);
+                });
+                qrContentModal.classList.add('active');
             }
         });
 
@@ -245,6 +318,16 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                 updateDoc(screenRef, { newsRssUrl: e.target.value.trim() });
             }
 
+            // Si se cambió el toggle del QR
+            if (e.target.classList.contains('qr-toggle-checkbox')) {
+                updateDoc(screenRef, { qrEnabled: e.target.checked });
+            }
+
+            // Si se cambió el toggle de "Mostrar QR en Pantalla"
+            if (e.target.classList.contains('show-qr-toggle-checkbox')) {
+                updateDoc(screenRef, { showQrOnPlayer: e.target.checked });
+            }
+
             // Si se cambió el límite de noticias
             if (e.target.classList.contains('news-limit-input')) {
                 updateDoc(screenRef, { newsLimit: Number(e.target.value) });
@@ -258,13 +341,13 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
         listenersAttached = true;
     }
 
-    let unsubscribe = loadScreens(userId, getPlaylists(), getMusicPlaylists(), getLang());
+    let unsubscribe = loadScreens(userId, getPlaylists(), getMusicPlaylists(), getLang(), getMedia(), onUpdateCallback);
 
     return {
         unsubscribe: () => unsubscribe(),
         rerender: () => {
             unsubscribe();
-            unsubscribe = loadScreens(userId, getPlaylists(), getMusicPlaylists(), getLang());
+            unsubscribe = loadScreens(userId, getPlaylists(), getMusicPlaylists(), getLang(), getMedia(), onUpdateCallback);
         }
     };
 }
