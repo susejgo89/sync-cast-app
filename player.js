@@ -1,6 +1,7 @@
 import { db } from './firebase-config.js';
-import { collection, query, where, getDocs, doc, updateDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { collection, query, where, getDocs, doc, updateDoc, onSnapshot, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { translations } from './utils/translations.js';
+import { WEATHER_API_KEY } from './weather-config.js';
 
 // --- DOM Elements ---
 const pairingScreen = document.getElementById('pairing-screen');
@@ -9,6 +10,277 @@ const pairingCodeInputs = document.getElementById('pairing-code-inputs');
 const inputs = pairingCodeInputs.querySelectorAll('.pairing-input');
 const pairBtn = document.getElementById('pair-btn');
 const messageBox = document.getElementById('player-message-box');
+
+// --- Audio Autoplay Overlay ---
+const audioOverlay = document.createElement('div');
+audioOverlay.id = 'audio-overlay';
+audioOverlay.style.cssText = `
+    position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.75); color: white;
+    display: none; /* Initially hidden */
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; font-size: 2rem; cursor: pointer; z-index: 10000; padding: 2rem;
+`;
+audioOverlay.innerHTML = `
+    <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 6v12a1 1 0 01-1.707.707L5.586 15z"></path></svg>
+    <h3 data-lang="enableAudioTitle">Audio Desactivado</h3>
+    <p class="text-lg mt-2" data-lang="enableAudioMsg">Haz click para activar el sonido.</p>
+`;
+document.body.appendChild(audioOverlay);
+
+function showAudioOverlay() {
+    audioOverlay.style.display = 'flex';
+    const lang = document.documentElement.lang || 'es';
+    const titleEl = audioOverlay.querySelector('[data-lang="enableAudioTitle"]');
+    const msgEl = audioOverlay.querySelector('[data-lang="enableAudioMsg"]');
+    if (translations[lang]) {
+        titleEl.textContent = translations[lang].enableAudioTitle;
+        msgEl.textContent = translations[lang].enableAudioMsg;
+    }
+}
+
+audioOverlay.addEventListener('click', () => {
+    audioOverlay.style.display = 'none';
+    if (currentMusicPlaylistItems.length > 0 && audioPlayer.paused) {
+        playNextMusicItem();
+    }
+}, { once: true });
+
+// --- Widgets Container ---
+const widgetsContainer = document.createElement('div');
+widgetsContainer.id = 'widgets-container';
+widgetsContainer.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+`;
+document.body.appendChild(widgetsContainer);
+
+// --- Clock Widget ---
+const clockWidget = document.createElement('div');
+clockWidget.id = 'clock-widget';
+clockWidget.style.cssText = `
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    text-align: right;
+    display: none; /* Initially hidden */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    transition: opacity 0.5s;
+`;
+clockWidget.innerHTML = `
+    <div id="clock-time" style="font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 700; line-height: 1;"></div>
+    <div id="clock-date" style="font-size: clamp(0.75rem, 2vw, 1rem); margin-top: 4px;"></div>
+`;
+widgetsContainer.appendChild(clockWidget);
+
+function updateClock() {
+    const now = new Date();
+    const lang = document.documentElement.lang || 'es';
+    const timeEl = document.getElementById('clock-time');
+    const dateEl = document.getElementById('clock-date');
+
+    if (!timeEl || !dateEl) return;
+
+    timeEl.textContent = now.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit', hour12: false });
+    dateEl.textContent = now.toLocaleDateString(lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+setInterval(updateClock, 1000);
+
+// --- Weather Widget ---
+const weatherWidget = document.createElement('div');
+weatherWidget.id = 'weather-widget';
+weatherWidget.style.cssText = `
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    transition: opacity 0.5s;
+    display: none; /* Initially hidden, will be flex */
+    align-items: center;
+    gap: 15px;
+`;
+widgetsContainer.appendChild(weatherWidget);
+
+let weatherInterval = null;
+
+async function updateWeather(location, lang) {
+    if (!location || !WEATHER_API_KEY || WEATHER_API_KEY === 'TU_API_KEY_DE_OPENWEATHERMAP') {
+        weatherWidget.style.display = 'none';
+        return;
+    }
+
+    // Mapea el idioma de la app al que entiende la API del clima
+    const apiLang = lang === 'pt' ? 'pt_br' : lang;
+
+    try {
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${WEATHER_API_KEY}&units=metric&lang=${apiLang}`);
+        if (!response.ok) {
+            if (response.status === 401) {
+                const errorMsg = translations[lang]?.weatherApiUnauthorized || "Error 401: API Key no válida o inactiva. Revisa tu clave y espera unas horas si es nueva.";
+                throw new Error(errorMsg); // Lanzamos un error más descriptivo
+            }
+            throw new Error(`Weather API response not OK: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        weatherWidget.innerHTML = `
+            <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="${data.weather[0].description}" style="width: 60px; height: 60px; filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));">
+            <div>
+                <div style="font-size: 2.2rem; font-weight: 700; line-height: 1;">${Math.round(data.main.temp)}°C</div>
+                <div style="font-size: 1rem; text-transform: capitalize; margin-top: 4px;">${data.weather[0].description}</div>
+            </div>
+        `;
+        weatherWidget.style.display = 'flex';
+    } catch (error) {
+        console.error("Error al obtener el clima:", error.message);
+        weatherWidget.style.display = 'none'; // Oculta el widget si hay un error
+    }
+}
+
+// --- News Widget (RSS) ---
+const newsWidget = document.createElement('div');
+newsWidget.id = 'news-widget';
+newsWidget.style.cssText = `
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.85); /* Blanco semitransparente (más opaco) */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* Para Safari */
+    color: #1f2937; /* Gris más oscuro para mejor contraste */
+    padding: 12px 25px;
+    font-family: 'Inter', sans-serif;
+    text-shadow: none;
+    transition: opacity 0.5s;
+    display: none; /* Initially hidden, will be flex */
+    align-items: center;
+    z-index: 1000;
+    border-top: 1px solid rgba(255, 255, 255, 0.2); /* Borde superior translúcido */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1); /* Sombra superior para definir el borde */
+`;
+newsWidget.innerHTML = `
+    <h4 id="news-widget-title" style="
+        background-color: #7c3aed;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-right: 15px;
+        text-transform: uppercase;
+        flex-shrink: 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        border-bottom: 2px solid #6d28d9;
+    "></h4>
+    <div id="news-content" style="font-size: 1.2rem; font-weight: 500; overflow: hidden; white-space: nowrap; flex-grow: 1;">
+        <span id="news-ticker-item" style="transition: opacity 0.4s ease-in-out; opacity: 1;">Cargando noticias...</span>
+    </div>
+`;
+document.body.appendChild(newsWidget);
+
+let newsIntervals = { fetch: null, rotate: null };
+
+function handleNewsWidget(settings) {
+    const { show, url, limit = 5, speed = 7 } = settings;
+
+    // Limpiamos cualquier intervalo anterior
+    clearInterval(newsIntervals.fetch);
+    clearInterval(newsIntervals.rotate);
+    newsIntervals.rotate = null; // Resetea el tracker de rotación
+
+    if (!show || !url) {
+        newsWidget.style.display = 'none';
+        return;
+    }
+    newsWidget.style.display = 'flex';
+
+    // Actualizamos el título del widget con la traducción correcta
+    const widgetTitleEl = document.getElementById('news-widget-title');
+    if (widgetTitleEl) {
+        const lang = document.documentElement.lang || 'es';
+        widgetTitleEl.textContent = translations[lang]?.newsWidgetDefaultTitle || 'Últimas Noticias';
+    }
+
+    // Resetea el texto a "Cargando..." cada vez que se activa
+    const tickerItem = document.getElementById('news-ticker-item');
+    if (tickerItem) {
+        tickerItem.textContent = "Cargando noticias...";
+    }
+
+    let newsItems = [];
+    let currentNewsIndex = -1;
+
+    const fetchAndParseRss = async () => {
+        // Usamos un proxy CORS para evitar problemas de seguridad del navegador
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const lang = document.documentElement.lang || 'es';
+        try {
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error(`Proxy response not OK: ${response.status}`);
+            
+            const data = await response.json();
+            if (!data.contents) throw new Error("El proxy no devolvió contenido.");
+
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data.contents, "application/xml");
+
+            const parseError = xmlDoc.querySelector("parsererror");
+            if (parseError) {
+                console.error("Error al parsear el XML del RSS:", parseError.textContent);
+                throw new Error("InvalidXML"); // Custom error para capturarlo abajo
+            }
+
+            // Buscamos <item> (RSS) y si no, <entry> (Atom) para mayor compatibilidad
+            let items = Array.from(xmlDoc.querySelectorAll("item"));
+            if (items.length === 0) {
+                items = Array.from(xmlDoc.querySelectorAll("entry"));
+            }
+            
+            const newNews = items.slice(0, limit).map(item => item.querySelector("title")?.textContent.trim()).filter(Boolean);
+            
+            newsItems = newNews.length > 0 ? newNews : [translations[lang]?.rssNoNewsInFeed || "No se encontraron noticias en el feed."];
+        } catch (error) {
+            console.error("Error al obtener o procesar el feed RSS:", error);
+            if (error instanceof SyntaxError || error.message === "InvalidXML") {
+                newsItems = [translations[lang]?.rssInvalidFormat || "Error: Formato de RSS no válido o URL incorrecta."];
+            } else {
+                newsItems = [translations[lang]?.rssFetchError || "Error al cargar el feed."];
+            }
+        } finally {
+            // Este bloque se asegura de que la rotación comience, incluso si hubo un error, para mostrar el mensaje.
+            if (newsItems.length > 0 && newsIntervals.rotate === null) {
+                rotateNews(); // Primera rotación inmediata
+                newsIntervals.rotate = setInterval(rotateNews, speed * 1000);
+            }
+        }
+    };
+
+    const rotateNews = () => {
+        const tickerItem = document.getElementById('news-ticker-item');
+        if (!tickerItem || newsItems.length === 0) return;
+
+        tickerItem.style.opacity = 0;
+        setTimeout(() => {
+            currentNewsIndex = (currentNewsIndex + 1) % newsItems.length;
+            tickerItem.textContent = newsItems[currentNewsIndex];
+            tickerItem.style.opacity = 1;
+        }, 400); // Coincide con la duración de la transición
+    };
+
+    fetchAndParseRss(); // Primera llamada
+    newsIntervals.fetch = setInterval(fetchAndParseRss, 30 * 60 * 1000); // Refresca cada 30 mins
+}
 
 // --- State ---
 let currentPlaylistItems = [];
@@ -64,9 +336,13 @@ async function playNextMusicItem() {
             playNextMusicItem();
         }
     } catch (error) {
-        console.error("Error al intentar reproducir audio:", error);
-        // En caso de error, intenta con el siguiente tras un breve retraso
-        setTimeout(playNextMusicItem, 1000);
+        if (error.name === 'NotAllowedError') {
+            console.warn("La reproducción automática de audio fue bloqueada. Esperando interacción del usuario.");
+            showAudioOverlay();
+        } else {
+            console.error("Error al intentar reproducir audio:", error);
+            setTimeout(playNextMusicItem, 1000);
+        }
     }
 }
 audioPlayer.onended = playNextMusicItem;
@@ -94,6 +370,31 @@ function startContentPlayback(screenId) {
         const screenData = screenSnap.data();
         const playlistId = screenData.playlistId;
         const musicPlaylistId = screenData.musicPlaylistId;
+        const showClock = screenData.showClock;
+        const showWeather = screenData.showWeather;
+        const weatherLocation = screenData.weatherLocation;
+
+        // --- Controlar Widget de Noticias ---
+        handleNewsWidget({ show: screenData.showNews, url: screenData.newsRssUrl, limit: screenData.newsLimit, speed: screenData.newsSpeed });
+
+        // Controlar visibilidad del reloj
+        if (clockWidget) {
+            clockWidget.style.display = showClock ? 'block' : 'none';
+        }
+
+        // --- Controlar visibilidad y actualización del Clima ---
+        if (weatherInterval) {
+            clearInterval(weatherInterval);
+            weatherInterval = null;
+        }
+        if (showWeather && weatherLocation) {
+            const lang = document.documentElement.lang || 'es';
+            updateWeather(weatherLocation, lang); // Primera llamada inmediata
+            // Actualiza el clima cada 30 minutos
+            weatherInterval = setInterval(() => updateWeather(weatherLocation, lang), 1800000); 
+        } else {
+            weatherWidget.style.display = 'none';
+        }
         
         // --- Cargar Playlist de Música ---
         if (musicPlaylistId) {
@@ -161,7 +462,20 @@ function displayMedia(item) {
     contentScreen.innerHTML = ''; 
 
     if (item.type.startsWith('image')) {
-        audioPlayer.volume = 1; // Aseguramos que la música suene
+        // Si la música estaba en pausa (ej. por un video anterior) y hay una playlist, la reanudamos.
+        if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
+            audioPlayer.volume = 1; // Nos aseguramos que el volumen esté al máximo.
+            audioPlayer.play().catch(e => {
+                // Si el error es por autoplay, el overlay ya debería estar visible.
+                if (e.name !== 'NotAllowedError') {
+                    console.error("Error al reanudar audio para imagen:", e);
+                }
+            });
+        } else {
+            // Si no estaba en pausa, solo nos aseguramos de que el volumen esté al máximo.
+            audioPlayer.volume = 1;
+        }
+
         const img = document.createElement('img');
         img.src = item.url;
         img.className = 'w-full h-full object-contain';
@@ -171,16 +485,28 @@ function displayMedia(item) {
         setTimeout(playNextItem, durationInSeconds * 1000);
 
     } else if (item.type.startsWith('video')) {
-        audioPlayer.volume = 0; // SILENCIAMOS la música de fondo
+        // Pausamos la música de fondo para dar prioridad al audio del video.
+        if (!audioPlayer.paused) {
+            audioPlayer.pause();
+        }
+
         const video = document.createElement('video');
         video.src = item.url;
         video.className = 'w-full h-full object-contain';
         video.autoplay = true;
         video.muted = false; // Permitimos el sonido del video
         
-        video.onended = () => {
-            audioPlayer.volume = 1; // RESTAURAMOS el volumen de la música
+        const resumeMusicAndPlayNext = () => {
+            if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
+                audioPlayer.play().catch(e => console.error("Error al reanudar audio:", e));
+            }
             playNextItem();
+        };
+        
+        video.onended = resumeMusicAndPlayNext;
+        video.onerror = () => {
+            console.error("Error al cargar o reproducir el video:", item.url);
+            resumeMusicAndPlayNext(); // Si hay un error, también reanudamos y pasamos al siguiente.
         };
         
         contentScreen.appendChild(video);
@@ -241,51 +567,68 @@ pairBtn.addEventListener('click', async () => {
     try {
         const screensRef = collection(db, 'screens');
         const q = query(screensRef, where("pairingCode", "==", pairingCode));
-        const querySnapshot = await getDocs(q); // Aquí se define querySnapshot
+        const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.empty) {
-            messageBox.textContent = translations[lang].invalidCode || "Código no válido. Por favor, inténtalo de nuevo.";
+        let isValid = false;
+        let screenId = null;
+        let screenDocRef = null;
+
+        if (!querySnapshot.empty) {
+            const screenDoc = querySnapshot.docs[0];
+            // Comprobamos si la pantalla encontrada NO está ya enlazada
+            if (!screenDoc.data().isPaired) {
+                isValid = true;
+                screenId = screenDoc.id;
+                screenDocRef = doc(db, 'screens', screenId);
+            }
+        }
+
+        if (!isValid) {
+            // El código no existe, o si existe, la pantalla ya está enlazada.
+            messageBox.textContent = translations[lang].invalidCode;
             messageBox.classList.remove('hidden', 'bg-emerald-500');
             messageBox.classList.add('bg-red-500');
             
             pairBtn.disabled = false;
-            pairBtn.textContent = translations[lang].pairDeviceBtn || "Enlazar Dispositivo";
+            pairBtn.textContent = translations[lang].pairDeviceBtn;
             inputs.forEach(input => input.value = '');
             inputs[0].focus();
-
         } else {
-            const screenDoc = querySnapshot.docs[0];
-            const screenId = screenDoc.id;
-
+            // ¡Éxito! La pantalla es válida y no está enlazada.
             localStorage.setItem('nexusplay_screen_id', screenId);
 
-            const screenDocRef = doc(db, 'screens', screenId);
             await updateDoc(screenDocRef, {
-                isPaired: true,
-                pairingCode: null 
+                isPaired: true
             });
 
-            // Mostramos el mensaje de éxito y llamamos a la función de reproducción
-            messageBox.textContent = translations[lang].pairingSuccess || "¡Dispositivo enlazado con éxito! Cargando contenido...";
+            messageBox.textContent = translations[lang].pairingSuccess;
             messageBox.classList.remove('hidden', 'bg-red-500');
             messageBox.classList.add('bg-emerald-500');
 
             setTimeout(() => {
-                // Llamamos a la función principal para empezar a mostrar contenido
                 startContentPlayback(screenId);
             }, 2000);
         }
-
     } catch (error) {
         console.error("Error al verificar el código:", error);
         messageBox.textContent = "Error de conexión. Inténtalo de nuevo.";
         messageBox.classList.remove('hidden');
         messageBox.classList.add('bg-red-500');
         pairBtn.disabled = false;
-        pairBtn.textContent = translations[lang].pairDeviceBtn || "Enlazar Dispositivo";
+        pairBtn.textContent = translations[lang].pairDeviceBtn;
     }
 });
 
+
+// --- Heartbeat Logic ---
+// Esta función envía una señal a la base de datos para indicar que la pantalla está online.
+function sendHeartbeat(screenId) {
+    if (!screenId) return;
+    const screenRef = doc(db, 'screens', screenId);
+    // Actualizamos el campo 'lastSeen' con la hora actual del servidor
+    updateDoc(screenRef, { lastSeen: serverTimestamp() })
+        .catch(err => console.error("Error al enviar heartbeat:", err));
+}
 
 // --- Initialization ---
 function init() {
@@ -296,11 +639,18 @@ function init() {
     const savedScreenId = localStorage.getItem('nexusplay_screen_id');
     if (savedScreenId) {
         // Si ya lo está, iniciamos la reproducción directamente
+        // Si ya está enlazado, iniciamos la reproducción Y el heartbeat
         startContentPlayback(savedScreenId);
+        
+        // Enviamos un primer latido de inmediato
+        sendHeartbeat(savedScreenId); 
+        // Y luego programamos que se envíe uno cada 60 segundos
+        setInterval(() => sendHeartbeat(savedScreenId), 60000); 
+
     } else {
         // Si no, mostramos la pantalla de emparejamiento
         pairingScreen.classList.remove('hidden');
-        inputs[0].focus();
+        if(inputs[0]) inputs[0].focus();
     }
 }
 

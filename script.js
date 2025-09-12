@@ -56,7 +56,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let userMusicPlaylistsData = [];
         let userScreensData = [];
         let unsubscribeMedia = null;
-        let unsubscribePlaylists = null;
+        let playlistsViewInstance = null;
         let unsubscribeMusicPlaylists = null;
         let unsubscribeScreens = null;
         let currentUserId = null;
@@ -168,7 +168,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         dashboardContainer.style.display = 'none';
         document.getElementById('login-form-container').style.display = 'block';
         if (unsubscribeMedia) unsubscribeMedia();
-        if (unsubscribePlaylists) unsubscribePlaylists();
+        if (playlistsViewInstance) playlistsViewInstance.unsubscribe();
         if (unsubscribeMusicPlaylists) unsubscribeMusicPlaylists();
         if (unsubscribeScreens) unsubscribeScreens();
     }
@@ -240,12 +240,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         
         function loadInitialData(userId) {
             unsubscribeMedia = initMediaView(userId, () => currentLang, (media) => {
-    userMediaData = media;
-});
-            unsubscribePlaylists = initPlaylistsView(userId, () => currentLang, (playlists) => {
+                userMediaData = media;
+                if (playlistsViewInstance) {
+                    playlistsViewInstance.rerenderLibrary();
+                }
+            });
+            playlistsViewInstance = initPlaylistsView(userId, () => currentLang, (playlists) => {
                 userPlaylistsData = playlists;
                 if (screensViewInstance) screensViewInstance.rerender();
-            });
+            }, () => userMediaData);
             unsubscribeMusicPlaylists = initMusicPlaylistsView(userId, () => currentLang, (musicPlaylists) => {
                 userMusicPlaylistsData = musicPlaylists;
                 if (screensViewInstance) screensViewInstance.rerender();

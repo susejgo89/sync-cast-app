@@ -126,10 +126,29 @@
                 <div id="media-section" class="page-section hidden">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                         <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="mediaTitle">Gestión de Medios</h2>
-                        <label for="file-upload" class="btn-primary cursor-pointer mt-4 sm:mt-0">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                            <span data-lang="uploadFile">Subir Archivo</span>
-                        </label>
+                        <div class="flex flex-wrap items-center justify-start sm:justify-end gap-4 mt-4 sm:mt-0">
+                            <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" class="btn-gemini">
+                                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="geminiIconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#4285F4"/>
+                                            <stop offset="50%" stop-color="#9B72CB"/>
+                                            <stop offset="100%" stop-color="#d96570"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path stroke="url(#geminiIconGradient)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                </svg>
+                                <span data-lang="generateWithGemini">Generar con Gemini</span>
+                            </a>
+                            <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21H3v-3.5L14.732 5.232z"></path></svg>
+                                <span data-lang="designOnCanva">Diseñar en Canva</span>
+                            </a>
+                            <label for="file-upload" class="btn-primary cursor-pointer">
+                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span data-lang="uploadFile">Subir Archivo</span>
+                            </label>
+                        </div>
                         <input id="file-upload" type="file" class="hidden" accept="image/jpeg,image/png,video/mp4,audio/mpeg,.mp3,audio/wav,.wav">
                     </div>
                     <div id="upload-progress-container" class="mt-4 w-full bg-gray-200 rounded-full h-2.5 hidden">
@@ -339,6 +358,7 @@
             <button id="pairing-code-close" class="w-full px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900" data-lang="gotIt">Entendido</button>
         </div>
     </div>
+
 
     <script type="module" src="script.js" defer></script>
 

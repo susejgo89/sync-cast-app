@@ -4,6 +4,7 @@ import { db } from '../firebase-config.js';
 import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
+import { createMediaCard } from '../components/mediaCard.js';
 
 // DOM Elements specific to this view
 const addPlaylistBtn = document.getElementById('add-playlist-btn');
@@ -13,6 +14,7 @@ const playlistPlaceholder = document.getElementById('playlist-placeholder');
 const playlistEditorTitle = document.getElementById('playlist-editor-title');
 const deletePlaylistBtn = document.getElementById('delete-playlist-btn');
 const playlistContentArea = document.getElementById('playlist-content-area');
+const playlistMediaLibrary = document.getElementById('playlist-media-library');
 const addPlaylistModal = document.getElementById('add-playlist-modal');
 const addPlaylistForm = document.getElementById('add-playlist-form');
 const newPlaylistNameInput = document.getElementById('new-playlist-name');
@@ -23,8 +25,21 @@ let currentUserId = null;
 let activePlaylistId = null;
 let draggedItem = null;
 let onPlaylistsUpdate = () => {}; // Callback function
+let getMediaData = () => [];
 let listenersAttached = false;
 
+
+function renderVisualMediaLibrary() {
+    if (!playlistMediaLibrary) return;
+    // Filtra por medios que NO son de audio
+    const visualMedia = getMediaData().filter(media => !media.type.startsWith('audio/'));
+    
+    playlistMediaLibrary.innerHTML = '';
+    visualMedia.forEach(media => {
+        const card = createMediaCard(media, { isDraggable: true });
+        playlistMediaLibrary.appendChild(card);
+    });
+}
 
 function createPlaylistItemElement(item, index, currentLang) {
     const el = document.createElement('div');
@@ -81,6 +96,7 @@ async function selectPlaylist(playlistId, currentLang) {
     playlistPlaceholder.classList.add('hidden');
     playlistEditorTitle.textContent = `${translations[currentLang].editing}: ${playlist.name}`;
     renderPlaylistItems(playlist.items || [], currentLang);
+    renderVisualMediaLibrary();
     Array.from(playlistsList.children).forEach(child => {
         child.classList.toggle('bg-violet-600', child.dataset.playlistId === playlistId);
         child.classList.toggle('text-white', child.dataset.playlistId === playlistId);
@@ -127,9 +143,10 @@ function loadPlaylists(userId, currentLang) {
     });
 }
 
-export function initPlaylistsView(userId, getLang, onUpdateCallback) {
+export function initPlaylistsView(userId, getLang, onUpdateCallback, mediaDataGetter) {
     currentUserId = userId;
     onPlaylistsUpdate = onUpdateCallback;
+    getMediaData = mediaDataGetter;
 
     if (!listenersAttached) {
         addPlaylistBtn.addEventListener('click', () => addPlaylistModal.classList.add('active'));
@@ -231,5 +248,10 @@ export function initPlaylistsView(userId, getLang, onUpdateCallback) {
         listenersAttached = true;
     }
 
-    return loadPlaylists(userId, getLang());
+    const unsubscribe = loadPlaylists(userId, getLang());
+
+    return {
+        unsubscribe: unsubscribe,
+        rerenderLibrary: renderVisualMediaLibrary
+    };
 }

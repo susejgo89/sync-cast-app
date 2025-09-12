@@ -1,5 +1,6 @@
 # Ignorar el archivo de configuración de Firebase que contiene secretos.
 firebase-config.js
+weather-config.js
 
 # Ignorar dependencias de Node.js (buena práctica para el futuro)
 node_modules/
