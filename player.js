@@ -312,7 +312,7 @@ function handleQrCodeWidget(screenId, settings) {
 
     if (show && enabled) {
         qrContainer.innerHTML = ''; // Limpia el QR anterior para evitar duplicados
-        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?id=${screenId}`, width: 128, height: 128 });
+        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?screenId=${screenId}`, width: 128, height: 128 });
         
         // Usa el texto personalizado si existe, si no, usa el de las traducciones.
         const displayText = text && text.trim() !== '' ? text : (translations[lang]?.scanForMenu || "Escanea para más info");
@@ -685,6 +685,42 @@ function displayMedia(item) {
 
         updateFullscreenClock(); // Primera llamada
         const durationInSeconds = item.duration || 10;
+        setTimeout(playNextItem, durationInSeconds * 1000);
+
+    } else if (item.type === 'qrcode') {
+        // Si hay música de fondo, la reanudamos si estaba pausada.
+        if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
+            audioPlayer.play().catch(e => console.error("Error al reanudar audio para QR:", e));
+        }
+
+        const qrContainer = document.createElement('div');
+        qrContainer.className = 'w-full h-full flex flex-col items-center justify-center bg-white text-gray-800 p-8';
+        
+        const qrCodeEl = document.createElement('div');
+        const qrTextEl = document.createElement('p');
+        qrTextEl.className = 'text-3xl md:text-4xl font-semibold mt-8 text-center';
+
+        qrContainer.append(qrCodeEl, qrTextEl);
+        contentScreen.appendChild(qrContainer);
+
+        const screenId = localStorage.getItem('nexusplay_screen_id');
+        if (screenId) {
+            const qrTargetUrl = (item.qrType === 'url' && item.qrUrl)
+                ? item.qrUrl
+                : `${window.location.origin}/viewer.html?qrMenuId=${item.qrMenuId}`;
+
+            new QRCode(qrCodeEl, {
+                text: qrTargetUrl,
+                width: 300,
+                height: 300,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+            });
+
+            qrTextEl.textContent = item.text || (translations[document.documentElement.lang || 'es']?.scanForMenu || "Escanea para más info");
+        }
+
+        const durationInSeconds = item.duration || 15;
         setTimeout(playNextItem, durationInSeconds * 1000);
 
     } else if (item.type === 'youtube' || item.type === 'iframe') {

@@ -3,9 +3,11 @@ const urlsToCache = [
     '/',
     '/viewer.html',
     '/viewer.css',
-    '/viewer.js',
+    '/viewer.js',    
     '/firebase-config.js',
-    '/assets/icons/generic-icon-192x192.png'
+    '/manifest.json',
+    '/assets/icons/generic-icon-192x192.png',
+    '/assets/icons/generic-icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
