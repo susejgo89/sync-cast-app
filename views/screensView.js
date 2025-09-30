@@ -121,22 +121,19 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-200">
-                <div class="flex items-center justify-between mb-2">
-                    <label for="qr-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].enableQrMenu}</label>
+                <div class="flex items-center justify-between">
+                    <label for="show-qr-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showQrOnScreen}</label>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="qr-toggle-${screen.id}" data-screen-id="${screen.id}" class="qr-toggle-checkbox" ${screen.qrEnabled ? 'checked' : ''}>
+                        <input type="checkbox" id="show-qr-toggle-${screen.id}" data-screen-id="${screen.id}" class="show-qr-toggle-checkbox" ${screen.showQrOnPlayer ? 'checked' : ''}>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
-                <div class="space-y-3 ${screen.qrEnabled ? '' : 'hidden'}">
-                    <div class="flex items-center justify-between mt-2">
-                        <label for="show-qr-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showQrOnScreen}</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="show-qr-toggle-${screen.id}" data-screen-id="${screen.id}" class="show-qr-toggle-checkbox" ${screen.showQrOnPlayer ? 'checked' : ''}>
-                            <span class="toggle-slider"></span>
-                        </label>
+                <div class="space-y-3 ${screen.showQrOnPlayer ? '' : 'hidden'}">
+                    <div>
+                        <label for="qr-text-${screen.id}" class="block text-sm font-medium text-gray-700 sr-only">${translations[currentLang].qrCodeText}</label>
+                        <input type="text" id="qr-text-${screen.id}" data-screen-id="${screen.id}" class="qr-text-input custom-select mt-2" value="${screen.qrCodeText || ''}" placeholder="${translations[currentLang].qrTextPlaceholder}">
                     </div>
-                    <button data-screen-id="${screen.id}" class="select-qr-content-btn w-full btn-secondary mt-2">${translations[currentLang].selectQrContent}</button>
+                    <button data-screen-id="${screen.id}" class="select-qr-content-btn w-full btn-secondary mt-3">${translations[currentLang].selectQrContent}</button>
                 </div>
             </div>
         `;
@@ -169,13 +166,13 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
         addScreenForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
-                const lang = getLang();
-                const userDocRef = doc(db, 'users', userId);
+                const lang = getLang(); // Obtiene el idioma actual
+                const userDocRef = doc(db, 'users', currentUserId); // Usa el currentUserId que ya tenemos
                 let userDocSnap = await getDoc(userDocRef);
         
                 if (!userDocSnap.exists()) {
                     const auth = getAuth();
-                    const user = auth.currentUser;
+                    const user = auth.currentUser; // Obtiene el usuario autenticado
                     await setDoc(userDocRef, {
                         email: user.email,
                         createdAt: serverTimestamp(),
@@ -185,7 +182,7 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                 }
                 const screenLimit = userDocSnap.data()?.screenLimit || 3;
         
-                const screensQuery = query(collection(db, 'screens'), where('userId', '==', userId));
+                const screensQuery = query(collection(db, 'screens'), where('userId', '==', currentUserId));
                 const screensSnapshot = await getDocs(screensQuery);
                 const currentScreenCount = screensSnapshot.size;
         
@@ -303,11 +300,6 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                 updateDoc(screenRef, { showWeather: e.target.checked });
             }
 
-            // Si se cambió la ubicación del clima (al perder el foco)
-            if (e.target.classList.contains('weather-location-input')) {
-                updateDoc(screenRef, { weatherLocation: e.target.value.trim() });
-            }
-
             // Si se cambió el toggle de noticias
             if (e.target.classList.contains('news-toggle-checkbox')) {
                 updateDoc(screenRef, { showNews: e.target.checked });
@@ -318,14 +310,10 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                 updateDoc(screenRef, { newsRssUrl: e.target.value.trim() });
             }
 
-            // Si se cambió el toggle del QR
-            if (e.target.classList.contains('qr-toggle-checkbox')) {
-                updateDoc(screenRef, { qrEnabled: e.target.checked });
-            }
-
             // Si se cambió el toggle de "Mostrar QR en Pantalla"
             if (e.target.classList.contains('show-qr-toggle-checkbox')) {
-                updateDoc(screenRef, { showQrOnPlayer: e.target.checked });
+                const isEnabled = e.target.checked;
+                updateDoc(screenRef, { showQrOnPlayer: isEnabled, qrEnabled: isEnabled });
             }
 
             // Si se cambió el límite de noticias
@@ -338,6 +326,20 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                 updateDoc(screenRef, { newsSpeed: Number(e.target.value) });
             }
         });
+
+        // Usamos 'blur' para los inputs de texto, es más fiable que 'change'.
+        screensListContainer.addEventListener('blur', (e) => {
+            const screenId = e.target.dataset.screenId;
+            if (!screenId) return;
+            const screenRef = doc(db, 'screens', screenId);
+            if (e.target.classList.contains('weather-location-input')) {
+                updateDoc(screenRef, { weatherLocation: e.target.value.trim() });
+            }
+            if (e.target.classList.contains('qr-text-input')) {
+                updateDoc(screenRef, { qrCodeText: e.target.value.trim() });
+            }
+        }, true); // El 'true' es importante para que el evento se capture correctamente.
+
         listenersAttached = true;
     }
 

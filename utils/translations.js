@@ -111,6 +111,13 @@ export const translations = {
                 qrMenuContent: "Contenido del QR",
                 showQrOnScreen: "Mostrar QR en Pantalla",
                 scanForMenu: "Escanea para más info",
+                addUrlPlaceholder: "Pegar URL de YouTube o página web",
+                addUrlButton: "Añadir URL",
+                selectPlaylistFirst: "Por favor, selecciona una playlist primero.",
+                qrCodeText: "Texto del QR",
+                qrTextPlaceholder: "Ej: Escanea para ver el menú",
+                addClock: "Añadir Reloj Digital",
+                addWeather: "Añadir Resumen del Clima",
             },
             en: {
                 loginTitle: "Login",
@@ -224,6 +231,12 @@ export const translations = {
                 qrMenuContent: "QR Content",
                 showQrOnScreen: "Show QR on Screen",
                 scanForMenu: "Scan for more info",
+                addUrlPlaceholder: "Paste YouTube or website URL",
+                addUrlButton: "Add URL",
+                selectPlaylistFirst: "Please select a playlist first.",
+                qrCodeText: "QR Code Text",
+                qrTextPlaceholder: "E.g.: Scan to see the menu",
+                addClock: "Add Digital Clock",
             },
             pt: {
                 loginTitle: "Entrar",
@@ -337,5 +350,9 @@ export const translations = {
                 qrMenuContent: "Conteúdo do QR",
                 showQrOnScreen: "Mostrar QR na Tela",
                 scanForMenu: "Escaneie para mais info",
+                addUrlPlaceholder: "Cole o URL do YouTube ou do site",
+                addUrlButton: "Adicionar URL",
+                selectPlaylistFirst: "Por favor, selecione uma playlist primeiro.",
+                addClock: "Adicionar Relógio Digital",
             }
         };

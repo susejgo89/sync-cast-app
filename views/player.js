@@ -306,17 +306,14 @@ qrCodeWidget.innerHTML = `
 document.body.appendChild(qrCodeWidget);
 
 function handleQrCodeWidget(screenId, settings) {
-    const { show, enabled, text } = settings;
+    const { show, enabled } = settings;
     const lang = document.documentElement.lang || 'es';
     const qrContainer = document.getElementById('player-qrcode');
 
     if (show && enabled) {
         qrContainer.innerHTML = ''; // Limpia el QR anterior para evitar duplicados
         new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?id=${screenId}`, width: 128, height: 128 });
-        
-        // Usa el texto personalizado si existe, si no, usa el de las traducciones.
-        const displayText = text && text.trim() !== '' ? text : (translations[lang]?.scanForMenu || "Escanea para más info");
-        document.getElementById('qr-code-text').textContent = displayText;
+        document.getElementById('qr-code-text').textContent = translations[lang]?.scanForMenu || "Escanea para más info";
         qrCodeWidget.style.display = 'flex';
     } else {
         qrCodeWidget.style.display = 'none';
@@ -418,12 +415,17 @@ function startContentPlayback(screenId) {
     let currentMusicPlaylistId = null;
 
     unsubscribeScreenListener = onSnapshot(screenDocRef, (screenSnap) => {
+        if (!screenSnap.exists()) {
+            resetPlayer(); // Llamamos a nuestra nueva función de reinicio.
+            return;
+        }
+
         const screenData = screenSnap.data();
         const newPlaylistId = screenData.playlistId;
         const newMusicPlaylistId = screenData.musicPlaylistId;
 
         // --- Controlar Widget de QR ---
-        handleQrCodeWidget(screenId, { show: screenData.showQrOnPlayer, enabled: screenData.qrEnabled, text: screenData.qrCodeText });
+        handleQrCodeWidget(screenId, { show: screenData.showQrOnPlayer, enabled: screenData.qrEnabled });
 
         // --- Controlar Widget de Noticias ---
         handleNewsWidget({ show: screenData.showNews, url: screenData.newsRssUrl, limit: screenData.newsLimit, speed: screenData.newsSpeed });
@@ -449,6 +451,7 @@ function startContentPlayback(screenId) {
         
         // --- LÓGICA MEJORADA PARA CARGAR PLAYLIST DE MÚSICA ---
         if (newMusicPlaylistId !== currentMusicPlaylistId) {
+            currentMusicPlaylistId = newMusicPlaylistId;
             if (unsubscribeMusicPlaylistListener) unsubscribeMusicPlaylistListener();
 
             if (newMusicPlaylistId) {
@@ -467,11 +470,11 @@ function startContentPlayback(screenId) {
                 audioPlayer.pause();
                 currentMusicPlaylistItems = [];
             }
-            currentMusicPlaylistId = newMusicPlaylistId;
         }
 
         // --- LÓGICA MEJORADA PARA CARGAR PLAYLIST VISUAL ---
         if (newPlaylistId !== currentVisualPlaylistId) {
+            currentVisualPlaylistId = newPlaylistId;
             if (unsubscribePlaylistListener) unsubscribePlaylistListener();
 
             if (newPlaylistId) {
@@ -489,15 +492,13 @@ function startContentPlayback(screenId) {
                 currentPlaylistItems = [];
                 playNextItem();
             }
-            currentVisualPlaylistId = newPlaylistId;
         }
     });
 }
 
 // Muestra el siguiente item en la lista
 function playNextItem() { // Ya no necesita ser 'async'
-    if (!currentPlaylistItems || currentPlaylistItems.length === 0) {
-        // Si la lista está vacía, muestra un mensaje y termina.
+    if (currentPlaylistItems.length === 0) {
         displayMessage("No hay ninguna playlist visual asignada.");
         return;
     }
@@ -571,121 +572,6 @@ function displayMedia(item) {
         };
         
         contentScreen.appendChild(video);
-
-    } else if (item.type === 'weather') {
-        // Si hay música de fondo, la reanudamos si estaba pausada.
-        if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
-            audioPlayer.play().catch(e => console.error("Error al reanudar audio para clima:", e));
-        }
-
-        const weatherContainer = document.createElement('div');
-        weatherContainer.className = 'w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600 text-white p-8';
-        weatherContainer.innerHTML = `<div class="text-3xl font-light">Cargando pronóstico...</div>`;
-        contentScreen.appendChild(weatherContainer);
-
-        const fetchAndDisplayWeather = async () => {
-            let location = item.location; // Prioridad 1: la ubicación del propio item.
-
-            // Si el item no tiene ubicación, usamos la de la pantalla como alternativa.
-            if (!location) {
-                const screenDocRef = doc(db, 'screens', localStorage.getItem('nexusplay_screen_id'));
-                const screenSnap = await getDoc(screenDocRef);
-                if (screenSnap.exists()) {
-                    location = screenSnap.data().weatherLocation;
-                }
-            }
-
-            const lang = document.documentElement.lang || 'es';
-            if (!location || !WEATHER_API_KEY || WEATHER_API_KEY === 'TU_API_KEY_DE_OPENWEATHERMAP') {
-                weatherContainer.innerHTML = `<div class="text-3xl font-light">Ubicación no configurada.</div>`; // Mensaje de error
-                return;
-            }
-
-            try {
-                const apiLang = lang === 'pt' ? 'pt_br' : lang;
-                const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${location}&appid=${WEATHER_API_KEY}&units=metric&lang=${apiLang}`);
-                if (!response.ok) throw new Error('No se pudo obtener el pronóstico.');
-                const data = await response.json();
-
-                // Pronóstico por horas (primeras 5 predicciones, cada 3 horas)
-                const hourlyForecast = data.list.slice(0, 5).map(forecast => `
-                    <div class="text-center p-2 bg-white/10 rounded-lg">
-                        <p class="text-lg">${new Date(forecast.dt * 1000).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })}</p>
-                        <img src="https://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="${forecast.weather[0].description}" class="mx-auto">
-                        <p class="font-bold text-xl">${Math.round(forecast.main.temp)}°</p>
-                    </div>
-                `).join('');
-
-                // Pronóstico por días (agrupando por día y tomando el mediodía)
-                const dailyForecasts = {};
-                data.list.forEach(forecast => {
-                    const date = new Date(forecast.dt * 1000).toLocaleDateString(lang, { weekday: 'long' });
-                    if (!dailyForecasts[date] && new Date(forecast.dt * 1000).getHours() >= 12) {
-                        dailyForecasts[date] = forecast;
-                    }
-                });
-
-                const dailyForecast = Object.values(dailyForecasts).slice(1, 6).map(forecast => `
-                    <div class="flex justify-between items-center p-2 bg-white/10 rounded-lg">
-                        <p class="text-lg w-1/3">${new Date(forecast.dt * 1000).toLocaleDateString(lang, { weekday: 'short' })}</p>
-                        <img src="https://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="${forecast.weather[0].description}" class="w-10 h-10">
-                        <p class="font-bold text-lg w-1/3 text-right">${Math.round(forecast.main.temp_max)}° / ${Math.round(forecast.main.temp_min)}°</p>
-                    </div>
-                `).join('');
-
-                weatherContainer.innerHTML = `
-                    <div class="w-full max-w-4xl mx-auto">
-                        <h2 class="text-4xl font-bold mb-6 text-center">Pronóstico para ${data.city.name}</h2>
-                        <div class="grid grid-cols-5 gap-4 mb-8">
-                            ${hourlyForecast}
-                        </div>
-                        <div class="space-y-2">
-                            ${dailyForecast}
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                console.error("Error al mostrar pronóstico completo:", error);
-                weatherContainer.innerHTML = `<div class="text-3xl font-light">No se pudo cargar el pronóstico.</div>`;
-            }
-        };
-
-        fetchAndDisplayWeather();
-        const durationInSeconds = item.duration || 15;
-        setTimeout(playNextItem, durationInSeconds * 1000);
-
-    } else if (item.type === 'clock') {
-        // Si hay música de fondo, la reanudamos si estaba pausada.
-        if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
-            audioPlayer.play().catch(e => console.error("Error al reanudar audio para reloj:", e));
-        }
-
-        const clockContainer = document.createElement('div');
-        clockContainer.className = 'w-full h-full flex flex-col items-center justify-center bg-black text-white p-8';
-        
-        clockContainer.innerHTML = `
-            <div class="font-bold text-8xl md:text-9xl tracking-wider" id="fullscreen-clock-time"></div>
-            <div class="font-medium text-2xl md:text-3xl mt-4" id="fullscreen-clock-date"></div>
-        `;
-        contentScreen.appendChild(clockContainer);
-
-        const updateFullscreenClock = () => {
-            const timeEl = document.getElementById('fullscreen-clock-time');
-            const dateEl = document.getElementById('fullscreen-clock-date');
-            if (!timeEl || !dateEl) return;
-
-            const now = new Date();
-            const options = { hour: '2-digit', minute: '2-digit', hour12: false };
-            if (item.timezone && item.timezone !== 'local') {
-                options.timeZone = item.timezone;
-            }
-            timeEl.textContent = now.toLocaleTimeString('es-ES', options); // Usamos un locale neutro para el formato
-            dateEl.textContent = now.toLocaleDateString(document.documentElement.lang || 'es', { weekday: 'long', day: 'numeric', month: 'long' });
-        };
-
-        updateFullscreenClock(); // Primera llamada
-        const durationInSeconds = item.duration || 10;
-        setTimeout(playNextItem, durationInSeconds * 1000);
 
     } else if (item.type === 'youtube' || item.type === 'iframe') {
         // Si hay música de fondo, la pausamos para dar prioridad a la web/video.
@@ -802,9 +688,7 @@ pairBtn.addEventListener('click', async () => {
             messageBox.classList.add('bg-emerald-500');
 
             setTimeout(() => {
-                // 1. Inicia la reproducción del contenido.
                 startContentPlayback(screenId);
-                // 2. Inicia el "heartbeat" inmediatamente.
                 sendHeartbeat(screenId);
                 setInterval(() => sendHeartbeat(screenId), 60000);
             }, 2000);

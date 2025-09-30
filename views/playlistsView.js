@@ -1,7 +1,7 @@
 // views/playlistsView.js
 
 import { db } from '../firebase-config.js';
-import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
 import { createMediaCard } from '../components/mediaCard.js';
@@ -27,6 +27,7 @@ let draggedItem = null;
 let onPlaylistsUpdate = () => {}; // Callback function
 let getMediaData = () => [];
 let listenersAttached = false;
+let getLang = () => 'es'; // Guardaremos la función aquí
 
 
 function renderVisualMediaLibrary() {
@@ -46,27 +47,31 @@ function createPlaylistItemElement(item, index, currentLang) {
     el.className = 'flex items-center bg-gray-200 p-2 rounded-lg cursor-grab';
     el.draggable = true;
     el.dataset.index = index;
-    const isImage = item.type.startsWith('image');
+    const isEditable = item.type.startsWith('image') || item.type === 'iframe' || item.type === 'youtube' || item.type === 'clock' || item.type === 'weather';
 
     // El cambio se hace dentro de esta plantilla de HTML
     el.innerHTML = `
-        <div class="w-16 h-10 bg-black rounded-md mr-3 flex-shrink-0">
-            ${isImage ? `<img src="${item.url}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/160x100/EEE/31343C?text=Error';">` : `<video src="${item.url}" class="w-full h-full object-cover"></video>`}
+        <div class="w-16 h-10 bg-gray-800 rounded-md mr-3 flex-shrink-0 flex items-center justify-center text-white">
+            ${item.type.startsWith('image') ? `<img src="${item.url}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/160x100/EEE/31343C?text=Error';">` : ''}
+            ${item.type.startsWith('video') ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5z"></path></svg>` : ''}
+            ${item.type === 'youtube' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'iframe' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.5-1.5a.5.5 0 01.707-.707l1.5 1.5a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path><path fill-rule="evenodd" d="M4.086 15.414a2 2 0 010-2.828l3-3a2 2 0 012.828 0l1.5 1.5a.5.5 0 01-.707.707l-1.5-1.5a1 1 0 00-1.414 0l-3 3a1 1 0 000 1.414 1 1 0 001.414 0l.5-.5a.5.5 0 11.707.707l-.5.5a2 2 0 01-2.828 0z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'clock' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'weather' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.312 11.218a.5.5 0 01.688.718A6.979 6.979 0 0110 16a6.979 6.979 0 01-6-4.064.5.5 0 01.688-.718A5.979 5.979 0 0010 15a5.979 5.979 0 005.312-3.782zM10 4a.5.5 0 01.5.5v5a.5.5 0 01-1 0v-5A.5.5 0 0110 4z" clip-rule="evenodd"></path></svg>` : ''}
         </div>
 
         <div class="flex-grow min-w-0">
             <p class="text-sm truncate text-gray-700" title="${item.name}">${item.name}</p>
         </div>
         
-        ${isImage ? `
-            <div class="flex items-center gap-x-1 mx-3">
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                
-                <input type="number" value="${item.duration || 10}" min="1" class="duration-input w-12 bg-gray-300 text-gray-800 text-center rounded-md p-1" data-index="${index}">
-                
-                <span class="text-sm font-semibold text-gray-600">s</span>
-            </div>
-        ` : ''}
+        <div class="flex items-center gap-x-3 mx-3">
+            ${isEditable ? `
+                <span class="text-sm text-gray-500">${item.duration || 10}s</span>
+                <button class="edit-item-btn text-gray-500 hover:text-violet-600 p-1" data-index="${index}" title="Editar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21H3v-3.5L14.732 5.232z"></path></svg>
+                </button>
+            ` : ''}
+        </div>
         
         <button class="remove-item-btn text-red-400 hover:text-red-600 p-1" data-index="${index}">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -82,8 +87,9 @@ function renderPlaylistItems(items, currentLang) {
     items.forEach((item, index) => playlistContentArea.appendChild(createPlaylistItemElement(item, index, currentLang)));
 }
 
-async function selectPlaylist(playlistId, currentLang) {
+async function selectPlaylist(playlistId) {
     activePlaylistId = playlistId;
+    const currentLang = getLang(); // Obtenemos el idioma desde la función guardada
     const playlistDoc = await getDoc(doc(db, 'playlists', playlistId));
     if (!playlistDoc.exists()) {
         activePlaylistId = null;
@@ -95,6 +101,11 @@ async function selectPlaylist(playlistId, currentLang) {
     playlistEditor.classList.remove('hidden');
     playlistPlaceholder.classList.add('hidden');
     playlistEditorTitle.textContent = `${translations[currentLang].editing}: ${playlist.name}`;
+
+    // Ocultamos el editor de duración al cambiar de playlist
+    document.getElementById('edit-item-form').classList.add('hidden');
+    document.getElementById('add-url-form').classList.remove('hidden');
+
     renderPlaylistItems(playlist.items || [], currentLang);
     renderVisualMediaLibrary();
     Array.from(playlistsList.children).forEach(child => {
@@ -103,13 +114,55 @@ async function selectPlaylist(playlistId, currentLang) {
         child.classList.toggle('bg-gray-100', child.dataset.playlistId !== playlistId);
         child.classList.toggle('text-gray-800', child.dataset.playlistId !== playlistId);
     });
+
+    // --- LÓGICA PARA AÑADIR URL (MOVIDA AQUÍ) ---
+    // Al moverla aquí, nos aseguramos de que se activa cada vez que se muestra el editor.
+    const addUrlForm = document.getElementById('add-url-form');
+    const urlInput = document.getElementById('url-input');
+
+    // Usamos .cloneNode para eliminar listeners antiguos y evitar que se acumulen.
+    const newForm = addUrlForm.cloneNode(true);
+    addUrlForm.parentNode.replaceChild(newForm, addUrlForm);
+    const newUrlInput = document.getElementById('url-input');
+
+    newForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Previene la recarga de la página.
+        if (!activePlaylistId) {
+            alert(translations[lang].selectPlaylistFirst || 'Por favor, selecciona una playlist primero.');
+            return;
+        }
+        const url = newUrlInput.value.trim();
+        if (!url) return;
+
+        let itemData = {
+            type: 'iframe',
+            url: url,
+            duration: 15,
+            name: `Web: ${new URL(url).hostname}` // Añadimos un nombre por defecto
+        };
+
+        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const match = url.match(youtubeRegex);
+
+        if (match && match[1]) {
+            const videoId = match[1];
+            itemData.type = 'youtube';
+            itemData.url = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&modestbranding=1`;
+            itemData.name = `YouTube: ${videoId}`;
+        }
+
+        await updateDoc(doc(db, 'playlists', activePlaylistId), { items: arrayUnion(itemData) });
+        newUrlInput.value = '';
+    });
+
 }
 
-function loadPlaylists(userId, currentLang) {
+function loadPlaylists(userId) {
     const q = query(collection(db, 'playlists'), where('userId', '==', userId));
     
     // onSnapshot escucha cambios en la base de datos en tiempo real
     return onSnapshot(q, snapshot => {
+        const currentLang = getLang();
         const sortedDocs = snapshot.docs.sort((a, b) => (b.data().createdAt?.seconds || 0) - (a.data().createdAt?.seconds || 0));
         const userPlaylistsData = sortedDocs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -120,7 +173,7 @@ function loadPlaylists(userId, currentLang) {
             item.className = `p-3 rounded-lg cursor-pointer transition-colors ${p.id === activePlaylistId ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`;
             item.textContent = p.name;
             item.dataset.playlistId = p.id;
-            item.addEventListener('click', () => selectPlaylist(p.id, currentLang));
+            item.addEventListener('click', () => selectPlaylist(p.id));
             playlistsList.appendChild(item);
         });
         
@@ -143,9 +196,10 @@ function loadPlaylists(userId, currentLang) {
     });
 }
 
-export function initPlaylistsView(userId, getLang, onUpdateCallback, mediaDataGetter) {
+export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDataGetter) {
     currentUserId = userId;
     onPlaylistsUpdate = onUpdateCallback;
+    getLang = langGetter; // Guardamos la función para usarla en todo el módulo
     getMediaData = mediaDataGetter;
 
     if (!listenersAttached) {
@@ -164,6 +218,37 @@ export function initPlaylistsView(userId, getLang, onUpdateCallback, mediaDataGe
             });
             newPlaylistNameInput.value = '';
             addPlaylistModal.classList.remove('active');
+        });
+
+        // Lógica para el botón de añadir reloj (MOVIDA AQUÍ)
+        const addClockBtn = document.getElementById('add-clock-item-btn');
+        addClockBtn.addEventListener('click', async () => {
+            if (!activePlaylistId) {
+                alert(translations[getLang()].selectPlaylistFirst || 'Por favor, selecciona una playlist primero.');
+                return;
+            }
+            const clockItem = { 
+                type: 'clock', 
+                name: 'Reloj Digital (Local)', 
+                duration: 10,
+                timezone: 'local' // 'local' para la hora del dispositivo
+            };
+            await updateDoc(doc(db, 'playlists', activePlaylistId), { items: arrayUnion(clockItem) });
+        });
+
+        const addWeatherBtn = document.getElementById('add-weather-item-btn');
+        addWeatherBtn.addEventListener('click', async () => {
+            if (!activePlaylistId) {
+                alert(translations[getLang()].selectPlaylistFirst || 'Por favor, selecciona una playlist primero.');
+                return;
+            }
+            const weatherItem = { 
+                type: 'weather', 
+                name: 'Resumen del Clima', 
+                duration: 15,
+                location: '' // Añadimos la propiedad de ubicación
+            };
+            await updateDoc(doc(db, 'playlists', activePlaylistId), { items: arrayUnion(weatherItem) });
         });
 
         deletePlaylistBtn.addEventListener('click', () => { 
@@ -203,21 +288,6 @@ export function initPlaylistsView(userId, getLang, onUpdateCallback, mediaDataGe
             draggedItem = null;
         });
 
-        playlistContentArea.addEventListener('change', async (e) => {
-            if (e.target.classList.contains('duration-input')) {
-                const index = parseInt(e.target.dataset.index);
-                const newDuration = parseInt(e.target.value);
-                if (newDuration < 1) return;
-                const playlistRef = doc(db, 'playlists', activePlaylistId);
-                const playlistDoc = await getDoc(playlistRef);
-                if (playlistDoc.exists()) {
-                    let items = playlistDoc.data().items || [];
-                    if (items[index]) items[index].duration = newDuration;
-                    await updateDoc(playlistRef, { items });
-                }
-            }
-        });
-
        playlistContentArea.addEventListener('click', async (e) => {
     const removeBtn = e.target.closest('.remove-item-btn');
     if (removeBtn) {
@@ -245,10 +315,71 @@ export function initPlaylistsView(userId, getLang, onUpdateCallback, mediaDataGe
     }
 });
 
+        document.getElementById('edit-item-cancel').addEventListener('click', () => {
+            document.getElementById('edit-item-form').classList.add('hidden');
+            document.getElementById('add-url-form').classList.remove('hidden');
+            document.getElementById('add-weather-item-btn').parentElement.classList.remove('hidden');
+            document.getElementById('add-clock-item-btn').parentElement.classList.remove('hidden');
+        });
+
+        playlistContentArea.addEventListener('click', async (e) => {
+            const editBtn = e.target.closest('.edit-item-btn');
+            if (editBtn) {
+                const index = parseInt(editBtn.dataset.index);
+                const playlistRef = doc(db, 'playlists', activePlaylistId);
+                const playlistDoc = await getDoc(playlistRef);
+                if (!playlistDoc.exists()) return;
+                const items = playlistDoc.data().items || [];
+                const item = items[index];
+
+                if (item) {
+                    document.getElementById('add-url-form').classList.add('hidden');
+                    document.getElementById('add-weather-item-btn').parentElement.classList.add('hidden');
+                    document.getElementById('add-clock-item-btn').parentElement.classList.add('hidden');
+                    const editForm = document.getElementById('edit-item-form');
+                    editForm.classList.remove('hidden');
+                    document.getElementById('edit-item-name').textContent = item.name;
+                    document.getElementById('edit-item-duration').value = item.duration || 10;
+                    document.getElementById('edit-item-index').value = index;
+
+                    // Mostramos el campo de ubicación SOLO si es un item de clima
+                    const locationContainer = document.getElementById('edit-item-location-container');
+                    if (item.type === 'weather') {
+                        document.getElementById('edit-item-location').value = item.location || '';
+                        locationContainer.classList.remove('hidden');
+                    } else {
+                        locationContainer.classList.add('hidden');
+                    }
+                }
+            }
+        });
+
+        document.getElementById('edit-item-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const index = parseInt(document.getElementById('edit-item-index').value);
+            const playlistRef = doc(db, 'playlists', activePlaylistId);
+            const playlistDoc = await getDoc(playlistRef);
+            if (!playlistDoc.exists()) return;
+            let items = playlistDoc.data().items || [];
+            
+            if (items[index]) {
+                items[index].duration = parseInt(document.getElementById('edit-item-duration').value);
+                if (items[index].type === 'weather') {
+                    items[index].location = document.getElementById('edit-item-location').value.trim();
+                }
+                await updateDoc(playlistRef, { items });
+            }
+            // En lugar de simular un click, llamamos directamente a la lógica de cierre para más control
+            document.getElementById('edit-item-form').classList.add('hidden');
+            document.getElementById('add-url-form').classList.remove('hidden');
+            document.getElementById('add-weather-item-btn').parentElement.classList.remove('hidden');
+            document.getElementById('add-clock-item-btn').parentElement.classList.remove('hidden');
+        });
+
         listenersAttached = true;
     }
 
-    const unsubscribe = loadPlaylists(userId, getLang());
+    const unsubscribe = loadPlaylists(userId);
 
     return {
         unsubscribe: unsubscribe,

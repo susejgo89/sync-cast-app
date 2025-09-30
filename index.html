@@ -260,7 +260,39 @@
                                 <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden">
                                     <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
                                         <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="mediaLibrary">Biblioteca de
-                                            Medios</h4>
+                                            Medios y URLs</h4>
+                                        <form id="add-url-form" class="mb-3">
+                                            <label for="url-input" class="sr-only">Añadir URL</label>
+                                            <input type="url" id="url-input" data-lang-placeholder="addUrlPlaceholder"
+                                                class="custom-select w-full" placeholder="Pegar URL de YouTube o página web">
+                                            <button type="submit" class="btn-primary w-full mt-2" data-lang="addUrlButton">Añadir URL</button>
+                                        </form>                                        
+                                        <div class="my-3">
+                                            <button id="add-clock-item-btn" class="btn-secondary w-full flex items-center justify-center">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                <span data-lang="addClock">Añadir Reloj Digital</span>
+                                            </button>
+                                        </div>
+                                        <div class="my-3">
+                                            <button id="add-weather-item-btn" class="btn-secondary w-full flex items-center justify-center">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                                                <span data-lang="addWeather">Añadir Resumen del Clima</span>
+                                            </button>
+                                        </div>
+                                        <form id="edit-item-form" class="hidden bg-gray-200 p-3 rounded-lg mb-3">
+                                            <p class="text-sm font-semibold mb-2" id="edit-item-name"></p>
+                                            <div class="flex items-center gap-2">
+                                                <label for="edit-item-duration" class="text-sm">Duración (s):</label>
+                                                <input type="number" id="edit-item-duration" min="1" class="custom-select w-20">
+                                                <button type="submit" class="btn-primary flex-1 text-sm py-1" data-lang="save">Guardar</button>
+                                                <button type="button" id="edit-item-cancel" class="btn-secondary text-sm py-1">X</button>
+                                            </div>
+                                            <div id="edit-item-location-container" class="hidden mt-2">
+                                                <label for="edit-item-location" class="text-sm" data-lang="weatherLocation">Ubicación (Clima)</label>
+                                                <input type="text" id="edit-item-location" class="custom-select w-full mt-1" data-lang-placeholder="weatherLocationPlaceholder">
+                                            </div>
+                                            <input type="hidden" id="edit-item-index">
+                                        </form>
                                         <div class="bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
                                             <div id="playlist-media-library" class="grid grid-cols-2 gap-3"></div>
                                         </div>
