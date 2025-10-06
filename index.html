@@ -103,6 +103,11 @@
 
 
                     <a href="#screens" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-lang="navScreens">Pantallas</span></a>
+
+                    <a href="#groups" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700">
+                        <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a3.002 3.002 0 013.292-2.296M12 10a4 4 0 110-8 4 4 0 010 8zm0 0a2 2 0 100-4 2 2 0 000 4z" /></svg>
+                        <span data-lang="navGroups">Grupos</span>
+                    </a>
                 </nav>
                 <div class="px-4 py-6 border-t border-neutral-700">
                     <div id="user-info" class="flex items-center"></div>
@@ -180,11 +185,17 @@
                             </div>
                         </div>
                         <!-- Card: Archivos Recientes -->
-                        <div class="card p-6">
+                        <div class="card p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
                             <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentUploads">Archivos Recientes</h3>
                             <div id="recent-uploads-container" class="mt-4 grid grid-cols-3 gap-3">
                                 <!-- Thumbnails will be injected here -->
-                                <p class="text-xs text-gray-400 col-span-3 text-center" data-lang="dashboardNoRecentUploads">No hay archivos recientes.</p>
+                            </div>
+                        </div>
+                        <!-- Card: Actividad Reciente -->
+                        <div class="card p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
+                            <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentActivity">Actividad Reciente</h3>
+                            <div id="recent-activity-container" class="mt-4 space-y-3">
+                                <!-- La actividad reciente se insertará aquí -->
                             </div>
                         </div>
                     </div>
@@ -279,6 +290,12 @@
                                                 <span data-lang="addWeather">Añadir Resumen del Clima</span>
                                             </button>
                                         </div>
+                                        <div class="my-3">
+                                            <button id="add-qr-fullscreen-item-btn" class="btn-secondary w-full flex items-center justify-center">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M3 10v4M21 10v4M10 3h4M10 21h4"></path></svg>
+                                                <span data-lang="addQrFullscreen">Añadir QR a Pantalla Completa</span>
+                                            </button>
+                                        </div>
                                         <form id="edit-item-form" class="hidden bg-gray-200 p-3 rounded-lg mb-3">
                                             <p class="text-sm font-semibold mb-2" id="edit-item-name"></p>
                                             <div class="flex items-center gap-2">
@@ -290,6 +307,26 @@
                                             <div id="edit-item-location-container" class="hidden mt-2">
                                                 <label for="edit-item-location" class="text-sm" data-lang="weatherLocation">Ubicación (Clima)</label>
                                                 <input type="text" id="edit-item-location" class="custom-select w-full mt-1" data-lang-placeholder="weatherLocationPlaceholder">
+                                            </div>
+                                            <div id="edit-item-qr-container" class="hidden mt-2 space-y-2">
+                                                <div>
+                                                    <label for="edit-item-qr-text" class="text-sm" data-lang="qrCodeText">Texto de llamada a la acción</label>
+                                                    <input type="text" id="edit-item-qr-text" class="custom-select w-full mt-1" data-lang-placeholder="qrTextPlaceholder">
+                                                </div>
+                                                <div>
+                                                    <label for="edit-item-qr-type" class="text-sm">Tipo de Contenido del QR</label>
+                                                    <select id="edit-item-qr-type" class="custom-select w-full mt-1">
+                                                        <option value="url">Enlazar a una URL</option>
+                                                        <option value="menu">Mostrar Menú de Medios</option>
+                                                    </select>
+                                                </div>
+                                                <div id="edit-item-qr-url-container">
+                                                    <label for="edit-item-qr-url" class="text-sm">URL de destino</label>
+                                                    <input type="url" id="edit-item-qr-url" class="custom-select w-full mt-1" placeholder="https://ejemplo.com">
+                                                </div>
+                                                <div id="edit-item-qr-menu-container" class="hidden">
+                                                    <button type="button" id="edit-item-qr-select-media-btn" class="btn-secondary w-full mt-2" data-lang="selectQrContent">Seleccionar Contenido</button>
+                                                </div>
                                             </div>
                                             <input type="hidden" id="edit-item-index">
                                         </form>
@@ -389,6 +426,73 @@
                     </div>
                     <div id="screens-list" class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
+
+                <div id="groups-section" class="page-section hidden h-full flex flex-col">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="groupsTitle">Grupos de Pantallas</h2>
+                        <button id="add-group-btn" class="btn-primary mt-4 sm:mt-0">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            <span data-lang="createGroup">Crear Grupo</span>
+                        </button>
+                    </div>
+                
+                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden">
+                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4" data-lang="myGroups">Mis Grupos</h3>
+                            <div id="groups-list" class="space-y-2 pr-2 bg-gray-50 rounded-md p-2 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                                <!-- La lista de grupos se insertará aquí -->
+                            </div>
+                        </div>
+                
+                        <div class="w-full lg:w-2/3 xl:w-3/4 flex flex-col">
+                            <div id="group-editor" class="flex-1 flex-col hidden h-full bg-white rounded-lg shadow-md p-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 id="group-editor-title" class="text-2xl font-bold text-gray-800"></h3>
+                                    <button id="delete-group-btn" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-transform transform hover:scale-110" title="Eliminar Grupo">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-700 mb-3" data-lang="groupAssignPlaylist">Asignar Playlist al Grupo</h4>
+                                        <!-- Selector de Modo de Programación para Grupos -->
+                                        <div class="flex items-center gap-4 mb-4">
+                                            <label class="flex items-center text-sm"><input type="radio" name="group-scheduling-mode" value="simple" class="group-scheduling-mode-radio"> <span class="ml-2" data-lang="simpleMode">Simple</span></label>
+                                            <label class="flex items-center text-sm"><input type="radio" name="group-scheduling-mode" value="advanced" class="group-scheduling-mode-radio"> <span class="ml-2" data-lang="advancedMode">Avanzado</span></label>
+                                        </div>
+                                        <!-- Contenedor para modo Simple del Grupo -->
+                                        <div id="group-simple-schedule-container" class="space-y-3">
+                                            <div class="space-y-3">
+                                                <div>
+                                                    <label for="group-playlist-select" class="text-sm font-medium text-gray-600" data-lang="visualPlaylist">Playlist Visual</label>
+                                                    <select id="group-playlist-select" class="custom-select mt-1"></select>
+                                                </div>
+                                                <div>
+                                                    <label for="group-music-playlist-select" class="text-sm font-medium text-gray-600" data-lang="musicPlaylist">Playlist de Música</label>
+                                                    <select id="group-music-playlist-select" class="custom-select mt-1"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Contenedor para modo Avanzado del Grupo -->
+                                        <div id="group-advanced-schedule-container" class="hidden">
+                                            <div id="group-schedule-summary-list" class="space-y-2 mb-2 max-h-24 overflow-y-auto pr-1 border rounded-md p-1 bg-gray-50">
+                                                <!-- El resumen de los horarios se insertará aquí -->
+                                            </div>
+                                            <button id="manage-group-schedule-btn" class="w-full btn-secondary" data-lang="manageSchedule">Gestionar Horarios</button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-700 mb-3" data-lang="groupScreens">Pantallas en este Grupo</h4>
+                                        <div id="group-screens-list" class="space-y-2 max-h-64 overflow-y-auto bg-gray-50 p-3 rounded-md border"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="group-placeholder" class="flex-1 flex items-center justify-center bg-white rounded-lg shadow-md">
+                                <p class="text-gray-500 text-center p-4" data-lang="groupPlaceholder">Selecciona un grupo para editar o crea uno nuevo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -415,6 +519,60 @@
                 </div>
                 
             </form>
+        </div>
+    </div>
+    <div id="add-group-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm">
+            <h3 class="text-lg font-medium text-gray-900" data-lang="createGroupTitle">Crear Nuevo Grupo</h3>
+            <form id="add-group-form">
+                <label for="new-group-name" class="sr-only">Nombre del Grupo</label>
+                <input id="new-group-name" type="text" required class="mt-4 w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="groupNamePlaceholder">
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" id="add-group-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" data-lang="save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="schedule-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-3xl flex flex-col">
+            <h3 class="text-xl font-bold text-gray-900 mb-4" data-lang="scheduleTitle">Gestionar Horarios</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Columna para añadir reglas -->
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <h4 class="text-lg font-semibold mb-3" data-lang="scheduleAddRule">Añadir Nueva Regla</h4>
+                    <form id="add-schedule-rule-form" class="space-y-4">
+                        <div>
+                            <label for="rule-playlist-select" class="block text-sm font-medium text-gray-700" data-lang="visualPlaylist">Playlist Visual</label>
+                            <select id="rule-playlist-select" class="custom-select mt-1"></select>
+                        </div>
+                        <div>
+                            <label for="rule-music-playlist-select" class="block text-sm font-medium text-gray-700" data-lang="musicPlaylist">Playlist de Música</label>
+                            <select id="rule-music-playlist-select" class="custom-select mt-1"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" data-lang="scheduleDays">Días de la Semana</label>
+                            <div id="rule-days-checkboxes" class="mt-2 grid grid-cols-3 sm:grid-cols-4 gap-2 text-sm">
+                                <!-- Checkboxes de días se insertarán aquí -->
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label for="rule-start-time" class="block text-sm font-medium text-gray-700" data-lang="scheduleStartTime">Hora Inicio</label>
+                                <input type="time" id="rule-start-time" required class="custom-select mt-1">
+                            </div>
+                            <div class="flex-1">
+                                <label for="rule-end-time" class="block text-sm font-medium text-gray-700" data-lang="scheduleEndTime">Hora Fin</label>
+                                <input type="time" id="rule-end-time" required class="custom-select mt-1">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary w-full" data-lang="scheduleAddRuleBtn">Añadir Regla</button>
+                    </form>
+                </div>
+                <!-- Columna para ver reglas existentes -->
+                <div id="schedule-rules-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
+            </div>
+            <button id="schedule-modal-close" class="mt-6 ml-auto px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="close">Cerrar</button>
         </div>
     </div>
     <div id="add-music-playlist-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">

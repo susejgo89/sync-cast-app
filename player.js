@@ -222,18 +222,32 @@ function handleNewsWidget(settings) {
     let currentNewsIndex = -1;
 
     const fetchAndParseRss = async () => {
-        // Usamos un proxy CORS para evitar problemas de seguridad del navegador
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
         const lang = document.documentElement.lang || 'es';
+        // Lista de proxies. Si uno falla, intentará con el siguiente.
+        const proxies = [
+            `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+            `https://thingproxy.freeboard.io/fetch/${url}`
+        ];
+
         try {
-            const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error(`Proxy response not OK: ${response.status}`);
+            let response;
+            let data;
+
+            // Intenta con el primer proxy, si falla, intenta con el segundo.
+            try {
+                response = await fetch(proxies[0]);
+                if (!response.ok) throw new Error('Primer proxy falló');
+                data = await response.json();
+            } catch (e) {
+                response = await fetch(proxies[1]);
+                data = await response.json(); // thingproxy no envuelve en 'contents'
+            }
             
-            const data = await response.json();
-            if (!data.contents) throw new Error("El proxy no devolvió contenido.");
+            const contents = data.contents || data; // allorigins usa 'contents', thingproxy no.
+            if (!contents) throw new Error("El proxy no devolvió contenido.");
 
             const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(data.contents, "application/xml");
+            const xmlDoc = parser.parseFromString(contents, "application/xml");
 
             const parseError = xmlDoc.querySelector("parsererror");
             if (parseError) {
@@ -329,6 +343,9 @@ let currentItemIndex = 0;
 let unsubscribeScreenListener = null; 
 let unsubscribePlaylistListener = null;
 let unsubscribeMusicPlaylistListener = null; // Listener para la playlist de música
+let currentVisualPlaylistId = null; 
+let scheduleCheckInterval = null;
+let currentMusicPlaylistId = null;
 
 let currentMusicPlaylistItems = [];
 let currentMusicItemIndex = 0;
@@ -413,14 +430,13 @@ function startContentPlayback(screenId) {
     const screenDocRef = doc(db, 'screens', screenId);
     if (unsubscribeScreenListener) unsubscribeScreenListener();
 
-    // Estado para rastrear cambios y evitar recargas innecesarias
-    let currentVisualPlaylistId = null; 
-    let currentMusicPlaylistId = null;
-
     unsubscribeScreenListener = onSnapshot(screenDocRef, (screenSnap) => {
+        if (!screenSnap.exists()) {
+            resetPlayer(); // La pantalla fue eliminada, reiniciamos el reproductor.
+            return;
+        }
+
         const screenData = screenSnap.data();
-        const newPlaylistId = screenData.playlistId;
-        const newMusicPlaylistId = screenData.musicPlaylistId;
 
         // --- Controlar Widget de QR ---
         handleQrCodeWidget(screenId, { show: screenData.showQrOnPlayer, enabled: screenData.qrEnabled, text: screenData.qrCodeText });
@@ -447,56 +463,111 @@ function startContentPlayback(screenId) {
             weatherWidget.style.display = 'none';
         }
         
-        // --- LÓGICA MEJORADA PARA CARGAR PLAYLIST DE MÚSICA ---
-        if (newMusicPlaylistId !== currentMusicPlaylistId) {
-            if (unsubscribeMusicPlaylistListener) unsubscribeMusicPlaylistListener();
+        // --- LÓGICA DE PROGRAMACIÓN (CON GRUPOS Y HORARIOS) ---
+        clearInterval(scheduleCheckInterval); // Limpia el intervalo anterior
 
-            if (newMusicPlaylistId) {
-                const musicPlaylistDocRef = doc(db, 'musicPlaylists', newMusicPlaylistId);
-                unsubscribeMusicPlaylistListener = onSnapshot(musicPlaylistDocRef, (musicPlaylistSnap) => {
-                    if (musicPlaylistSnap.exists()) {
-                        currentMusicPlaylistItems = musicPlaylistSnap.data().items || [];
-                        currentMusicItemIndex = 0;
-                        playNextMusicItem();
+        const checkSchedule = () => {
+            const now = new Date();
+            const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
+            const currentTime = now.toTimeString().slice(0, 5);
+
+            let finalVisualPlaylistId;
+            let finalMusicPlaylistId;
+
+            // JERARQUÍA 1: La pantalla está gestionada por un grupo.
+            if (screenData.managedByGroup) {
+                // Prioridad 1.1: Regla de horario del grupo.
+                if (screenData.schedulingMode === 'advanced' && screenData.scheduleRules) {
+                    const activeRule = screenData.scheduleRules.find(r => r.days.includes(dayOfWeek) && currentTime >= r.startTime && currentTime < r.endTime);
+                    if (activeRule) {
+                        finalVisualPlaylistId = activeRule.playlistId || null;
+                        finalMusicPlaylistId = activeRule.musicPlaylistId || null;
                     } else {
-                        audioPlayer.pause();
-                        currentMusicPlaylistItems = [];
+                        // Si no hay regla activa, usa la configuración simple del grupo.
+                        finalVisualPlaylistId = screenData.playlistId;
+                        finalMusicPlaylistId = screenData.musicPlaylistId;
                     }
-                });
+                } else {
+                    // Prioridad 1.2: Configuración simple del grupo.
+                    finalVisualPlaylistId = screenData.playlistId;
+                    finalMusicPlaylistId = screenData.musicPlaylistId;
+                }
+            } else {
+                // JERARQUÍA 2: La pantalla se gestiona individualmente.
+                finalVisualPlaylistId = screenData.playlistId; // Por defecto, la simple.
+                finalMusicPlaylistId = screenData.musicPlaylistId; // Por defecto, la simple.
+
+                // Prioridad 2.1: Reglas de horario individuales.
+                if (screenData.visualSchedulingMode === 'advanced' && screenData.visualScheduleRules) {
+                    const activeRule = screenData.visualScheduleRules.find(r => r.days.includes(dayOfWeek) && currentTime >= r.startTime && currentTime < r.endTime);
+                    if (activeRule) finalVisualPlaylistId = activeRule.playlistId || null;
+                }
+                if (screenData.musicSchedulingMode === 'advanced' && screenData.musicScheduleRules) {
+                    const activeRule = screenData.musicScheduleRules.find(r => r.days.includes(dayOfWeek) && currentTime >= r.startTime && currentTime < r.endTime);
+                    if (activeRule) finalMusicPlaylistId = activeRule.musicPlaylistId || null;
+                }
+            }
+
+            // Cargar las playlists si han cambiado
+            if (finalVisualPlaylistId !== currentVisualPlaylistId) {
+                loadVisualPlaylist(finalVisualPlaylistId);
+            }
+            if (finalMusicPlaylistId !== currentMusicPlaylistId) {
+                loadMusicPlaylist(finalMusicPlaylistId);
+            }
+        };
+
+        checkSchedule();
+        scheduleCheckInterval = setInterval(checkSchedule, 60000);
+    });
+}
+
+function loadVisualPlaylist(playlistId) {
+    currentVisualPlaylistId = playlistId;
+    if (unsubscribePlaylistListener) unsubscribePlaylistListener();
+
+    if (playlistId) {
+        const playlistDocRef = doc(db, 'playlists', playlistId);
+        unsubscribePlaylistListener = onSnapshot(playlistDocRef, (playlistSnap) => {
+            if (playlistSnap.exists()) {
+                currentPlaylistItems = playlistSnap.data().items || [];
+                currentItemIndex = 0;
+                playNextItem();
+            } else {
+                displayMessage("Error: La playlist visual no fue encontrada.");
+            }
+        });
+    } else {
+        currentPlaylistItems = [];
+        playNextItem(); // Esto mostrará el mensaje de "No hay playlist asignada"
+    }
+}
+
+function loadMusicPlaylist(playlistId) {
+    currentMusicPlaylistId = playlistId;
+    if (unsubscribeMusicPlaylistListener) unsubscribeMusicPlaylistListener();
+
+    if (playlistId) {
+        const musicPlaylistDocRef = doc(db, 'musicPlaylists', playlistId);
+        unsubscribeMusicPlaylistListener = onSnapshot(musicPlaylistDocRef, (musicPlaylistSnap) => {
+            if (musicPlaylistSnap.exists()) {
+                currentMusicPlaylistItems = musicPlaylistSnap.data().items || [];
+                currentMusicItemIndex = 0;
+                playNextMusicItem();
             } else {
                 audioPlayer.pause();
                 currentMusicPlaylistItems = [];
             }
-            currentMusicPlaylistId = newMusicPlaylistId;
-        }
-
-        // --- LÓGICA MEJORADA PARA CARGAR PLAYLIST VISUAL ---
-        if (newPlaylistId !== currentVisualPlaylistId) {
-            if (unsubscribePlaylistListener) unsubscribePlaylistListener();
-
-            if (newPlaylistId) {
-                const playlistDocRef = doc(db, 'playlists', newPlaylistId);
-                unsubscribePlaylistListener = onSnapshot(playlistDocRef, (playlistSnap) => {
-                    if (playlistSnap.exists()) {
-                        currentPlaylistItems = playlistSnap.data().items || [];
-                        currentItemIndex = 0;
-                        playNextItem();
-                    } else {
-                        displayMessage("Error: La playlist visual no fue encontrada.");
-                    }
-                });
-            } else {
-                currentPlaylistItems = [];
-                playNextItem();
-            }
-            currentVisualPlaylistId = newPlaylistId;
-        }
-    });
+        });
+    } else {
+        audioPlayer.pause();
+        currentMusicPlaylistItems = [];
+    }
 }
 
 // Muestra el siguiente item en la lista
 function playNextItem() { // Ya no necesita ser 'async'
-    if (!currentPlaylistItems || currentPlaylistItems.length === 0) {
+    if (currentPlaylistItems.length === 0) {
         // Si la lista está vacía, muestra un mensaje y termina.
         displayMessage("No hay ninguna playlist visual asignada.");
         return;
@@ -552,7 +623,8 @@ function displayMedia(item) {
         }
 
         const video = document.createElement('video');
-        video.src = item.url;
+        // Añadimos un parámetro único para evitar errores de caché del navegador (net::ERR_CACHE_OPERATION_NOT_SUPPORTED)
+        video.src = `${item.url}&_cacheBust=${new Date().getTime()}`;
         video.className = 'w-full h-full object-contain';
         video.autoplay = true;
         video.muted = false; // Permitimos el sonido del video
@@ -685,6 +757,38 @@ function displayMedia(item) {
 
         updateFullscreenClock(); // Primera llamada
         const durationInSeconds = item.duration || 10;
+        setTimeout(playNextItem, durationInSeconds * 1000);
+
+    } else if (item.type === 'qrcode') {
+        // Si hay música de fondo, la reanudamos si estaba pausada.
+        if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
+            audioPlayer.play().catch(e => console.error("Error al reanudar audio para QR:", e));
+        }
+
+        const qrContainer = document.createElement('div');
+        qrContainer.className = 'w-full h-full flex flex-col items-center justify-center bg-white text-gray-800 p-8';
+        
+        const qrCodeEl = document.createElement('div');
+        const qrTextEl = document.createElement('p');
+        qrTextEl.className = 'text-3xl md:text-4xl font-semibold mt-8 text-center';
+
+        qrContainer.append(qrCodeEl, qrTextEl);
+        contentScreen.appendChild(qrContainer);
+
+        const screenId = localStorage.getItem('nexusplay_screen_id');
+        if (screenId) {
+            new QRCode(qrCodeEl, {
+                text: item.qrUrl || window.location.origin,
+                width: 300,
+                height: 300,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+            });
+
+            qrTextEl.textContent = item.text || (translations[document.documentElement.lang || 'es']?.scanForMenu || "Escanea para más info");
+        }
+
+        const durationInSeconds = item.duration || 15;
         setTimeout(playNextItem, durationInSeconds * 1000);
 
     } else if (item.type === 'youtube' || item.type === 'iframe') {

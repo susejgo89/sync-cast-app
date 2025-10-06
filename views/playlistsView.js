@@ -1,7 +1,7 @@
 // views/playlistsView.js
 
 import { db } from '../firebase-config.js';
-import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
 import { createMediaCard } from '../components/mediaCard.js';
@@ -27,6 +27,7 @@ let draggedItem = null;
 let onPlaylistsUpdate = () => {}; // Callback function
 let getMediaData = () => [];
 let listenersAttached = false;
+let setCurrentQrId = () => {};
 let getLang = () => 'es'; // Guardaremos la función aquí
 
 
@@ -47,7 +48,7 @@ function createPlaylistItemElement(item, index, currentLang) {
     el.className = 'flex items-center bg-gray-200 p-2 rounded-lg cursor-grab';
     el.draggable = true;
     el.dataset.index = index;
-    const isEditable = item.type.startsWith('image') || item.type === 'iframe' || item.type === 'youtube' || item.type === 'clock' || item.type === 'weather';
+    const isEditable = item.type.startsWith('image') || item.type === 'iframe' || item.type === 'youtube' || item.type === 'clock' || item.type === 'weather' || item.type === 'qrcode';
 
     // El cambio se hace dentro de esta plantilla de HTML
     el.innerHTML = `
@@ -58,6 +59,7 @@ function createPlaylistItemElement(item, index, currentLang) {
             ${item.type === 'iframe' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.5-1.5a.5.5 0 01.707-.707l1.5 1.5a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path><path fill-rule="evenodd" d="M4.086 15.414a2 2 0 010-2.828l3-3a2 2 0 012.828 0l1.5 1.5a.5.5 0 01-.707.707l-1.5-1.5a1 1 0 00-1.414 0l-3 3a1 1 0 000 1.414 1 1 0 001.414 0l.5-.5a.5.5 0 11.707.707l-.5.5a2 2 0 01-2.828 0z" clip-rule="evenodd"></path></svg>` : ''}
             ${item.type === 'clock' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>` : ''}
             ${item.type === 'weather' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.312 11.218a.5.5 0 01.688.718A6.979 6.979 0 0110 16a6.979 6.979 0 01-6-4.064.5.5 0 01.688-.718A5.979 5.979 0 0010 15a5.979 5.979 0 005.312-3.782zM10 4a.5.5 0 01.5.5v5a.5.5 0 01-1 0v-5A.5.5 0 0110 4z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'qrcode' ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M3 10v4M21 10v4M10 3h4M10 21h4"></path></svg>` : ''}
         </div>
 
         <div class="flex-grow min-w-0">
@@ -196,11 +198,12 @@ function loadPlaylists(userId) {
     });
 }
 
-export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDataGetter) {
+export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDataGetter, setQrIdCallback) {
     currentUserId = userId;
     onPlaylistsUpdate = onUpdateCallback;
     getLang = langGetter; // Guardamos la función para usarla en todo el módulo
     getMediaData = mediaDataGetter;
+    setCurrentQrId = setQrIdCallback;
 
     if (!listenersAttached) {
         addPlaylistBtn.addEventListener('click', () => addPlaylistModal.classList.add('active'));
@@ -249,6 +252,33 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
                 location: '' // Añadimos la propiedad de ubicación
             };
             await updateDoc(doc(db, 'playlists', activePlaylistId), { items: arrayUnion(weatherItem) });
+        });
+
+        const addQrBtn = document.getElementById('add-qr-fullscreen-item-btn');
+        addQrBtn.addEventListener('click', async () => {
+            if (!activePlaylistId) {
+                alert(translations[getLang()].selectPlaylistFirst);
+                return;
+            }
+            const qrItem = { 
+                type: 'qrcode', 
+                name: 'Código QR Pantalla Completa', 
+                duration: 15,
+                text: translations[getLang()].scanForMenu || 'Escanea para más info',
+                qrType: 'url',
+                qrUrl: '',
+                qrMenuId: `qr_${Date.now()}`
+            };
+
+            // Creamos el documento en qrContents por adelantado para evitar errores de permisos
+            const qrContentRef = doc(db, 'qrMenus', qrItem.qrMenuId);
+            await setDoc(qrContentRef, {
+                userId: currentUserId,
+                items: []
+            });
+
+            // Añadimos el item a la playlist
+            await updateDoc(doc(db, 'playlists', activePlaylistId), { items: arrayUnion(qrItem) });
         });
 
         deletePlaylistBtn.addEventListener('click', () => { 
@@ -344,13 +374,58 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
 
                     // Mostramos el campo de ubicación SOLO si es un item de clima
                     const locationContainer = document.getElementById('edit-item-location-container');
+                    const qrContainer = document.getElementById('edit-item-qr-container');
+
                     if (item.type === 'weather') {
                         document.getElementById('edit-item-location').value = item.location || '';
                         locationContainer.classList.remove('hidden');
+                        qrContainer.classList.add('hidden');
+                    } else if (item.type === 'qrcode') {
+                        document.getElementById('edit-item-qr-text').value = item.text || '';
+                        const qrTypeSelect = document.getElementById('edit-item-qr-type');
+                        const qrUrlContainer = document.getElementById('edit-item-qr-url-container');
+                        const qrMenuContainer = document.getElementById('edit-item-qr-menu-container');
+                        
+                        qrTypeSelect.value = item.qrType || 'url';
+                        
+                        if (qrTypeSelect.value === 'url') {
+                            document.getElementById('edit-item-qr-url').value = item.qrUrl || '';
+                            qrUrlContainer.classList.remove('hidden');
+                            qrMenuContainer.classList.add('hidden');
+                        } else { // menu
+                            qrUrlContainer.classList.add('hidden');
+                            qrMenuContainer.classList.remove('hidden');
+                        }
+
+                        qrContainer.classList.remove('hidden');
+                        locationContainer.classList.add('hidden');
                     } else {
                         locationContainer.classList.add('hidden');
+                        qrContainer.classList.add('hidden');
                     }
                 }
+            }
+        });
+
+        document.getElementById('edit-item-qr-type').addEventListener('change', (e) => {
+            const type = e.target.value;
+            document.getElementById('edit-item-qr-url-container').classList.toggle('hidden', type !== 'url');
+            document.getElementById('edit-item-qr-menu-container').classList.toggle('hidden', type !== 'menu');
+        });
+
+        document.getElementById('edit-item-qr-select-media-btn').addEventListener('click', async () => {
+            const index = parseInt(document.getElementById('edit-item-index').value);
+            const playlistRef = doc(db, 'playlists', activePlaylistId);
+            const playlistSnap = await getDoc(playlistRef);
+            if (!playlistSnap.exists()) return;
+            const items = playlistSnap.data().items || [];
+            const item = items[index];
+
+            if (item && item.qrMenuId) {
+                // Notificamos al script principal el ID del QR que estamos editando
+                setCurrentQrId(item.qrMenuId);
+                document.dispatchEvent(new CustomEvent('openQrContentModal', { detail: { qrMenuId: item.qrMenuId } }));
+                document.getElementById('qr-content-modal').classList.add('active');
             }
         });
 
@@ -366,6 +441,11 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
                 items[index].duration = parseInt(document.getElementById('edit-item-duration').value);
                 if (items[index].type === 'weather') {
                     items[index].location = document.getElementById('edit-item-location').value.trim();
+                }
+                if (items[index].type === 'qrcode') {
+                    items[index].qrType = document.getElementById('edit-item-qr-type').value;
+                    items[index].text = document.getElementById('edit-item-qr-text').value.trim();
+                    items[index].qrUrl = document.getElementById('edit-item-qr-url').value.trim();
                 }
                 await updateDoc(playlistRef, { items });
             }

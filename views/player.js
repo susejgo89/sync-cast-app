@@ -327,6 +327,10 @@ let unsubscribeScreenListener = null;
 let unsubscribePlaylistListener = null;
 let unsubscribeMusicPlaylistListener = null; // Listener para la playlist de música
 
+let currentVisualPlaylistId = null; 
+let scheduleCheckInterval = null;
+let currentMusicPlaylistId = null;
+
 let currentMusicPlaylistItems = [];
 let currentMusicItemIndex = 0;
 const audioPlayer = new Audio(); // Nuestro reproductor de música dedicado

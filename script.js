@@ -9,7 +9,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         import { initPlaylistsView } from './views/playlistsView.js';
         import { initScreensView } from './views/screensView.js'; 
         import { initMusicPlaylistsView } from './views/musicPlaylistsView.js';
-        
+        import { initGroupsView } from './views/groupsView.js';
+        import { createMediaCard } from './components/mediaCard.js';
         
         document.addEventListener('DOMContentLoaded', () => {
             const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -54,12 +55,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let userPlaylistsData = [];
         let userMusicPlaylistsData = [];
         let userScreensData = [];
+        let userGroupsData = [];
         let unsubscribeMedia = null;
         let playlistsViewInstance = null;
         let unsubscribeMusicPlaylists = null;
         let screensViewInstance = null;
         let currentUserId = null;
+        let groupsViewInstance = null;
         let activePlaylistId = null;
+        let currentScreenForQr = null;
         let draggedItem = null;
         
 
@@ -171,6 +175,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         if (playlistsViewInstance) playlistsViewInstance.unsubscribe();
         if (unsubscribeMusicPlaylists) unsubscribeMusicPlaylists();
         if (screensViewInstance) screensViewInstance.unsubscribe();
+        if (groupsViewInstance) groupsViewInstance.unsubscribe();
     }
     
     loader.style.display = 'none';
@@ -238,6 +243,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             loginFormContainer.style.display = 'block'; // Usamos el nombre correcto
         });
 
+        function formatTimeAgo(date, lang) {
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return lang === 'es' ? `hace ${Math.floor(interval)} años` : ` ${Math.floor(interval)} years ago`;
+            interval = seconds / 2592000;
+            if (interval > 1) return lang === 'es' ? `hace ${Math.floor(interval)} meses` : ` ${Math.floor(interval)} months ago`;
+            interval = seconds / 86400;
+            if (interval > 1) return lang === 'es' ? `hace ${Math.floor(interval)} días` : ` ${Math.floor(interval)} days ago`;
+            interval = seconds / 3600;
+            if (interval > 1) return lang === 'es' ? `hace ${Math.floor(interval)} horas` : ` ${Math.floor(interval)} hours ago`;
+            interval = seconds / 60;
+            if (interval > 1) return lang === 'es' ? `hace ${Math.floor(interval)} minutos` : ` ${Math.floor(interval)} minutes ago`;
+            return lang === 'es' ? 'justo ahora' : 'just now';
+        }
+
         function updateDashboardCards() {
             // Card de Medios
             const mediaCountEl = document.getElementById('media-count');
@@ -275,15 +296,55 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     recentMedia.forEach(media => {
                         const isVideo = media.type.startsWith('video');
                         const thumb = document.createElement(isVideo ? 'video' : 'img');
-                        thumb.src = media.url;
+                        thumb.src = isVideo ? `${media.url.split('&token=')[0]}&token=${media.url.split('&token=')[1]}#t=0.5` : media.url;
                         thumb.title = media.name;
                         thumb.className = 'recent-upload-thumb';
-                        if (isVideo) thumb.muted = true; // Videos must be muted to maybe autoplay
+                        if (isVideo) thumb.muted = true;
                         thumb.onerror = () => { thumb.src = 'https://placehold.co/100x60/EEE/31343C?text=Error'; };
                         recentUploadsContainer.appendChild(thumb);
                     });
                 } else {
                     recentUploadsContainer.innerHTML = `<p class="text-xs text-gray-400 col-span-3 text-center" data-lang="dashboardNoRecentUploads">${translations[currentLang].dashboardNoRecentUploads || 'No hay archivos recientes.'}</p>`;
+                }
+            }
+
+            // Card de Actividad Reciente
+            const recentActivityContainer = document.getElementById('recent-activity-container');
+            if (recentActivityContainer) {
+                const recentScreens = userScreensData
+                    .filter(s => s.lastScheduledAt)
+                    .map(s => ({ ...s, type: 'screen' }));
+
+                const recentGroups = userGroupsData
+                    .filter(g => g.lastScheduledAt)
+                    .map(g => ({ ...g, type: 'group' }));
+
+                const allActivities = [...recentScreens, ...recentGroups]
+                    .sort((a, b) => b.lastScheduledAt.seconds - a.lastScheduledAt.seconds)
+                    .slice(0, 4); // Mostramos las 4 más recientes
+
+                recentActivityContainer.innerHTML = '';
+                if (allActivities.length > 0) {
+                    allActivities.forEach(activity => {
+                        const activityEl = document.createElement('div');
+                        activityEl.className = 'flex items-center text-sm p-2 bg-gray-50 rounded-md border';
+                        const icon = activity.type === 'screen' 
+                            ? `<svg class="w-5 h-5 mr-3 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>`
+                            : `<svg class="w-5 h-5 mr-3 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a3.002 3.002 0 013.292-2.296M12 10a4 4 0 110-8 4 4 0 010 8zm0 0a2 2 0 100-4 2 2 0 000 4z"></path></svg>`;
+                        
+                        const timeAgo = formatTimeAgo(activity.lastScheduledAt.toDate(), currentLang);
+
+                        activityEl.innerHTML = `
+                            ${icon}
+                            <div class="flex-grow min-w-0">
+                                <p class="font-semibold truncate text-gray-700">${activity.name}</p>
+                                <p class="text-xs text-gray-500">${timeAgo}</p>
+                            </div>
+                        `;
+                        recentActivityContainer.appendChild(activityEl);
+                    });
+                } else {
+                    recentActivityContainer.innerHTML = `<p class="text-xs text-gray-400 text-center" data-lang="dashboardNoRecentActivity">${translations[currentLang].dashboardNoRecentActivity || 'No hay actividad reciente.'}</p>`;
                 }
             }
         }
@@ -293,14 +354,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 userMediaData = media;
                 if (playlistsViewInstance) {
                     playlistsViewInstance.rerenderLibrary();
-                }
+                } 
                 updateDashboardCards();
             });
             playlistsViewInstance = initPlaylistsView(userId, () => currentLang, (playlists) => {
                 userPlaylistsData = playlists;
                 if (screensViewInstance) screensViewInstance.rerender();
                 updateDashboardCards();
-            }, () => userMediaData);
+            }, () => userMediaData, (qrId) => { currentScreenForQr = qrId; }); // Pasamos la función para setear el QR
             unsubscribeMusicPlaylists = initMusicPlaylistsView(userId, () => currentLang, (musicPlaylists) => {
                 userMusicPlaylistsData = musicPlaylists;
                 if (screensViewInstance) screensViewInstance.rerender();
@@ -308,18 +369,71 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }, () => userMediaData);
             screensViewInstance = initScreensView(userId, () => userPlaylistsData, () => userMusicPlaylistsData, () => currentLang, () => userMediaData, (screens) => {
                 userScreensData = screens;
+                updateDashboardCards(); 
+            }, () => userGroupsData, (screenId) => { currentScreenForQr = screenId; }); // Pasamos la función para setear el QR
+            groupsViewInstance = initGroupsView(userId, () => currentLang, () => userScreensData, () => userPlaylistsData, () => userMusicPlaylistsData, (groups) => {
+                userGroupsData = groups;
                 updateDashboardCards();
             });
         }
 
+        // Listener para abrir el modal de QR desde playlistsView
+        document.addEventListener('openQrContentModal', async (e) => {
+            const qrMenuId = e.detail.qrMenuId;
+            const qrContentRef = doc(db, 'qrMenus', qrMenuId);
+            const qrContentSnap = await getDoc(qrContentRef);
+            const existingIds = qrContentSnap.exists() ? qrContentSnap.data().items : [];
+
+            const visualMedia = userMediaData.filter(media => !media.type.startsWith('audio/'));
+            const qrContentMediaLibrary = document.getElementById('qr-content-media-library');
+            qrContentMediaLibrary.innerHTML = '';
+            visualMedia.forEach(media => {
+                const isSelected = existingIds.includes(media.id);
+                const card = createMediaCard(media, { isDraggable: false });
+                // Añadimos una clase específica para el modal de QR
+                card.classList.add('qr-media-card-selectable'); 
+                if (isSelected) card.classList.add('selected');
+                qrContentMediaLibrary.appendChild(card);
+            });
+        });
+
+        // Listener para la selección de items en el modal de QR
+        const qrContentMediaLibrary = document.getElementById('qr-content-media-library');
+        const qrContentSaveBtn = document.getElementById('qr-content-save');
+        const qrContentCancelBtn = document.getElementById('qr-content-cancel');
+        const qrContentModal = document.getElementById('qr-content-modal');
+
+        qrContentMediaLibrary.addEventListener('click', (e) => {
+            const card = e.target.closest('.qr-media-card-selectable');
+            if (card) {
+                card.classList.toggle('selected');
+            }
+        });
+
+        qrContentCancelBtn.addEventListener('click', () => qrContentModal.classList.remove('active'));
+
+        qrContentSaveBtn.addEventListener('click', async () => {
+            if (!currentScreenForQr) return;
+        
+            const selectedIds = [];
+            qrContentMediaLibrary.querySelectorAll('.qr-media-card-selectable.selected').forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                if (checkbox) selectedIds.push(checkbox.dataset.mediaId);
+            });
+        
+            if (currentScreenForQr.startsWith('qr_')) {
+                const qrContentRef = doc(db, 'qrMenus', currentScreenForQr);
+                await setDoc(qrContentRef, { items: selectedIds, userId: currentUserId }, { merge: true });
+            } else {
+                const screenRef = doc(db, 'screens', currentScreenForQr);
+                await updateDoc(screenRef, { qrCodeItems: selectedIds });
+            }
+            qrContentModal.classList.remove('active');
+        });
+
         // --- Navigation Logic ---
         const navLinks = document.querySelectorAll('.nav-link');
         const pageSections = document.querySelectorAll('.page-section');
-        navLinks.forEach(link => { link.addEventListener('click', e => { e.preventDefault(); const targetId = link.getAttribute('href').substring(1); pageSections.forEach(s => s.classList.add('hidden')); navLinks.forEach(l => {l.classList.remove('bg-neutral-700', 'text-white')}); document.getElementById(`${targetId}-section`).classList.remove('hidden'); link.classList.add('bg-neutral-700', 'text-white');
-         
-        const linkText = link.querySelector('span').textContent;
-        document.title = `${linkText} - NexusPlay`;
-    }); });
         navLinks.forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();

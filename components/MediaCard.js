@@ -25,7 +25,7 @@ export function createMediaCard(media, options = {}) {
     }
 
     card.innerHTML = `
-        ${media.type.startsWith('video') ? `<video src="${media.url}" class="w-full h-40 object-cover" muted></video>` : `<img src="${media.url}" alt="${media.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/EEE/31343C?text=Error';">`}
+        ${media.type.startsWith('video') ? `<video src="${media.url.split('&token=')[0]}&token=${media.url.split('&token=')[1]}" class="w-full h-40 object-cover" muted></video>` : `<img src="${media.url}" alt="${media.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/EEE/31343C?text=Error';">`}
         <div class="p-3"><p class="text-gray-700 text-sm truncate" title="${media.name}">${media.name}</p></div>
         ${onDelete ? `<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button class="delete-media-btn bg-red-600 hover:bg-red-700 text-white p-2 rounded-full">
