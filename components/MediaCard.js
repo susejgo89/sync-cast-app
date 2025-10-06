@@ -27,10 +27,6 @@ export function createMediaCard(media, options = {}) {
     }
 
     card.innerHTML = `
-<<<<<<< HEAD
-        ${media.type.startsWith('video') ? `<video src="${media.url.split('&token=')[0]}&token=${media.url.split('&token=')[1]}" class="w-full h-40 object-cover" muted></video>` : `<img src="${media.url}" alt="${media.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/EEE/31343C?text=Error';">`}
-        <div class="p-3"><p class="text-gray-700 text-sm truncate" title="${media.name}">${media.name}</p></div>
-=======
         ${media.type.startsWith('image/') ? 
             `<img src="${media.url}" alt="${media.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/EEE/31343C?text=Error';">` :
          media.type.startsWith('video/') ? 
@@ -41,7 +37,6 @@ export function createMediaCard(media, options = {}) {
         <div class="p-3 h-16 flex items-start">
             <p class="text-gray-700 text-sm line-clamp-2" title="${media.name}">${media.name}</p>
         </div>
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
         ${onDelete ? `<div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button class="delete-media-btn bg-red-600 hover:bg-red-700 text-white p-2 rounded-full">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>

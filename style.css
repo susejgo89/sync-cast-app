@@ -296,81 +296,31 @@ input[type=number] {
     -moz-appearance: textfield; 
 }
 
-/* --- QR Content Selection Styles --- */
-.qr-media-card {
-    position: relative;
-    cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    transition: border-color 0.2s;
-}
-.qr-media-card.selected {
-    border-color: #7c3aed;
-}
-.qr-media-card .checkbox-overlay {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 2px solid #a7a7a7;
-    border-radius: 50%;
-}
-.qr-media-card.selected .checkbox-overlay {
-    background-color: #7c3aed;
-    border-color: #7c3aed;
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
-}
-
-/* --- QR Content Selection Styles --- */
-.qr-media-card {
-    position: relative;
-    cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    transition: border-color 0.2s;
-}
-.qr-media-card.selected {
-    border-color: #7c3aed;
-}
-.qr-media-card .checkbox-overlay {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 2px solid #a7a7a7;
-    border-radius: 50%;
-}
-.qr-media-card.selected .checkbox-overlay {
-    background-color: #7c3aed;
-    border-color: #7c3aed;
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
-}
-
-<<<<<<< HEAD
 /* Estilos para la selección de medios en el modal de QR */
 .qr-media-card-selectable {
-    @apply relative cursor-pointer border-4 border-transparent rounded-lg overflow-hidden;
+    position: relative;
+    cursor: pointer;
+    border: 4px solid transparent;
+    border-radius: 0.5rem; /* rounded-lg */
+    overflow: hidden;
 }
 
 .qr-media-card-selectable.selected {
-    @apply border-violet-600;
+    border-color: #7c3aed; /* violet-600 */
 }
 
 .qr-media-card-selectable.selected::after {
     content: '✓';
-    @apply absolute top-2 right-2 bg-violet-600 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold;
-=======
-/* --- Estilos para la selección de tarjetas de medios en modales --- */
-.card.selected {
-    border: 2px solid #7c3aed; /* Borde violeta */
-}
-.card.selected .selection-overlay {
-    opacity: 1; /* Muestra la capa semitransparente y el check */
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
+    position: absolute;
+    top: 0.5rem; /* top-2 */
+    right: 0.5rem; /* right-2 */
+    background-color: #7c3aed; /* bg-violet-600 */
+    color: white;
+    border-radius: 9999px; /* rounded-full */
+    width: 1.5rem; /* w-6 */
+    height: 1.5rem; /* h-6 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700; /* font-bold */
 }

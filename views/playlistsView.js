@@ -1,11 +1,7 @@
 // views/playlistsView.js
 
 import { db } from '../firebase-config.js';
-<<<<<<< HEAD
-import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-=======
-import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
+import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion, setDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
 import { createMediaCard } from '../components/mediaCard.js';
@@ -23,10 +19,6 @@ const addPlaylistModal = document.getElementById('add-playlist-modal');
 const addPlaylistForm = document.getElementById('add-playlist-form');
 const newPlaylistNameInput = document.getElementById('new-playlist-name');
 const addPlaylistCancelBtn = document.getElementById('add-playlist-cancel');
-const playlistQrContentModal = document.getElementById('playlist-qr-content-modal');
-const playlistQrContentMediaLibrary = document.getElementById('playlist-qr-content-media-library');
-const playlistQrContentCancelBtn = document.getElementById('playlist-qr-content-cancel');
-const playlistQrContentSaveBtn = document.getElementById('playlist-qr-content-save');
 
 // State
 let currentUserId = null;
@@ -35,11 +27,7 @@ let draggedItem = null;
 let onPlaylistsUpdate = () => {}; // Callback function
 let getMediaData = () => [];
 let listenersAttached = false;
-<<<<<<< HEAD
 let setCurrentQrId = () => {};
-=======
-let currentItemForQr = { playlistId: null, itemIndex: -1 };
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
 let getLang = () => 'es'; // Guardaremos la función aquí
 
 
@@ -71,11 +59,7 @@ function createPlaylistItemElement(item, index, currentLang) {
             ${item.type === 'iframe' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.5-1.5a.5.5 0 01.707-.707l1.5 1.5a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path><path fill-rule="evenodd" d="M4.086 15.414a2 2 0 010-2.828l3-3a2 2 0 012.828 0l1.5 1.5a.5.5 0 01-.707.707l-1.5-1.5a1 1 0 00-1.414 0l-3 3a1 1 0 000 1.414 1 1 0 001.414 0l.5-.5a.5.5 0 11.707.707l-.5.5a2 2 0 01-2.828 0z" clip-rule="evenodd"></path></svg>` : ''}
             ${item.type === 'clock' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>` : ''}
             ${item.type === 'weather' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.312 11.218a.5.5 0 01.688.718A6.979 6.979 0 0110 16a6.979 6.979 0 01-6-4.064.5.5 0 01.688-.718A5.979 5.979 0 0010 15a5.979 5.979 0 005.312-3.782zM10 4a.5.5 0 01.5.5v5a.5.5 0 01-1 0v-5A.5.5 0 0110 4z" clip-rule="evenodd"></path></svg>` : ''}
-<<<<<<< HEAD
             ${item.type === 'qrcode' ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M3 10v4M21 10v4M10 3h4M10 21h4"></path></svg>` : ''}
-=======
-            ${item.type === 'qrcode' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5h3v3H5V5zm6 0h3v3h-3V5zm6 0h3v3h-3V5zM5 11h3v3H5v-3zm6 6h3v3h-3v-3zm6-6h3v3h-3v-3zM5 17h3v3H5v-3zm6-6h3v3h-3v-3z"></path></svg>` : ''}
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
         </div>
 
         <div class="flex-grow min-w-0">
@@ -85,11 +69,6 @@ function createPlaylistItemElement(item, index, currentLang) {
         <div class="flex items-center gap-x-3 mx-3">
             ${isEditable ? `
                 <span class="text-sm text-gray-500">${item.duration || 10}s</span>
-                ${(item.type === 'qrcode' && (item.qrType || 'menu') === 'menu') ? `
-                    <button class="select-qr-content-direct-btn text-gray-500 hover:text-violet-600 p-1" data-index="${index}" title="Seleccionar Contenido QR">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    </button>
-                ` : ''}
                 <button class="edit-item-btn text-gray-500 hover:text-violet-600 p-1" data-index="${index}" title="Editar">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21H3v-3.5L14.732 5.232z"></path></svg>
                 </button>
@@ -151,7 +130,7 @@ async function selectPlaylist(playlistId) {
     newForm.addEventListener('submit', async (e) => {
         e.preventDefault(); // Previene la recarga de la página.
         if (!activePlaylistId) {
-            alert(translations[lang].selectPlaylistFirst || 'Por favor, selecciona una playlist primero.');
+            alert(translations[getLang()].selectPlaylistFirst || 'Por favor, selecciona una playlist primero.');
             return;
         }
         const url = newUrlInput.value.trim();
@@ -275,22 +254,14 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
             await updateDoc(doc(db, 'playlists', activePlaylistId), { items: arrayUnion(weatherItem) });
         });
 
-<<<<<<< HEAD
         const addQrBtn = document.getElementById('add-qr-fullscreen-item-btn');
         addQrBtn.addEventListener('click', async () => {
             if (!activePlaylistId) {
                 alert(translations[getLang()].selectPlaylistFirst);
-=======
-        const addQrBtn = document.getElementById('add-qr-item-btn');
-        addQrBtn.addEventListener('click', async () => {
-            if (!activePlaylistId) {
-                alert(translations[getLang()].selectPlaylistFirst || 'Por favor, selecciona una playlist primero.');
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
                 return;
             }
             const qrItem = { 
                 type: 'qrcode', 
-<<<<<<< HEAD
                 name: 'Código QR Pantalla Completa', 
                 duration: 15,
                 text: translations[getLang()].scanForMenu || 'Escanea para más info',
@@ -307,15 +278,6 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
             });
 
             // Añadimos el item a la playlist
-=======
-                name: 'QR Pantalla Completa', 
-                duration: 15,
-                text: translations[getLang()].scanForMenu || 'Escanea para más info',
-                qrType: 'menu', // Por defecto, apunta al menú interactivo
-                qrUrl: '',       // URL personalizada vacía por defecto
-                qrMenuId: null   // ID para el menú interactivo personalizado
-            };
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
             await updateDoc(doc(db, 'playlists', activePlaylistId), { items: arrayUnion(qrItem) });
         });
 
@@ -336,6 +298,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
 
         playlistContentArea.addEventListener('drop', async e => {
             e.preventDefault();
+            playlistContentArea.classList.remove('drag-over');
             const mediaInfoStr = e.dataTransfer.getData('application/json');
             const playlistRef = doc(db, 'playlists', activePlaylistId);
             const playlistDoc = await getDoc(playlistRef);
@@ -357,38 +320,35 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
         });
 
        playlistContentArea.addEventListener('click', async (e) => {
-    const removeBtn = e.target.closest('.remove-item-btn');
-    if (removeBtn) {
-        const indexToRemove = parseInt(removeBtn.dataset.index);
-        const playlistRef = doc(db, 'playlists', activePlaylistId);
-        const playlistDoc = await getDoc(playlistRef);
+            const removeBtn = e.target.closest('.remove-item-btn');
+            if (removeBtn) {
+                const indexToRemove = parseInt(removeBtn.dataset.index);
+                const playlistRef = doc(db, 'playlists', activePlaylistId);
+                const playlistDoc = await getDoc(playlistRef);
 
-        if (playlistDoc.exists()) {
-            let items = playlistDoc.data().items || [];
-            const itemToRemove = items[indexToRemove];
+                if (playlistDoc.exists()) {
+                    let items = playlistDoc.data().items || [];
+                    const itemToRemove = items[indexToRemove];
 
-            if (itemToRemove) {
-                // Usamos getLang() para obtener el idioma actual
-                const lang = getLang(); 
-                showConfirmModal(
-                    translations[lang].confirmRemoveItemTitle || "Confirmar Eliminación",
-                    `${translations[lang].confirmRemoveItemMsg || '¿Seguro que quieres quitar'} "${itemToRemove.name}"?`,
-                    async () => {
-                        items.splice(indexToRemove, 1);
-                        await updateDoc(playlistRef, { items });
+                    if (itemToRemove) {
+                        // Usamos getLang() para obtener el idioma actual
+                        const lang = getLang(); 
+                        showConfirmModal(
+                            translations[lang].confirmRemoveItemTitle || "Confirmar Eliminación",
+                            `${translations[lang].confirmRemoveItemMsg || '¿Seguro que quieres quitar'} "${itemToRemove.name}"?`,
+                            async () => {
+                                items.splice(indexToRemove, 1);
+                                await updateDoc(playlistRef, { items });
+                            }
+                        );
                     }
-                );
+                }
             }
-        }
-    }
-});
+        });
 
         document.getElementById('edit-item-cancel').addEventListener('click', () => {
             document.getElementById('edit-item-form').classList.add('hidden');
             document.getElementById('add-url-form').classList.remove('hidden');
-            document.getElementById('add-weather-item-btn').parentElement.classList.remove('hidden');
-            document.getElementById('add-qr-item-btn').parentElement.classList.remove('hidden');
-            document.getElementById('add-clock-item-btn').parentElement.classList.remove('hidden');
         });
 
         playlistContentArea.addEventListener('click', async (e) => {
@@ -403,9 +363,6 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
 
                 if (item) {
                     document.getElementById('add-url-form').classList.add('hidden');
-                    document.getElementById('add-weather-item-btn').parentElement.classList.add('hidden');
-                    document.getElementById('add-qr-item-btn').parentElement.classList.add('hidden');
-                    document.getElementById('add-clock-item-btn').parentElement.classList.add('hidden');
                     const editForm = document.getElementById('edit-item-form');
                     editForm.classList.remove('hidden');
                     document.getElementById('edit-item-name').textContent = item.name;
@@ -414,19 +371,11 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
 
                     // Mostramos el campo de ubicación SOLO si es un item de clima
                     const locationContainer = document.getElementById('edit-item-location-container');
-<<<<<<< HEAD
                     const qrContainer = document.getElementById('edit-item-qr-container');
-=======
-                    const qrTextContainer = document.getElementById('edit-item-qr-text-container');
-                    const qrConfigContainer = document.getElementById('edit-item-qr-config-container');
-                    const qrMenuBtnContainer = document.getElementById('edit-item-qr-menu-btn-container');
-                    const qrUrlContainer = document.getElementById('edit-item-qr-url-container');
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
 
                     if (item.type === 'weather') {
                         document.getElementById('edit-item-location').value = item.location || '';
                         locationContainer.classList.remove('hidden');
-<<<<<<< HEAD
                         qrContainer.classList.add('hidden');
                     } else if (item.type === 'qrcode') {
                         document.getElementById('edit-item-qr-text').value = item.text || '';
@@ -447,33 +396,10 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
 
                         qrContainer.classList.remove('hidden');
                         locationContainer.classList.add('hidden');
+
                     } else {
                         locationContainer.classList.add('hidden');
                         qrContainer.classList.add('hidden');
-=======
-                        qrTextContainer.classList.add('hidden');
-                        qrConfigContainer.classList.add('hidden');
-                        qrMenuBtnContainer.classList.add('hidden');
-                    } else if (item.type === 'qrcode') {
-                        document.getElementById('edit-item-qr-text').value = item.text || '';
-                        document.getElementById('edit-item-qr-type').value = item.qrType || 'menu';
-                        document.getElementById('edit-item-qr-url').value = item.qrUrl || '';
-                        
-                        qrTextContainer.classList.remove('hidden');
-                        qrConfigContainer.classList.remove('hidden');
-                        locationContainer.classList.add('hidden');
-
-                        // Muestra el campo de URL solo si el tipo es 'url'
-                        const isUrlType = (item.qrType || 'menu') === 'url';
-                        qrUrlContainer.classList.toggle('hidden', !isUrlType);
-                        qrMenuBtnContainer.classList.toggle('hidden', isUrlType);
-
-                    } else {
-                        locationContainer.classList.add('hidden');
-                        qrTextContainer.classList.add('hidden');
-                        qrConfigContainer.classList.add('hidden');
-                        qrMenuBtnContainer.classList.add('hidden');
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
                     }
                 }
             }
@@ -518,93 +444,12 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
                     items[index].text = document.getElementById('edit-item-qr-text').value.trim();
                     items[index].qrType = document.getElementById('edit-item-qr-type').value;
                     items[index].qrUrl = document.getElementById('edit-item-qr-url').value.trim();
-
-                    // Si es un menú y no tiene ID, se lo creamos
-                    if (items[index].qrType === 'menu' && !items[index].qrMenuId) {
-                        const newMenuRef = doc(collection(db, 'qrMenus'));
-                        items[index].qrMenuId = newMenuRef.id;
-                    }
-                }
-                if (items[index].type === 'qrcode') {
-                    items[index].qrType = document.getElementById('edit-item-qr-type').value;
-                    items[index].text = document.getElementById('edit-item-qr-text').value.trim();
-                    items[index].qrUrl = document.getElementById('edit-item-qr-url').value.trim();
                 }
                 await updateDoc(playlistRef, { items });
             }
             // En lugar de simular un click, llamamos directamente a la lógica de cierre para más control
             document.getElementById('edit-item-form').classList.add('hidden');
             document.getElementById('add-url-form').classList.remove('hidden');
-            document.getElementById('add-weather-item-btn').parentElement.classList.remove('hidden');
-            document.getElementById('add-qr-item-btn').parentElement.classList.remove('hidden');
-            document.getElementById('add-clock-item-btn').parentElement.classList.remove('hidden');
-        });
-
-        // --- LÓGICA PARA EL BOTÓN DIRECTO DE SELECCIÓN DE CONTENIDO QR ---
-        playlistContentArea.addEventListener('click', async (e) => {
-            const directSelectBtn = e.target.closest('.select-qr-content-direct-btn');
-            if (!directSelectBtn) return;
-
-            const index = parseInt(directSelectBtn.dataset.index);
-            const playlistRef = doc(db, 'playlists', activePlaylistId);
-            const playlistSnap = await getDoc(playlistRef);
-            if (!playlistSnap.exists()) return;
-
-            const item = playlistSnap.data().items[index];
-            if (!item || item.type !== 'qrcode') return;
-
-            let qrMenuId = item.qrMenuId;
-            let existingIds = [];
-
-            // Si el item aún no tiene un menú asignado, lo creamos
-            if (!qrMenuId) {
-                const newMenuRef = doc(collection(db, 'qrMenus'));
-                qrMenuId = newMenuRef.id;
-                const items = playlistSnap.data().items;
-                items[index].qrMenuId = qrMenuId;
-                const batch = writeBatch(db);
-                batch.update(playlistRef, { items: items });
-                batch.set(newMenuRef, { mediaIds: [], userId: currentUserId });
-                await batch.commit();
-            } else {
-                const menuRef = doc(db, 'qrMenus', qrMenuId);
-                const menuSnap = await getDoc(menuRef);
-                if (menuSnap.exists()) {
-                    existingIds = menuSnap.data().mediaIds || [];
-                }
-            }
-
-            currentItemForQr.qrMenuId = qrMenuId; // Guardamos el ID para el botón de guardar del modal
-
-            const visualMedia = getMediaData().filter(media => !media.type.startsWith('audio/'));
-            playlistQrContentMediaLibrary.innerHTML = '';
-            visualMedia.forEach(media => {
-                const isSelected = existingIds.includes(media.id);
-                const card = createMediaCard(media, { isSelectable: true, isSelected: isSelected });
-                playlistQrContentMediaLibrary.appendChild(card);
-            });
-            playlistQrContentModal.classList.add('active');
-        });
-
-        // Listener para mostrar/ocultar el campo de URL personalizada en el editor de QR
-        document.getElementById('edit-item-qr-type').addEventListener('change', (e) => {
-            const qrUrlContainer = document.getElementById('edit-item-qr-url-container');
-            const qrMenuBtnContainer = document.getElementById('edit-item-qr-menu-btn-container');
-            if (e.target.value === 'url') {
-                qrUrlContainer.classList.remove('hidden');
-                qrMenuBtnContainer.classList.add('hidden');
-            } else {
-                qrUrlContainer.classList.add('hidden');
-                qrMenuBtnContainer.classList.remove('hidden');
-            }
-        });
-
-        playlistQrContentCancelBtn.addEventListener('click', () => playlistQrContentModal.classList.remove('active'));
-        playlistQrContentSaveBtn.addEventListener('click', async () => {
-            const selectedIds = Array.from(playlistQrContentMediaLibrary.querySelectorAll('.media-card.selected')).map(card => card.dataset.mediaId);
-            const menuRef = doc(db, 'qrMenus', currentItemForQr.qrMenuId);
-            await updateDoc(menuRef, { mediaIds: selectedIds });
-            playlistQrContentModal.classList.remove('active');
         });
 
         listenersAttached = true;

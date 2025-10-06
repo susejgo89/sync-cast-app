@@ -777,17 +777,12 @@ function displayMedia(item) {
 
         const screenId = localStorage.getItem('nexusplay_screen_id');
         if (screenId) {
-<<<<<<< HEAD
-            new QRCode(qrCodeEl, {
-                text: item.qrUrl || window.location.origin,
-=======
             const qrTargetUrl = (item.qrType === 'url' && item.qrUrl)
                 ? item.qrUrl
                 : `${window.location.origin}/viewer.html?qrMenuId=${item.qrMenuId}`;
 
             new QRCode(qrCodeEl, {
                 text: qrTargetUrl,
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
                 width: 300,
                 height: 300,
                 colorDark: "#000000",

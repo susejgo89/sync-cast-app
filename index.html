@@ -306,28 +306,12 @@
                                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
                                                     <span data-lang="addWeather">Añadir Resumen del Clima</span>
                                                 </button>
-                                                <button id="add-qr-item-btn" class="btn-secondary w-full flex items-center justify-center">
-                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5h3v3H5zm6 0h3v3h-3zm6 0h3v3h-3zM5 11h3v3H5zm6 6h3v3h-3zm6-6h3v3h-3zM5 17h3v3H5zm6-6h3v3h-3z"></path></svg>
+                                                <button id="add-qr-fullscreen-item-btn" class="btn-secondary w-full flex items-center justify-center">
+                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M3 10v4M21 10v4M10 3h4M10 21h4"></path></svg>
                                                     <span data-lang="addQrFullscreen">Añadir QR a Pantalla Completa</span>
                                                 </button>
                                         </div>
-                                        <!-- Sección de la Biblioteca (ahora con más espacio) -->
-                                        <div class="bg-gray-50 rounded-md p-2 flex-1 overflow-y-auto">
-                                            <div id="playlist-media-library" class="grid grid-cols-2 gap-3"></div>
-                                        </div>
-<<<<<<< HEAD
-                                        <div class="my-3">
-                                            <button id="add-qr-fullscreen-item-btn" class="btn-secondary w-full flex items-center justify-center">
-                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M3 10v4M21 10v4M10 3h4M10 21h4"></path></svg>
-                                                <span data-lang="addQrFullscreen">Añadir QR a Pantalla Completa</span>
-                                            </button>
-                                        </div>
                                         <form id="edit-item-form" class="hidden bg-gray-200 p-3 rounded-lg mb-3">
-=======
-
-                                        <!-- Formulario de edición (movido fuera del flujo de pestañas) -->
-                                        <form id="edit-item-form" class="hidden bg-gray-200 p-3 rounded-lg mt-4">
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
                                             <p class="text-sm font-semibold mb-2" id="edit-item-name"></p>
                                             <div class="flex items-center gap-2">
                                                 <label for="edit-item-duration" class="text-sm">Duración (s):</label>
@@ -339,7 +323,6 @@
                                                 <label for="edit-item-location" class="text-sm" data-lang="weatherLocation">Ubicación (Clima)</label>
                                                 <input type="text" id="edit-item-location" class="custom-select w-full mt-1" data-lang-placeholder="weatherLocationPlaceholder">
                                             </div>
-<<<<<<< HEAD
                                             <div id="edit-item-qr-container" class="hidden mt-2 space-y-2">
                                                 <div>
                                                     <label for="edit-item-qr-text" class="text-sm" data-lang="qrCodeText">Texto de llamada a la acción</label>
@@ -358,97 +341,19 @@
                                                 </div>
                                                 <div id="edit-item-qr-menu-container" class="hidden">
                                                     <button type="button" id="edit-item-qr-select-media-btn" class="btn-secondary w-full mt-2" data-lang="selectQrContent">Seleccionar Contenido</button>
-=======
-                                            <div id="edit-item-qr-text-container" class="hidden mt-2">
-                                                <label for="edit-item-qr-text" class="text-sm" data-lang="qrCodeText">Texto del QR</label>
-                                                <input type="text" id="edit-item-qr-text" class="custom-select w-full mt-1" data-lang-placeholder="qrTextPlaceholder">
-                                            </div>
-                                            <div id="edit-item-qr-config-container" class="hidden mt-2 space-y-2">
-                                                <div>
-                                                    <label for="edit-item-qr-type" class="text-sm">Tipo de Contenido</label>
-                                                    <select id="edit-item-qr-type" class="custom-select w-full mt-1">
-                                                        <option value="menu" data-lang="qrMenuContent">Menú Interactivo</option>
-                                                        <option value="url">URL Personalizada</option>
-                                                    </select>
-                                                </div>
-                                                <div id="edit-item-qr-menu-btn-container">
-                                                    <button type="button" id="edit-item-qr-menu-btn" class="btn-secondary w-full" data-lang="selectQrContent">Seleccionar Contenido</button>
-                                                </div>
-                                                <div id="edit-item-qr-url-container" class="hidden">
-                                                    <input type="url" id="edit-item-qr-url" class="custom-select w-full" placeholder="https://ejemplo.com">
->>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
                                                 </div>
                                             </div>
                                             <input type="hidden" id="edit-item-index">
                                         </form>
+                                        <!-- Sección de la Biblioteca (ahora con más espacio) -->
+                                        <div class="bg-gray-50 rounded-md p-2 flex-1 overflow-y-auto">
+                                            <div id="playlist-media-library" class="grid grid-cols-2 gap-3"></div>
+                                        </div>
                                     </div>
                                     <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
                                         <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="playlistContent">Contenido de la
                                             Playlist</h4>
                                         <div id="playlist-content-area"
-                                            class="space-y-2 bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                
-                            <div id="playlist-placeholder"
-                                class="flex-1 flex items-center justify-center bg-white rounded-lg shadow-md">
-                                <p class="text-gray-500 text-center p-4" data-lang="playlistPlaceholder">Selecciona una playlist para
-                                    editar o crea una nueva.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-
-                <div id="music-playlists-section" class="page-section hidden h-full flex flex-col">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                        <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="musicPlaylistsTitle">Playlists de Música
-                        </h2>
-                        <button id="add-music-playlist-btn" class="btn-primary mt-4 sm:mt-0">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
-                                </path>
-                            </svg>
-                            <span data-lang="createMusicPlaylist">Crear Playlist de Música</span>
-                        </button>
-                    </div>
-                
-                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden">
-                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4" data-lang="myMusicPlaylists">Mis Playlists de Música
-                            </h3>
-                            <div id="music-playlists-list"
-                                class="space-y-2 pr-2 bg-gray-50 rounded-md p-2 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-                            </div>
-                        </div>
-                
-                        <div class="w-full lg:w-2/3 xl:w-3/4 flex flex-col">
-                            <div id="music-playlist-editor" class="flex-1 flex-col hidden h-full">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 id="music-playlist-editor-title" class="text-2xl font-bold text-gray-800"></h3>
-                                    <button id="delete-music-playlist-btn"
-                                        class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-transform transform hover:scale-110"><svg
-                                            class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                            </path>
-                                        </svg></button>
-                                </div>
-                
-                                <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden">
-                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
-                                        <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="audioLibrary">Biblioteca de
-                                            Audio</h4>
-                                        <div class="bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
-                                            <div id="playlist-media-library" class="grid grid-cols-2 gap-3"></div>
-                                        </div>
-                                    </div>
-                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
-                                        <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="musicPlaylistContent">Contenido
-                                            de la Playlist</h4>
-                                        <div id="music-playlist-content-area"
                                             class="space-y-2 bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
                                         </div>
                                     </div>
@@ -729,32 +634,6 @@
     <div id="qr-content-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl h-[90vh] flex flex-col">
             <h3 class="text-xl font-bold text-gray-900 mb-4" data-lang="qrMenuContent">Contenido del Menú QR</h3>
-            <div id="qr-content-media-library" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 bg-gray-100 rounded-lg">
-                <!-- Media cards with checkboxes will be injected here -->
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" id="qr-content-cancel" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
-                <button type="button" id="qr-content-save" class="px-5 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" data-lang="save">Guardar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="playlist-qr-content-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl h-[90vh] flex flex-col">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" data-lang="qrMenuContent">Contenido del QR</h3>
-            <div id="playlist-qr-content-media-library" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 bg-gray-100 rounded-lg">
-                <!-- Media cards for playlist QR will be injected here -->
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" id="playlist-qr-content-cancel" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300" data-lang="cancel">Cancelar</button>
-                <button type="button" id="playlist-qr-content-save" class="px-5 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" data-lang="save">Guardar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="qr-content-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-4xl h-[90vh] flex flex-col">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" data-lang="qrMenuContent">Contenido del QR</h3>
             <div id="qr-content-media-library" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 bg-gray-100 rounded-lg">
                 <!-- Media cards with checkboxes will be injected here -->
             </div>
