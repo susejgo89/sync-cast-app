@@ -13,28 +13,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const screenNameEl = document.getElementById('screen-name');
 
     const params = new URLSearchParams(window.location.search);
-    const screenId = params.get('id');
+    const screenId = params.get('screenId');
+    const qrMenuId = params.get('qrMenuId');
 
-    if (!screenId) {
+    if (!screenId && !qrMenuId) {
         screenNameEl.textContent = "Error";
         contentViewer.innerHTML = `<p class="text-center text-red-500">No se ha especificado una pantalla.</p>`;
         return;
     }
 
-    const screenRef = doc(db, 'screens', screenId);
+    // Determina qué referencia usar: la del menú personalizado o la de la pantalla.
+    const isCustomMenu = !!qrMenuId;
+    const contentRef = isCustomMenu 
+        ? doc(db, 'qrMenus', qrMenuId)
+        : doc(db, 'screens', screenId);
 
-    onSnapshot(screenRef, async (screenSnap) => {
-        if (!screenSnap.exists() || !screenSnap.data().qrEnabled) {
+    onSnapshot(contentRef, async (contentSnap) => {
+        if (!contentSnap.exists()) {
             screenNameEl.textContent = "Contenido no disponible";
             contentViewer.innerHTML = `<p class="text-center text-gray-500">Este contenido no está disponible o ha sido desactivado.</p>`;
             return;
         }
 
-        const screenData = screenSnap.data();
-        screenNameEl.textContent = screenData.name;
-        document.title = screenData.name; // Actualiza el título de la página
+        const contentData = contentSnap.data();
+        
+        // Si es un menú personalizado, no tenemos nombre de pantalla, así que ponemos un título genérico.
+        if (isCustomMenu) {
+            screenNameEl.textContent = "Contenido Interactivo";
+            document.title = "Contenido Interactivo";
+        } else {
+            // Si es el QR del widget, nos aseguramos de que esté activado.
+            if (!contentData.qrEnabled) {
+                screenNameEl.textContent = "Contenido no disponible";
+                contentViewer.innerHTML = `<p class="text-center text-gray-500">Este contenido no está disponible o ha sido desactivado.</p>`;
+                return;
+            }
+            screenNameEl.textContent = contentData.name;
+            document.title = contentData.name;
+        }
 
-        const mediaIds = screenData.qrCodeItems || [];
+        const mediaIds = contentData.mediaIds || contentData.qrCodeItems || [];
         contentViewer.innerHTML = ''; // Limpia el contenido anterior
 
         if (mediaIds.length === 0) {

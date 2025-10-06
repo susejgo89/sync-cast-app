@@ -12,7 +12,9 @@ let unsubscribeMedia = null;
 // Esta es la función que se exporta y que script.js busca
 export function initMediaView(userId, getLang, onUpdateCallback) {
     const fileUploadInput = document.getElementById('file-upload');
-    const mediaGallery = document.getElementById('media-gallery');
+    const imagesGallery = document.getElementById('media-gallery-images');
+    const videosGallery = document.getElementById('media-gallery-videos');
+    const audioGallery = document.getElementById('media-gallery-audio');
 
     function uploadFile(file) {
         if (!file || !userId) return;
@@ -86,21 +88,37 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
 
     const q = query(collection(db, 'media'), where('userId', '==', userId));
     unsubscribeMedia = onSnapshot(q, (snapshot) => {
-        const userMediaData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        mediaGallery.innerHTML = '';
-        userMediaData.forEach(media => {
-            const card = createMediaCard(media, {
-                isDraggable: true,
-                onDelete: () => {
-                    showConfirmModal(
-                        translations[getLang()].confirmDeleteTitle, 
-                        `${translations[getLang()].confirmDeleteMsg} "${media.name}"?`,
-                        () => deleteMediaFile(media.id, media.storagePath)
-                    );
-                }
+        const userMediaData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        
+        const images = userMediaData.filter(m => m.type.startsWith('image/'));
+        const videos = userMediaData.filter(m => m.type.startsWith('video/'));
+        const audio = userMediaData.filter(m => m.type.startsWith('audio/'));
+
+        const renderCategory = (galleryEl, items, noItemsKey) => {
+            galleryEl.innerHTML = '';
+            if (items.length === 0) {
+                galleryEl.innerHTML = `<p class="placeholder-text text-gray-400 col-span-full">${translations[getLang()][noItemsKey]}</p>`;
+                return;
+            }
+            items.forEach(media => {
+                const card = createMediaCard(media, {
+                    isDraggable: true,
+                    onDelete: () => {
+                        showConfirmModal(
+                            translations[getLang()].confirmDeleteTitle, 
+                            `${translations[getLang()].confirmDeleteMsg} "${media.name}"?`,
+                            () => deleteMediaFile(media.id, media.storagePath)
+                        );
+                    }
+                });
+                galleryEl.appendChild(card);
             });
-            mediaGallery.appendChild(card);
-        });
+        };
+
+        renderCategory(imagesGallery, images, 'noImages');
+        renderCategory(videosGallery, videos, 'noVideos');
+        renderCategory(audioGallery, audio, 'noAudio');
+
         onUpdateCallback(userMediaData); // Notifica al script principal que los medios han cambiado
     });
 

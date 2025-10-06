@@ -326,7 +326,7 @@ function handleQrCodeWidget(screenId, settings) {
 
     if (show && enabled) {
         qrContainer.innerHTML = ''; // Limpia el QR anterior para evitar duplicados
-        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?id=${screenId}`, width: 128, height: 128 });
+        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?screenId=${screenId}`, width: 128, height: 128 });
         
         // Usa el texto personalizado si existe, si no, usa el de las traducciones.
         const displayText = text && text.trim() !== '' ? text : (translations[lang]?.scanForMenu || "Escanea para más info");
@@ -777,8 +777,17 @@ function displayMedia(item) {
 
         const screenId = localStorage.getItem('nexusplay_screen_id');
         if (screenId) {
+<<<<<<< HEAD
             new QRCode(qrCodeEl, {
                 text: item.qrUrl || window.location.origin,
+=======
+            const qrTargetUrl = (item.qrType === 'url' && item.qrUrl)
+                ? item.qrUrl
+                : `${window.location.origin}/viewer.html?qrMenuId=${item.qrMenuId}`;
+
+            new QRCode(qrCodeEl, {
+                text: qrTargetUrl,
+>>>>>>> d785a9826e6253649e8c8b035c1edae79cfe0727
                 width: 300,
                 height: 300,
                 colorDark: "#000000",
