@@ -24,7 +24,8 @@ let currentResellerId = null;
 let getLang = () => 'es';
 
 // --- CREAMOS LA REFERENCIA A LA FUNCIÓN UNA SOLA VEZ ---
-let createClientUser;
+const createClientUser = httpsCallable(functions, 'createClientUser');
+const deleteClientUser = httpsCallable(functions, 'deleteClientUser');
 
 /**
  * Formatea bytes a un formato legible (KB, MB, GB).
@@ -49,6 +50,7 @@ function formatBytes(bytes) {
  * Renderiza la tabla de clientes del revendedor.
  */
 function renderClientsTable() {
+    if (!clientsTableBody) return;
     if (clientsData.length === 0) {
         clientsTableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500" data-lang="adminNoClients">${translations[getLang()].adminNoClients}</td></tr>`;
         return;
@@ -77,10 +79,10 @@ function updatePoolSummary() {
     const usedScreens = clientsData.reduce((acc, client) => acc + (client.screenLimit || 0), 0);
     const usedStorage = clientsData.reduce((acc, client) => acc + (client.storageLimit || 0), 0);
 
-    usedScreensEl.textContent = usedScreens;
-    totalScreensEl.textContent = resellerData.totalScreenLimit || 0;
-    usedStorageEl.textContent = formatBytes(usedStorage);
-    totalStorageEl.textContent = formatBytes(resellerData.totalStorageLimit || 0); // Corregido: ya estaba bien, pero lo confirmo.
+    if(usedScreensEl) usedScreensEl.textContent = usedScreens;
+    if(totalScreensEl) totalScreensEl.textContent = resellerData.totalScreenLimit || 0;
+    if(usedStorageEl) usedStorageEl.textContent = formatBytes(usedStorage);
+    if(totalStorageEl) totalStorageEl.textContent = formatBytes(resellerData.totalStorageLimit || 0);
 }
 
 /**
@@ -91,18 +93,15 @@ function openClientModal(client = null) {
     clientForm.reset();
     document.getElementById('client-id').value = client ? client.id : '';
     document.getElementById('client-email').disabled = !!client;
-    document.getElementById('client-password-container').style.display = client ? 'block' : 'none';
+    document.getElementById('client-password-container').style.display = client ? 'none' : 'block';
 
     if (client) {
         clientModalTitle.textContent = 'Editar Cliente';
-        document.getElementById('client-password-label').textContent = translations[getLang()].adminClientEditPassword;
         document.getElementById('client-email').value = client.email;
-        document.getElementById('client-screen-limit').value = client.screenLimit || 0; // Bytes a GB
+        document.getElementById('client-screen-limit').value = client.screenLimit || 0;
         document.getElementById('client-storage-limit').value = (client.storageLimit || 0) / (1024 * 1024 * 1024); // Bytes a GB
     } else {
         clientModalTitle.textContent = 'Crear Nuevo Cliente';
-        document.getElementById('client-password-label').textContent = translations[getLang()].adminClientCreatePassword;
-        document.getElementById('client-password-container').style.display = 'block'; // Mostrar contraseña para nuevos
     }
     clientModal.classList.add('active');
 }
@@ -118,6 +117,9 @@ async function handleSaveClient(e) {
     const screenLimit = parseInt(document.getElementById('client-screen-limit').value, 10);
     const storageLimitGB = parseFloat(document.getElementById('client-storage-limit').value);
     const storageLimitBytes = storageLimitGB * 1024 * 1024 * 1024;
+
+    const saveButton = clientForm.querySelector('button[type="submit"]');
+    saveButton.disabled = true;
 
     // --- Validación de Pool ---
     const currentUsedScreens = clientsData.reduce((sum, c) => sum + (c.id !== clientId ? (c.screenLimit || 0) : 0), 0);
@@ -142,74 +144,49 @@ async function handleSaveClient(e) {
         // NOTA: La actualización de contraseña también debería hacerse con una Cloud Function.
     } else {
         // --- Lógica de Creación ---
-        if (!password || password.length < 6) {
-            alert('La contraseña es obligatoria y debe tener al menos 6 caracteres.');
-            return;
-        }
-        
         try {
-            // ¡IMPORTANTE! Esta es la llamada a la Cloud Function que debes crear.
-
-            // Forzamos la actualización del token de autenticación para evitar errores 401.
-            // Esto garantiza que la credencial más reciente se envíe con la llamada.
-            if (auth.currentUser) await auth.currentUser.getIdToken(true);
-
             const result = await createClientUser({
                 email,
                 password,
                 screenLimit,
-                storageLimit: storageLimitBytes,
-                resellerId: currentResellerId
+                storageLimitBytes
             });
-
-            if (result.data.success) {
-                console.log('Cliente creado con éxito:', result.data.uid);
-            } else {
-                throw new Error(result.data.error || 'Error desconocido al crear el cliente.');
-            }
+            console.log('Cliente creado con éxito:', result.data.message);
+            clientModal.classList.remove('active');
         } catch (error) {
-            console.error("Error al llamar a la Cloud Function:", error);
+            console.error("Error al crear el cliente:", error);
+            // Mostramos el mensaje de error que viene desde la Cloud Function
             alert(`Error: ${error.message}`);
-            return; // Detiene la ejecución si la función falla
         }
     }
 
-    clientModal.classList.remove('active');
+    saveButton.disabled = false;
+    if (!clientId) { // Solo cerramos el modal si no es una edición (para que el error sea visible)
+        clientModal.classList.remove('active');
+    }
 }
 
 export function initAdminView(resellerId, langGetter) {
     currentResellerId = resellerId;
     getLang = langGetter;
 
-    // --- INICIALIZACIÓN CLAVE ---
-    // Conectamos la función callable con la instancia de autenticación actual
-    createClientUser = httpsCallable(functions, 'createClientUser');
-
-    let unsubscribeClients = () => {}; // Inicializamos la función de desuscripción
+    let unsubscribeClients = () => {};
 
     // 1. Obtener los datos del propio revendedor (para los límites del pool)
     const resellerDocRef = doc(db, 'users', resellerId);
     const unsubscribeReseller = onSnapshot(resellerDocRef, (docSnap) => {
         if (docSnap.exists()) {
             resellerData = docSnap.data();
-            updatePoolSummary(); // <--- AÑADIDO: Actualiza los totales del pool inmediatamente.
+            updatePoolSummary();
 
-            // 2. SOLO SI es un revendedor, obtenemos la lista de sus clientes.
-            if (resellerData.role === 'reseller') {
-                const clientsQuery = query(collection(db, 'users'), where('resellerId', '==', resellerId));
-                // Nos aseguramos de cancelar la escucha anterior antes de crear una nueva
-                if (unsubscribeClients) unsubscribeClients(); 
-                unsubscribeClients = onSnapshot(clientsQuery, (snapshot) => {
-                    clientsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    renderClientsTable();
-                    updatePoolSummary(); // Actualizamos el pool con los datos de los clientes
-                });
-            } else {
-                // Si por alguna razón el usuario ya no es revendedor, limpiamos la tabla.
-                clientsData = [];
+            // 2. Obtenemos la lista de sus clientes.
+            const clientsQuery = query(collection(db, 'users'), where('ownerId', '==', resellerId));
+            if (unsubscribeClients) unsubscribeClients(); 
+            unsubscribeClients = onSnapshot(clientsQuery, (snapshot) => {
+                clientsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderClientsTable();
                 updatePoolSummary();
-            }
+            });
         }
     });
 
@@ -228,11 +205,15 @@ export function initAdminView(resellerId, langGetter) {
         }
 
         if (e.target.classList.contains('delete-client-btn')) {
-            // NOTA: Eliminar un usuario de Auth también requiere una Cloud Function.
-            showConfirmModal('Eliminar Cliente', '¿Seguro? Esta acción no se puede deshacer y eliminará al usuario y sus datos.', () => {
-                console.log(`TODO: Llamar a Cloud Function 'deleteClientUser' con ID: ${clientId}`);
-                // deleteDoc(doc(db, 'users', clientId)); // Esto solo borra de Firestore, no de Auth.
-            });
+            const clientToDelete = clientsData.find(c => c.id === clientId);
+            const lang = getLang();
+            showConfirmModal(
+                translations[lang].confirmDeleteTitle || 'Eliminar Cliente', 
+                `${translations[lang].confirmDeleteMsg || '¿Seguro que quieres eliminar a'} ${clientToDelete.email}? Esta acción borrará todos sus datos y no se puede deshacer.`, 
+                async () => {
+                    await deleteClientUser({ subAccountId: clientId });
+                }
+            );
         }
     });
 

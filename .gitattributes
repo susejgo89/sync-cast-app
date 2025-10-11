@@ -1,0 +1,18 @@
+# Establece el comportamiento por defecto para detectar automáticamente los archivos de texto.
+# Git intentará adivinar si un archivo es de texto y normalizará sus finales de línea a LF.
+* text=auto
+
+# Declara explícitamente que estos tipos de archivos son de texto.
+# Siempre se convertirán a finales de línea LF en el repositorio.
+*.html text
+*.css text
+*.js text
+*.json text
+*.rules text
+*.md text
+.gitignore text
+.eslintrc.js text
+
+# Declara explícitamente que estos archivos son binarios y no deben ser modificados.
+*.png binary
+*.jpg binary

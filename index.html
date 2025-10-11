@@ -107,6 +107,11 @@
                         <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a3.002 3.002 0 013.292-2.296M12 10a4 4 0 110-8 4 4 0 010 8zm0 0a2 2 0 100-4 2 2 0 000 4z" /></svg>
                         <span data-lang="navGroups">Grupos</span>
                     </a>
+
+                    <a href="#admin" id="admin-nav-link" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700 hidden">
+                        <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197m0 0A5.995 5.995 0 0012 12a5.995 5.995 0 00-3-5.197M15 21a6 6 0 00-9-5.197" /></svg>
+                        <span data-lang="navAdmin">Gestión de Clientes</span>
+                    </a>
                 </nav>
                 <div class="px-4 py-6 border-t border-neutral-700">
                     <div id="user-info" class="flex items-center"></div>
@@ -509,6 +514,54 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="admin-section" class="page-section hidden">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-6" data-lang="adminTitle">Gestión de Clientes</h2>
+                
+                    <!-- Resumen del Pool de Recursos -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="card p-6">
+                            <h3 class="font-bold text-lg text-gray-800" data-lang="adminScreensPool">Pool de Pantallas</h3>
+                            <p class="mt-2 text-4xl font-bold text-gray-800">
+                                <span id="reseller-used-screens">0</span> / <span id="reseller-total-screens">0</span>
+                            </p>
+                            <p class="text-sm text-gray-500" data-lang="adminAssigned">asignadas</p>
+                        </div>
+                        <div class="card p-6">
+                            <h3 class="font-bold text-lg text-gray-800" data-lang="adminStoragePool">Pool de Almacenamiento</h3>
+                            <p class="mt-2 text-4xl font-bold text-gray-800">
+                                <span id="reseller-used-storage">0 GB</span> / <span id="reseller-total-storage">0 GB</span>
+                            </p>
+                            <p class="text-sm text-gray-500" data-lang="adminAssigned">asignado</p>
+                        </div>
+                    </div>
+                
+                    <!-- Tabla de Clientes -->
+                    <div class="card p-0">
+                        <div class="flex justify-between items-center p-6">
+                            <h3 class="text-xl font-bold text-gray-800" data-lang="adminClientsList">Lista de Clientes</h3>
+                            <button id="add-client-btn" class="btn-primary">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                <span data-lang="adminAddClient">Crear Cliente</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang="adminClientAccount">Cuenta</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang="adminClientScreens">Pantallas</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang="adminClientStorage">Almacenamiento</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang="adminClientActions">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reseller-clients-table-body" class="bg-white divide-y divide-gray-200">
+                                    <!-- Las filas de los clientes se insertarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -628,6 +681,37 @@
             <p class="mt-2 text-sm text-gray-600" data-lang="pairingCodeInstruction">Usa el siguiente código para emparejar tu dispositivo:</p>
             <p id="pairing-code-display" class="my-4 text-5xl font-bold text-violet-600 tracking-widest bg-gray-100 p-4 rounded-lg"></p>
             <button id="pairing-code-close" class="w-full px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900" data-lang="gotIt">Entendido</button>
+        </div>
+    </div>
+
+    <div id="client-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-md">
+            <h3 id="client-modal-title" class="text-lg font-medium text-gray-900">Crear Nuevo Cliente</h3>
+            <form id="client-form" class="mt-4 space-y-4">
+                <input type="hidden" id="client-id">
+                <div>
+                    <label for="client-email" class="block text-sm font-medium text-gray-700" data-lang="emailPlaceholder">Correo Electrónico</label>
+                    <input id="client-email" type="email" required class="custom-input mt-1">
+                </div>
+                <div id="client-password-container">
+                    <label for="client-password" id="client-password-label" class="block text-sm font-medium text-gray-700" data-lang="passwordPlaceholder6Chars">Contraseña (mín. 6 caracteres)</label>
+                    <input id="client-password" type="password" class="custom-input mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="client-screen-limit" class="block text-sm font-medium text-gray-700" data-lang="adminClientScreens">Límite de Pantallas</label>
+                        <input id="client-screen-limit" type="number" required min="0" class="custom-input mt-1">
+                    </div>
+                    <div>
+                        <label for="client-storage-limit" class="block text-sm font-medium text-gray-700" data-lang="adminClientStorageGB">Almacenamiento (GB)</label>
+                        <input id="client-storage-limit" type="number" required min="0" step="0.5" class="custom-input mt-1">
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-2">
+                    <button type="button" id="client-modal-cancel" class="btn-secondary" data-lang="cancel">Cancelar</button>
+                    <button type="submit" class="btn-primary" data-lang="save">Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
 

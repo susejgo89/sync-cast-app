@@ -1,18 +1,45 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel, collection, addDoc, query, where, onSnapshot, serverTimestamp, doc, deleteDoc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, setLogLevel, collection, addDoc, query, where, onSnapshot, serverTimestamp, doc, deleteDoc, updateDoc, getDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         import { initMediaView } from './views/mediaView.js';
-        import { auth, db, storage } from './firebase-config.js';
+        import { auth, db, storage, functions } from './firebase-config.js';
         import { showConfirmModal } from './utils/modals.js';
         import { translations } from './utils/translations.js';
         import { initPlaylistsView } from './views/playlistsView.js';
         import { initScreensView } from './views/screensView.js'; 
         import { initMusicPlaylistsView } from './views/musicPlaylistsView.js';
         import { initGroupsView } from './views/groupsView.js';
+        import { initAdminView } from './views/adminView.js';
         import { createMediaCard } from './components/mediaCard.js';
         
-        document.addEventListener('DOMContentLoaded', () => {
+        /**
+         * Lógica de White-Labeling (Marca Personalizada).
+         * Se ejecuta al inicio para aplicar logos personalizados si se accede desde un customDomain.
+         */
+        async function applyWhiteLabeling() {
+            const currentHostname = window.location.hostname;
+            // Reemplaza 'your-default-domain.web.app' con tu dominio real de Firebase Hosting
+            const defaultDomains = ['localhost', '127.0.0.1', 'sync-cast-app.web.app']; 
+        
+            if (!defaultDomains.includes(currentHostname)) {
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("customDomain", "==", currentHostname), where("role", "==", "reseller"));
+                const querySnapshot = await getDocs(q);
+        
+                if (!querySnapshot.empty) {
+                    const resellerData = querySnapshot.docs[0].data();
+                    if (resellerData.customLogoUrl) {
+                        document.querySelectorAll('img[alt="NexusPlay Logo"]').forEach(img => img.src = resellerData.customLogoUrl);
+                        document.getElementById('favicon').href = resellerData.customLogoUrl;
+                    }
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await applyWhiteLabeling();
+
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -62,6 +89,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let screensViewInstance = null;
         let currentUserId = null;
         let groupsViewInstance = null;
+        let adminViewInstance = null;
         let activePlaylistId = null;
         let currentScreenForQr = null;
         let draggedItem = null;
@@ -146,11 +174,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         // (Tu código original para mostrar el dashboard va aquí)
         currentUserId = user.uid;
         authContainer.style.display = 'none';
-        dashboardContainer.style.display = 'flex';
-        // REEMPLAZA la línea de userInfo.innerHTML con esta:
 
-        userInfo.innerHTML = `<div class="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center font-bold text-white mr-3 flex-shrink-0">${user.email.charAt(0).toUpperCase()}</div><span class="text-sm font-medium text-white truncate" title="${user.email}">${user.email}</span>`;
-        loadInitialData(user.uid);
+        // --- LÓGICA DE ROLES ---
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const adminNavLink = document.getElementById('admin-nav-link');
+            
+            if (userData.role === 'reseller') {
+                adminNavLink.classList.remove('hidden');
+            } else {
+                adminNavLink.classList.add('hidden');
+            }
+
+            dashboardContainer.style.display = 'flex';
+            userInfo.innerHTML = `<div class="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center font-bold text-white mr-3 flex-shrink-0">${user.email.charAt(0).toUpperCase()}</div><span class="text-sm font-medium text-white truncate" title="${user.email}">${user.email}</span>`;
+            loadInitialData(user.uid, userData.role);
+        }
 
     } else if (user && !user.emailVerified) {
         // CASO 2: Usuario logueado PERO NO VERIFICADO -> Muestra el mensaje
@@ -176,6 +218,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         if (unsubscribeMusicPlaylists) unsubscribeMusicPlaylists();
         if (screensViewInstance) screensViewInstance.unsubscribe();
         if (groupsViewInstance) groupsViewInstance.unsubscribe();
+        if (adminViewInstance) adminViewInstance.unsubscribe();
     }
     
     loader.style.display = 'none';
@@ -212,7 +255,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             setDoc(userDocRef, {
                 email: user.email,
                 createdAt: serverTimestamp(),
-                screenLimit: 3 // Límite de pantallas por defecto para nuevos usuarios
+                role: 'client', // Rol por defecto para nuevos registros
+                ownerId: null, // Es una cuenta principal, no pertenece a un reseller
+                status: 'active', // Estado inicial
+                screenLimit: 3, // Límite de pantallas por defecto
+                storageLimit: 1 * 1024 * 1024 * 1024 // 1 GB de almacenamiento por defecto en bytes
             }).then(() => {
                 // Una vez creado el perfil, enviamos el email de verificación
                 sendEmailVerification(user)
@@ -349,7 +396,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
         }
         
-        function loadInitialData(userId) {
+        function loadInitialData(userId, userRole) {
             unsubscribeMedia = initMediaView(userId, () => currentLang, (media) => {
                 userMediaData = media;
                 if (playlistsViewInstance) {
@@ -375,6 +422,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 userGroupsData = groups;
                 updateDashboardCards();
             });
+
+            // Cargar la vista de admin solo si el usuario es un reseller
+            if (userRole === 'reseller') {
+                adminViewInstance = initAdminView(userId, () => currentLang);
+            }
         }
 
         // Listener para abrir el modal de QR desde playlistsView

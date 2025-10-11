@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
-
+import { getFunctions } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js";
 const firebaseConfig = {
     apiKey: "AIzaSyDLTypVwqqtopBRT0Uh2MP_dLUQVvZ2QZI",
     authDomain: "sutechtvcorporativa.firebaseapp.com",
@@ -17,7 +17,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const functions = getFunctions(app);
+
 setLogLevel('debug');
 
 // Export the services so other files can use them
-export { auth, db, storage };
+export { auth, db, storage, functions };
