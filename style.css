@@ -5,10 +5,28 @@ body {
 
 /* --- Background for Auth Screen --- */
 body.auth-bg {
+    position: relative; /* Necesario para el pseudo-elemento */
     background-image: url('assets/background.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    z-index: 0; /* Asegura un contexto de apilamiento */
+}
+
+/* Pseudo-elemento para la capa de color animada y translúcida */
+body.auth-bg::before {
+    content: '';
+    position: fixed; /* Cubre toda la pantalla */
+    inset: 0;
+    z-index: -1; /* Se coloca detrás del contenido, pero sobre el fondo del body */
+
+    /* El gradiente animado */
+    background: linear-gradient(-45deg, #4b0082, #8a2be2, #4169e1, #00ced1, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient-animation 18s ease infinite;
+
+    /* --- ¡AQUÍ ESTÁ LA MAGIA! --- */
+    opacity: 0.4; /* Ajusta este valor (entre 0.0 y 1.0) para la transparencia deseada */
 }
 
 /* --- Glassmorphism Effect for Auth Form --- */
@@ -58,18 +76,6 @@ select.custom-select:focus {
     outline: none;
     border-color: #8b5cf6; /* focus:border-violet-500 */
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); /* focus:ring-violet-500 */
-}
-
-/* --- Improved Card Styles --- */
-.card {
-    background-color: #fff;
-    border-radius: 0.5rem; /* rounded-lg */
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.card:hover {
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
-    transform: translateY(-0.25rem); /* -translate-y-1 */
 }
 
 /* --- Improved Button Styles --- */
@@ -266,24 +272,21 @@ input:checked + .toggle-slider:before {
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.5);
 }
 
-/* --- Main content area background --- */
-main {
-    position: relative; /* Needed for the pseudo-element */
-    z-index: 0; /* Ensure content stays on top */
-    background-color: #f9fafb; /* bg-gray-50, fallback color */
+/* --- Card Styles (Normal & Glass) --- */
+.card {
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-main::before {
-    content: '';
-    position: fixed; /* Change to fixed to cover the viewport */
-    inset: 0;
-    z-index: -1; /* Place it behind the content */
-    
-    /* The animated gradient */
-    background: linear-gradient(-45deg, #4b0082, #8a2be2, #4169e1, #00ced1);
-    background-size: 400% 400%;
-    animation: gradient-animation 18s ease infinite;
-    opacity: 0.25; /* Adjust for desired transparency */
+.card:hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-xl */
+    transform: translateY(-0.25rem); /* -translate-y-1 */
+}
+.card-glass {
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* --- Hide Number Input Arrows --- */

@@ -78,7 +78,7 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
         const isMusicAdvanced = screen.musicSchedulingMode === 'advanced';
 
         const card = document.createElement('div');
-        card.className = 'card p-5 flex flex-col';
+        card.className = 'card card-glass p-5 flex flex-col';
         
         card.innerHTML = `
             <div class="flex justify-between items-start">

@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // --- REGLAS PARA LOS ARCHIVOS DE MEDIOS DE LOS USUARIOS ---
+    // Un usuario solo puede leer y escribir en su propia carpeta de medios.
+    match /media/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // --- REGLAS PARA LA MARCA PERSONALIZADA (WHITE-LABEL) ---
+    match /branding/{resellerId}/logo {
+      // Un 'reseller' puede subir/actualizar su propio logo.
+      allow write: if request.auth != null &&
+                      request.auth.uid == resellerId &&
+                      // Verificamos que el archivo sea una imagen y que no supere 1MB.
+                      request.resource.contentType.matches('image/.*') &&
+                      request.resource.size < 1 * 1024 * 1024;
+
+      // Cualquiera puede leer los logos para mostrarlos en la app (incluso en la pantalla de login).
+      allow read: if true;
+    }
+  }
+}

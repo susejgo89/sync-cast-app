@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased">
+<body class="text-gray-800 antialiased auth-bg">
 
     <div id="loader" class="fixed inset-0 bg-gray-100 bg-opacity-80 flex items-center justify-center z-50">
         <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-violet-600"></div>
@@ -87,12 +87,12 @@
                     <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-18 w-auto">
                 </div>
                 <nav id="main-nav" class="flex-1 px-4 py-6 space-y-2">
-                    <a href="#dashboard" class="nav-link flex items-center px-4 py-2.5 rounded-lg bg-neutral-700 text-white"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg><span data-lang="navDashboard">Dashboard</span></a>
-                    <a href="#media" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span data-lang="navMedia">Medios</span></a>
-                    <a href="#playlists" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span data-lang="navPlaylists">Playlists</span></a>
+                    <a href="/dashboard" data-route="/dashboard" class="nav-link flex items-center px-4 py-2.5 rounded-lg bg-neutral-700 text-white"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg><span data-lang="navDashboard">Dashboard</span></a>
+                    <a href="/media" data-route="/media" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span data-lang="navMedia">Medios</span></a>
+                    <a href="/playlists" data-route="/playlists" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span data-lang="navPlaylists">Playlists</span></a>
                     
 
-                    <a href="#music-playlists" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700">
+                    <a href="/music-playlists" data-route="/music-playlists" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700">
                         <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
@@ -101,14 +101,14 @@
                     </a>
 
 
-                    <a href="#screens" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-lang="navScreens">Pantallas</span></a>
+                    <a href="/screens" data-route="/screens" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><span data-lang="navScreens">Pantallas</span></a>
 
-                    <a href="#groups" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700">
+                    <a href="/groups" data-route="/groups" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700">
                         <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a3.002 3.002 0 013.292-2.296M12 10a4 4 0 110-8 4 4 0 010 8zm0 0a2 2 0 100-4 2 2 0 000 4z" /></svg>
                         <span data-lang="navGroups">Grupos</span>
                     </a>
 
-                    <a href="#admin" id="admin-nav-link" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700 hidden">
+                    <a href="/admin" data-route="/admin" id="admin-nav-link" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700 hidden">
                         <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197m0 0A5.995 5.995 0 0012 12a5.995 5.995 0 00-3-5.197M15 21a6 6 0 00-9-5.197" /></svg>
                         <span data-lang="navAdmin">Gestión de Clientes</span>
                     </a>
@@ -132,7 +132,7 @@
                     <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-6" data-lang="dashboardTitle">Dashboard</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <!-- Card: Estado de Pantallas -->
-                        <div class="card p-6 flex flex-col justify-between">
+                        <div class="card card-glass p-6 flex flex-col justify-between">
                             <div>
                                 <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardScreenStatus">Estado de Pantallas</h3>
                                 <div class="flex items-baseline gap-6 mt-4">
@@ -146,10 +146,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <a href="#screens" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardManageScreens">Gestionar Pantallas &rarr;</a>
+                            <a href="/screens" data-route="/screens" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardManageScreens">Gestionar Pantallas &rarr;</a>
                         </div>
                         <!-- Card: Playlists -->
-                        <div class="card p-6 flex flex-col justify-between">
+                        <div class="card card-glass p-6 flex flex-col justify-between">
                             <div>
                                 <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardPlaylists">Playlists</h3>
                                 <div class="mt-4 space-y-2">
@@ -157,10 +157,10 @@
                                     <p class="text-gray-600"><strong id="music-playlist-count" class="text-2xl font-bold text-gray-800">0</strong> <span data-lang="dashboardMusicPlaylists">Playlists de Música</span></p>
                                 </div>
                             </div>
-                            <a href="#playlists" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardCreatePlaylist">Crear Nueva Playlist &rarr;</a>
+                            <a href="/playlists" data-route="/playlists" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardCreatePlaylist">Crear Nueva Playlist &rarr;</a>
                         </div>
                         <!-- Card: Medios -->
-                        <div class="card p-6 flex flex-col justify-between">
+                        <div class="card card-glass p-6 flex flex-col justify-between">
                             <div>
                                 <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardMediaLibrary">Biblioteca de Medios</h3>
                                 <div class="mt-4">
@@ -168,10 +168,10 @@
                                     <!-- Futuro: <p class="text-sm text-gray-500 mt-2">1.2 GB / 5 GB usados</p> -->
                                 </div>
                             </div>
-                            <a href="#media" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardUploadFile">Subir Nuevo Archivo &rarr;</a>
+                            <a href="/media" data-route="/media" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardUploadFile">Subir Nuevo Archivo &rarr;</a>
                         </div>
                         <!-- Card: Accesos Rápidos -->
-                        <div class="card p-6">
+                        <div class="card card-glass p-6">
                             <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardQuickActions">Accesos Rápidos</h3>
                             <div class="mt-4 space-y-3">
                                 <button id="quick-add-screen" class="btn-dashboard-action">
@@ -189,14 +189,14 @@
                             </div>
                         </div>
                         <!-- Card: Archivos Recientes -->
-                        <div class="card p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
+                        <div class="card card-glass p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
                             <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentUploads">Archivos Recientes</h3>
                             <div id="recent-uploads-container" class="mt-4 grid grid-cols-3 gap-3">
                                 <!-- Thumbnails will be injected here -->
                             </div>
                         </div>
                         <!-- Card: Actividad Reciente -->
-                        <div class="card p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
+                        <div class="card card-glass p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
                             <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentActivity">Actividad Reciente</h3>
                             <div id="recent-activity-container" class="mt-4 space-y-3">
                                 <!-- La actividad reciente se insertará aquí -->
@@ -520,14 +520,14 @@
                 
                     <!-- Resumen del Pool de Recursos -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="card p-6">
+                        <div class="card card-glass p-6">
                             <h3 class="font-bold text-lg text-gray-800" data-lang="adminScreensPool">Pool de Pantallas</h3>
                             <p class="mt-2 text-4xl font-bold text-gray-800">
                                 <span id="reseller-used-screens">0</span> / <span id="reseller-total-screens">0</span>
                             </p>
                             <p class="text-sm text-gray-500" data-lang="adminAssigned">asignadas</p>
                         </div>
-                        <div class="card p-6">
+                        <div class="card card-glass p-6">
                             <h3 class="font-bold text-lg text-gray-800" data-lang="adminStoragePool">Pool de Almacenamiento</h3>
                             <p class="mt-2 text-4xl font-bold text-gray-800">
                                 <span id="reseller-used-storage">0 GB</span> / <span id="reseller-total-storage">0 GB</span>
@@ -537,7 +537,7 @@
                     </div>
                 
                     <!-- Tabla de Clientes -->
-                    <div class="card p-0">
+                    <div class="card card-glass p-0">
                         <div class="flex justify-between items-center p-6">
                             <h3 class="text-xl font-bold text-gray-800" data-lang="adminClientsList">Lista de Clientes</h3>
                             <button id="add-client-btn" class="btn-primary">

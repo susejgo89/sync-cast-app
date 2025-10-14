@@ -133,19 +133,34 @@ exports.deleteClientUser = functions.https.onCall(async (data, context) => {
         // 3.2. Eliminar documento del usuario en Firestore
         await db.collection("users").doc(subAccountId).delete();
 
-        // 3.3. Eliminación en cascada de datos en otras colecciones
+        // 3.3. Obtener todas las referencias a documentos y archivos para eliminar
         const collectionsToDelete = ["media", "playlists", "musicPlaylists", "screens", "groups", "qrMenus"];
-        const deletePromises = collectionsToDelete.map(async (collectionName) => {
+        const docsToDeleteRefs = [];
+        const filesToDeletePaths = [];
+
+        for (const collectionName of collectionsToDelete) {
             const querySnapshot = await db.collection(collectionName).where("userId", "==", subAccountId).get();
-            const batch = db.batch();
             querySnapshot.forEach(doc => {
-                // Si es un archivo de media, también borramos de Storage
-                if (collectionName === 'media' && doc.data().storagePath) {
-                    admin.storage().bucket().file(doc.data().storagePath).delete().catch(err => console.error(`Failed to delete storage file ${doc.data().storagePath}:`, err));
+                docsToDeleteRefs.push(doc.ref);
+                // Si es un documento de 'media' con una ruta de archivo, lo añadimos a la lista de borrado de Storage
+                if (collectionName === "media" && doc.data().storagePath) {
+                    filesToDeletePaths.push(doc.data().storagePath);
                 }
-                batch.delete(doc.ref);
             });
-            return batch.commit();
+        }
+
+        // 3.4. Eliminar todos los documentos de Firestore en un solo batch
+        if (docsToDeleteRefs.length > 0) {
+            const batch = db.batch();
+            docsToDeleteRefs.forEach((ref) => batch.delete(ref));
+            await batch.commit();
+        }
+
+        // 3.5. Eliminar todos los archivos de Storage asociados
+        const deletePromises = filesToDeletePaths.map((path) => {
+            return admin.storage().bucket().file(path).delete().catch((err) => {
+                console.error(`Fallo al eliminar el archivo de Storage ${path}:`, err);
+            });
         });
 
         await Promise.all(deletePromises);

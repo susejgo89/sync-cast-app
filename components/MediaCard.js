@@ -14,7 +14,7 @@ export function createMediaCard(media, options = {}) {
     const { isDraggable = false, onDelete = null, isSelectable = false, isSelected = false } = options;
 
     const card = document.createElement('div');
-    card.className = 'card overflow-hidden relative group';
+    card.className = 'card card-glass overflow-hidden relative group';
 
     if (isDraggable) {
         card.draggable = true;

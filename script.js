@@ -10,6 +10,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         import { initScreensView } from './views/screensView.js'; 
         import { initMusicPlaylistsView } from './views/musicPlaylistsView.js';
         import { initGroupsView } from './views/groupsView.js';
+        import { initRouter, navigate } from './utils/router.js';
         import { initAdminView } from './views/adminView.js';
         import { createMediaCard } from './components/mediaCard.js';
         
@@ -55,6 +56,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 hamburgerBtn.addEventListener('click', toggleSidebar);
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
+
+            initRouter(); // <-- INICIALIZAMOS EL NUEVO ROUTER
 
         // --- DOM Elements ---
         const loader = document.getElementById('loader');
@@ -482,32 +485,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
             qrContentModal.classList.remove('active');
         });
-
-        // --- Navigation Logic ---
-        const navLinks = document.querySelectorAll('.nav-link');
-        const pageSections = document.querySelectorAll('.page-section');
-        navLinks.forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href').substring(1);
-                
-                pageSections.forEach(s => s.classList.add('hidden'));
-                navLinks.forEach(l => l.classList.remove('bg-neutral-700', 'text-white'));
-                
-                document.getElementById(`${targetId}-section`).classList.remove('hidden');
-                link.classList.add('bg-neutral-700', 'text-white');
-                
-                const linkText = link.querySelector('span').textContent;
-                document.title = `${linkText} - NexusPlay`;
-            });
-        });
-
-    document.querySelectorAll('.dashboard-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelector(`a.nav-link[href="${link.getAttribute('href')}"]`).click();
-        });
-    });
 
     // --- Quick Actions Logic ---
     const quickAddScreenBtn = document.getElementById('quick-add-screen');
