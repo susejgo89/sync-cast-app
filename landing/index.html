@@ -78,6 +78,18 @@
       width: 70%; /* El subrayado crece al pasar el ratón */
     }
 
+    /* Estilos para el selector de idioma del landing */
+    .lang-flag {
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      opacity: 0.6;
+    }
+    .lang-flag.active, .lang-flag:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+      opacity: 1;
+    }
     /* Estilos para las animaciones de scroll */
     .fade-in-section {
       opacity: 0;
@@ -559,8 +571,15 @@
             <a class="nav-link" href="#faq">FAQ</a>
           </li>
         </ul>
+        <!-- Selector de Idioma -->
+        <div class="d-flex align-items-center gap-3 me-3" id="landing-lang-selector">
+            <img src="https://flagcdn.com/es.svg" width="25" alt="Español" data-lang-id="es" class="lang-flag active">
+            <img src="https://flagcdn.com/gb.svg" width="25" alt="English" data-lang-id="en" class="lang-flag">
+            <img src="https://flagcdn.com/br.svg" width="25" alt="Português" data-lang-id="pt" class="lang-flag">
+        </div>
+
         <a href="../index.html" class="btn btn-outline-light">
-          Iniciar Sesión
+          <span data-lang="loginButton">Iniciar Sesión</span>
         </a>
       </div>
     </div>
@@ -580,16 +599,16 @@
 
     <div class="hero-content px-3">
       
-      <h1 class="display-4 mb-4">
+      <h1 class="display-4 mb-4" data-lang="heroTitle">
         Transforma tus Pantallas. Comunica, Vende e Impacta como Nunca Antes.
       </h1>
       
-      <p class="lead mb-5">
+      <p class="lead mb-5" data-lang="heroSubtitle">
         La plataforma de cartelería digital definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.
       </p>
       
-      <a href="#planes" class="btn btn-primary btn-lg px-5 py-3 text-uppercase">
-        Ver Planes y Precios
+      <a href="#planes" class="btn btn-primary btn-lg px-5 py-3 text-uppercase" data-lang="heroCtaButton">
+        Ver Planes
       </a>
 
     </div>
@@ -602,8 +621,8 @@
     <div class="container py-5">
         <div class="row mb-5 text-center">
             <div class="col-12">
-                <h2 class="section-title display-5">Todo lo que necesitas en un solo lugar</h2>
-                <p class="section-subtitle lead text-muted">Diseñado para ser potente pero increíblemente fácil de usar. Empieza a comunicar en minutos.</p>
+                <h2 class="section-title display-5" data-lang="featuresTitle">Todo lo que necesitas en un solo lugar</h2>
+                <p class="section-subtitle lead text-muted" data-lang="featuresSubtitle">Diseñado para ser potente pero increíblemente fácil de usar. Empieza a comunicar en minutos.</p>
             </div>
         </div>
         <div class="row text-center">
@@ -611,24 +630,24 @@
             <div class="col-lg-4 mb-4 mb-lg-0 fade-in-section">
                 <div class="feature-card d-flex flex-column align-items-center">
                     <i class="bi bi-cloud-arrow-up-fill feature-icon mb-4"></i>
-                    <h3 class="h4 mb-3">Control Total y Remoto</h3>
-                    <p class="text-muted mb-0">Actualiza cualquier pantalla, en cualquier lugar y al instante desde nuestra plataforma web.</p>
+                    <h3 class="h4 mb-3" data-lang="feature1Title">Control Total y Remoto</h3>
+                    <p class="text-muted mb-0" data-lang="feature1Text">Actualiza cualquier pantalla, en cualquier lugar y al instante desde nuestra plataforma web.</p>
                 </div>
             </div>
             <!-- Característica 2 -->
             <div class="col-lg-4 mb-4 mb-lg-0 fade-in-section" style="transition-delay: 100ms;">
                 <div class="feature-card d-flex flex-column align-items-center">
                     <i class="bi bi-calendar-week-fill feature-icon mb-4"></i>
-                    <h3 class="h4 mb-3">Programación Inteligente</h3>
-                    <p class="text-muted mb-0">Planifica tu contenido por día y franjas horarias. Perfecto para menús, promociones y eventos.</p>
+                    <h3 class="h4 mb-3" data-lang="feature2Title">Programación Inteligente</h3>
+                    <p class="text-muted mb-0" data-lang="feature2Text">Planifica tu contenido por día y franjas horarias. Perfecto para menús, promociones y eventos.</p>
                 </div>
             </div>
             <!-- Característica 3 -->
             <div class="col-lg-4 fade-in-section" style="transition-delay: 200ms;">
                 <div class="feature-card d-flex flex-column align-items-center">
                     <i class="bi bi-magic feature-icon mb-4"></i>
-                    <h3 class="h4 mb-3">Contenido Dinámico</h3>
-                    <p class="text-muted mb-0">Atrae todas las miradas con widgets de clima, noticias, reloj, videos de YouTube y más.</p>
+                    <h3 class="h4 mb-3" data-lang="feature3Title">Contenido Dinámico</h3>
+                    <p class="text-muted mb-0" data-lang="feature3Text">Atrae todas las miradas con widgets de clima, noticias, reloj, videos de YouTube y más.</p>
                 </div>
             </div>
         </div>
@@ -642,8 +661,8 @@
     <div class="container py-5">
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
-                <h2 class="section-title display-5">Una Interfaz Intuitiva y Potente</h2>
-                <p class="section-subtitle lead text-muted">Diseñada para que gestionar tu contenido sea una tarea rápida y sencilla, sin complicaciones técnicas.</p>
+                <h2 class="section-title display-5" data-lang="platformTitle">Una Interfaz Intuitiva y Potente</h2>
+                <p class="section-subtitle lead text-muted" data-lang="platformSubtitle">Diseñada para que gestionar tu contenido sea una tarea rápida y sencilla, sin complicaciones técnicas.</p>
             </div>
         </div>
         <div class="row justify-content-center">
@@ -674,8 +693,8 @@
     <div class="container py-5">
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
-                <h2 class="section-title display-5">Una Solución para Cada Necesidad</h2>
-                <p class="section-subtitle lead text-muted">Tanto si quieres potenciar tu negocio como si buscas lanzar tu propia marca de cartelería digital, tenemos el plan perfecto para ti.</p>
+                <h2 class="section-title display-5" data-lang="solutionsTitle">Una Solución para Cada Necesidad</h2>
+                <p class="section-subtitle lead text-muted" data-lang="solutionsSubtitle">Tanto si quieres potenciar tu negocio como si buscas lanzar tu propia marca de cartelería digital, tenemos el plan perfecto para ti.</p>
             </div>
         </div>
         <div class="row">
@@ -684,9 +703,9 @@
                 <div class="solution-card w-100">
                     <div class="card-body p-5 text-center d-flex flex-column">
                         <i class="bi bi-shop-window feature-icon mb-4"></i>
-                        <h3 class="card-title h4 mb-3">Para tu Negocio</h3>
-                        <p class="card-text text-muted flex-grow-1">Ideal para restaurantes, tiendas, gimnasios y oficinas que quieren gestionar sus propias pantallas de forma sencilla y profesional para potenciar sus ventas y comunicación.</p>
-                        <a href="#planes" class="btn btn-outline-primary mt-4 px-4 py-2">Ver Plan Profesional</a>
+                        <h3 class="card-title h4 mb-3" data-lang="solution1Title">Para tu Negocio</h3>
+                        <p class="card-text text-muted flex-grow-1" data-lang="solution1Text">Ideal para restaurantes, tiendas, gimnasios y oficinas que quieren gestionar sus propias pantallas de forma sencilla y profesional para potenciar sus ventas y comunicación.</p>
+                        <a href="#planes" class="btn btn-outline-primary mt-4 px-4 py-2" data-lang="solution1Button">Ver Plan Profesional</a>
                     </div>
                 </div>
             </div>
@@ -695,9 +714,9 @@
                 <div class="solution-card highlight w-100">
                     <div class="card-body p-5 text-center d-flex flex-column">
                         <i class="bi bi-briefcase-fill feature-icon mb-4"></i>
-                        <h3 class="card-title h4 mb-3">Para Agencias y Revendedores</h3>
-                        <p class="card-text text-muted flex-grow-1">La solución White-Label perfecta para escalar tu oferta de servicios. Ofrece cartelería digital a tus clientes con tu propia marca, gestionando todo desde un único panel.</p>
-                        <a href="#planes" class="btn btn-primary mt-4 px-4 py-2">Conocer Plan Corporativo</a>
+                        <h3 class="card-title h4 mb-3" data-lang="solution2Title">Para Agencias y Revendedores</h3>
+                        <p class="card-text text-muted flex-grow-1" data-lang="solution2Text">La solución White-Label perfecta para escalar tu oferta de servicios. Ofrece cartelería digital a tus clientes con tu propia marca, gestionando todo desde un único panel.</p>
+                        <a href="#planes" class="btn btn-primary mt-4 px-4 py-2" data-lang="solution2Button">Conocer Plan Corporativo</a>
                     </div>
                 </div>
             </div>
@@ -712,8 +731,8 @@
     <div class="container py-5">
       <div class="row justify-content-center text-center">
         <div class="col-lg-8">
-          <h2 class="section-title display-5">Inspírate con lo que puedes lograr</h2>
-          <p class="section-subtitle lead text-muted">Desde menús digitales hasta anuncios de ofertas, NexusPlay se adapta a cualquier industria.</p>
+          <h2 class="section-title display-5" data-lang="useCasesTitle">Inspírate con lo que puedes lograr</h2>
+          <p class="section-subtitle lead text-muted" data-lang="useCasesSubtitle">Desde menús digitales hasta anuncios de ofertas, NexusPlay se adapta a cualquier industria.</p>
         </div>
       </div>
       <div class="row g-4">
@@ -721,28 +740,28 @@
         <div class="col-md-6 col-lg-3 fade-in-section">
           <div class="use-case-card">
             <img src="../assets/1.png" class="use-case-img" alt="Cartelería digital en tienda de ropa">
-            <div class="use-case-title">Tiendas Retail</div>
+            <div class="use-case-title" data-lang="useCase1">Tiendas Retail</div>
           </div>
         </div>
         <!-- Caso de Uso 2: Restaurantes -->
         <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 100ms;">
           <div class="use-case-card">
             <img src="../assets/2.png" class="use-case-img" alt="Menú digital en cafetería">
-            <div class="use-case-title">Restaurantes y Cafés</div>
+            <div class="use-case-title" data-lang="useCase2">Restaurantes y Cafés</div>
           </div>
         </div>
         <!-- Caso de Uso 3: Oficinas -->
         <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 200ms;">
           <div class="use-case-card">
             <img src="../assets/3.png" class="use-case-img" alt="Pantalla de bienvenida en recepción de oficina">
-            <div class="use-case-title">Oficinas y Recepciones</div>
+            <div class="use-case-title" data-lang="useCase3">Oficinas y Recepciones</div>
           </div>
         </div>
         <!-- Caso de Uso 4: Gimnasios -->
         <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 300ms;">
           <div class="use-case-card">
             <img src="../assets/4.png" class="use-case-img" alt="Horario de clases en pantalla de gimnasio">
-            <div class="use-case-title">Gimnasios y Deporte</div>
+            <div class="use-case-title" data-lang="useCase4">Gimnasios y Deporte</div>
           </div>
         </div>
       </div>
@@ -756,8 +775,8 @@
     <div class="container py-5">
       <div class="row justify-content-center text-center">
         <div class="col-lg-8">
-            <h2 class="section-title display-5">Planes Flexibles para Crecer Contigo</h2>
-            <p class="section-subtitle lead text-muted">Elige el plan que se ajusta a tus objetivos. Sin contratos a largo plazo, cancela cuando quieras.</p>
+            <h2 class="section-title display-5" data-lang="plansTitle">Planes Flexibles para Crecer Contigo</h2>
+            <p class="section-subtitle lead text-muted" data-lang="plansSubtitle">Elige el plan que se ajusta a tus objetivos. Sin contratos a largo plazo, cancela cuando quieras.</p>
         </div>
       </div>
       <div class="row justify-content-center">
@@ -765,22 +784,22 @@
         <div class="col-lg-5 mb-4 mb-lg-0 d-flex fade-in-section">
           <div class="plan-card w-100">
             <div class="card-header text-center p-4">
-              <h3 class="h2 font-weight-bold mb-2">Plan Profesional</h3>
-              <p class="text-muted">Ideal para negocios, tiendas y empresas que gestionan sus propias pantallas.</p>
+              <h3 class="h2 font-weight-bold mb-2" data-lang="plan1Title">Plan Profesional</h3>
+              <p class="text-muted" data-lang="plan1Subtitle">Ideal para negocios, tiendas y empresas que gestionan sus propias pantallas.</p>
             </div>
             <div class="card-body p-4 flex-grow-1">
               <ul class="plan-features">
-                <li><i class="bi bi-check-circle-fill"></i><span><strong>Gestión Remota</strong> de Contenido</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span><strong>Programación</strong> por Horas, Días y Grupos</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span>Biblioteca de Medios (Videos, Imágenes, Audio)</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span><strong>Widgets Dinámicos</strong> (Clima, Reloj, Noticias RSS)</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span>Menú Digital con <strong>Código QR</strong></span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span>Exhibición de Páginas Web y Videos de YouTube</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span>Soporte Técnico</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureRemote"><strong>Gestión Remota</strong> de Contenido</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureSchedule"><strong>Programación</strong> por Horas, Días y Grupos</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureLibrary">Biblioteca de Medios (Videos, Imágenes, Audio)</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureWidgets"><strong>Widgets Dinámicos</strong> (Clima, Reloj, Noticias RSS)</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureQr">Menú Digital con <strong>Código QR</strong></span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureWeb">Exhibición de Páginas Web y Videos de YouTube</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureSupport">Soporte Técnico</span></li>
               </ul>
             </div>
             <div class="card-footer text-center p-4">
-              <a href="#contacto" class="btn btn-outline-primary btn-lg w-100">Contacto</a>
+              <a href="#contacto" class="btn btn-outline-primary btn-lg w-100" data-lang="contactButton">Contacto</a>
             </div>
           </div>
         </div>
@@ -788,21 +807,21 @@
         <div class="col-lg-5 d-flex fade-in-section" style="transition-delay: 100ms;">
           <div class="plan-card highlight w-100">
             <div class="card-header text-center p-4">
-              <h3 class="h2 font-weight-bold mb-2">Plan Corporativo</h3>
-              <p class="text-muted">Para agencias y revendedores que quieren ofrecer el servicio con su propia marca.</p>
+              <h3 class="h2 font-weight-bold mb-2" data-lang="plan2Title">Plan Corporativo</h3>
+              <p class="text-muted" data-lang="plan2Subtitle">Para agencias y revendedores que quieren ofrecer el servicio con su propia marca.</p>
             </div>
             <div class="card-body p-4 flex-grow-1">
-              <p class="fw-bold mb-3">Todo lo del Plan Profesional, y además:</p>
+              <p class="fw-bold mb-3" data-lang="plan2Includes">Todo lo del Plan Profesional, y además:</p>
               <ul class="plan-features">
-                <li><i class="bi bi-check-circle-fill"></i><span><strong>100% Marca Blanca:</strong> Usa tu propio logo y dominio.</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span><strong>Panel de Revendedor</strong> para crear y administrar clientes.</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span><strong>Asignación de Recursos</strong> (pantallas y almacenamiento).</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span>Modelo de Negocio Propio: Establece tus precios.</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span>Soporte Prioritario para Socios.</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureWhitelabel"><strong>100% Marca Blanca:</strong> Usa tu propio logo y dominio.</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureReseller"><strong>Panel de Revendedor</strong> para crear y administrar clientes.</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureResources"><strong>Asignación de Recursos</strong> (pantallas y almacenamiento).</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeaturePricing">Modelo de Negocio Propio: Establece tus precios.</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeaturePrioritySupport">Soporte Prioritario para Socios.</span></li>
               </ul>
             </div>
             <div class="card-footer text-center p-4">
-              <a href="#contacto" class="btn btn-primary btn-lg w-100">Contacto</a>
+              <a href="#contacto" class="btn btn-primary btn-lg w-100" data-lang="contactButton">Contacto</a>
             </div>
           </div>
         </div>
@@ -817,8 +836,8 @@
     <div class="container py-5">
       <div class="row justify-content-center text-center">
         <div class="col-lg-8">
-            <h2 class="section-title display-5">Resolvemos tus Dudas</h2>
-            <p class="section-subtitle lead text-muted">Encuentra aquí las respuestas a las preguntas más comunes sobre NexusPlay.</p>
+            <h2 class="section-title display-5" data-lang="faqTitle">Resolvemos tus Dudas</h2>
+            <p class="section-subtitle lead text-muted" data-lang="faqSubtitle">Encuentra aquí las respuestas a las preguntas más comunes sobre NexusPlay.</p>
         </div>
       </div>
       <div class="row justify-content-center">
@@ -827,12 +846,12 @@
             <!-- Pregunta 1 -->
             <div class="accordion-item">
               <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1" aria-expanded="true" aria-controls="faq-1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1" aria-expanded="true" aria-controls="faq-1" data-lang="faq1Title">
                   ¿Qué necesito para empezar a usar NexusPlay?
                 </button>
               </h2>
               <div id="faq-1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                <div class="accordion-body">
+                <div class="accordion-body" data-lang="faq1Text">
                   Solo dos cosas: una cuenta en NexusPlay y una pantalla con conexión a internet. Nuestro software es compatible con una amplia gama de dispositivos, desde televisores con Android TV hasta reproductores multimedia (media players) dedicados. ¡Podemos asesorarte para que elijas el mejor hardware!
                 </div>
               </div>
@@ -840,12 +859,12 @@
             <!-- Pregunta 2 -->
             <div class="accordion-item">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2" aria-expanded="false" aria-controls="faq-2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2" aria-expanded="false" aria-controls="faq-2" data-lang="faq2Title">
                   ¿Es difícil de usar? ¿Necesito conocimientos técnicos?
                 </button>
               </h2>
               <div id="faq-2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                <div class="accordion-body">
+                <div class="accordion-body" data-lang="faq2Text">
                   ¡Para nada! Hemos diseñado NexusPlay para que sea extremadamente intuitivo. Con nuestra interfaz de "arrastrar y soltar", podrás crear y programar contenido en minutos, sin necesidad de escribir ni una sola línea de código.
                 </div>
               </div>
@@ -853,12 +872,12 @@
             <!-- Pregunta 3 -->
             <div class="accordion-item">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3" aria-expanded="false" aria-controls="faq-3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3" aria-expanded="false" aria-controls="faq-3" data-lang="faq3Title">
                   ¿Qué tipo de contenido puedo mostrar en las pantallas?
                 </button>
               </h2>
               <div id="faq-3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                <div class="accordion-body">
+                <div class="accordion-body" data-lang="faq3Text">
                   Puedes mostrar casi cualquier cosa que imagines: imágenes (JPG, PNG, GIF), videos (MP4), páginas web, videos de YouTube y enriquecer tu comunicación con nuestros widgets dinámicos como el clima, noticias RSS y reloj digital.
                 </div>
               </div>
@@ -866,12 +885,12 @@
             <!-- Pregunta 4 -->
             <div class="accordion-item">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-4" aria-expanded="false" aria-controls="faq-4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-4" aria-expanded="false" aria-controls="faq-4" data-lang="faq4Title">
                   (Para Agencias) ¿Qué significa exactamente "White-Label" o Marca Blanca?
                 </button>
               </h2>
               <div id="faq-4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                <div class="accordion-body">
+                <div class="accordion-body" data-lang="faq4Text">
                   Significa que puedes ofrecer nuestra plataforma como si fuera tuya. Podrás usar tu propio logo, tus colores de marca y gestionar a todos tus clientes desde un panel centralizado. Es la solución ideal para añadir un nuevo flujo de ingresos recurrentes a tu negocio.
                 </div>
               </div>
@@ -879,12 +898,12 @@
             <!-- Pregunta 5 -->
             <div class="accordion-item">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-5" aria-expanded="false" aria-controls="faq-5">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-5" aria-expanded="false" aria-controls="faq-5" data-lang="faq5Title">
                   (Para Agencias) ¿Puedo usar mi propio dominio para la plataforma?
                 </button>
               </h2>
               <div id="faq-5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                <div class="accordion-body">
+                <div class="accordion-body" data-lang="faq5Text">
                   Sí. Con el Plan Corporativo, puedes configurar el servicio para que funcione bajo tu propio subdominio (ej: portal.tuagencia.com), ofreciendo una experiencia 100% transparente y profesional a tus clientes finales.
                 </div>
               </div>
@@ -892,12 +911,12 @@
             <!-- Pregunta 6 -->
             <div class="accordion-item">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-6" aria-expanded="false" aria-controls="faq-6">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-6" aria-expanded="false" aria-controls="faq-6" data-lang="faq6Title">
                   ¿Cómo funciona el soporte técnico?
                 </button>
               </h2>
               <div id="faq-6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                <div class="accordion-body">
+                <div class="accordion-body" data-lang="faq6Text">
                   Ofrecemos soporte completo a todos nuestros clientes a través de email y chat. Para nuestros socios con Plan Corporativo, brindamos un soporte prioritario para asegurar que siempre puedan dar el mejor servicio a sus propios clientes.
                 </div>
               </div>
@@ -915,8 +934,8 @@
     <div class="container py-5">
       <div class="row justify-content-center text-center">
         <div class="col-lg-8">
-          <h2 class="section-title display-5">¿Listo para Empezar? Hablemos.</h2>
-          <p class="section-subtitle lead text-muted">Estamos aquí para responder tus preguntas y ayudarte a encontrar la solución perfecta para tu negocio.</p>
+          <h2 class="section-title display-5" data-lang="contactTitle">¿Listo para Empezar? Hablemos.</h2>
+          <p class="section-subtitle lead text-muted" data-lang="contactSubtitle">Estamos aquí para responder tus preguntas y ayudarte a encontrar la solución perfecta para tu negocio.</p>
         </div>
       </div>
       <div class="row justify-content-center g-4">
@@ -924,8 +943,8 @@
         <div class="col-md-5">
           <div class="contact-card text-center p-5">
             <i class="bi bi-envelope-fill contact-icon mb-4"></i>
-            <h3 class="h4 mb-3">Escríbenos un Email</h3>
-            <p class="text-muted">La mejor opción para consultas detalladas sobre planes, características o soporte técnico.</p>
+            <h3 class="h4 mb-3" data-lang="contactEmailTitle">Escríbenos un Email</h3>
+            <p class="text-muted" data-lang="contactEmailText">La mejor opción para consultas detalladas sobre planes, características o soporte técnico.</p>
             <a href="mailto:contacto@nexusplay.com" class="btn btn-outline-primary mt-4">contacto@nexusplay.com</a>
           </div>
         </div>
@@ -933,9 +952,9 @@
         <div class="col-md-5">
           <div class="contact-card text-center p-5">
             <i class="bi bi-whatsapp contact-icon mb-4"></i>
-            <h3 class="h4 mb-3">Chatea por WhatsApp</h3>
-            <p class="text-muted">Perfecto para preguntas rápidas y una atención más directa. Te responderemos lo antes posible.</p>
-            <a href="https://wa.me/15551234567" target="_blank" rel="noopener noreferrer" class="btn btn-primary mt-4">Iniciar Chat</a>
+            <h3 class="h4 mb-3" data-lang="contactWhatsappTitle">Chatea por WhatsApp</h3>
+            <p class="text-muted" data-lang="contactWhatsappText">Perfecto para preguntas rápidas y una atención más directa. Te responderemos lo antes posible.</p>
+            <a href="https://wa.me/15551234567" target="_blank" rel="noopener noreferrer" class="btn btn-primary mt-4" data-lang="contactWhatsappButton">Iniciar Chat</a>
           </div>
         </div>
       </div>
@@ -947,10 +966,10 @@
   <!-- =============================================== -->
   <section id="cta" class="py-5">
     <div class="container text-center text-white py-5">
-      <h2 class="display-5 fw-bold">¿Listo para transformar tus pantallas?</h2>
-      <p class="lead my-4 mx-auto" style="max-width: 600px;">Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusPlay hoy mismo y lleva tu negocio al siguiente nivel.</p>
-      <a href="../index.html" class="btn btn-light btn-lg px-5 py-3 text-primary fw-bold text-uppercase mt-3">
-        Empezar Ahora
+      <h2 class="display-5 fw-bold" data-lang="ctaTitle">¿Listo para transformar tus pantallas?</h2>
+      <p class="lead my-4 mx-auto" style="max-width: 600px;" data-lang="ctaSubtitle">Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusPlay hoy mismo y lleva tu negocio al siguiente nivel.</p>
+      <a href="../index.html" class="btn btn-light btn-lg px-5 py-3 text-primary fw-bold text-uppercase mt-3" data-lang="ctaButton">
+        Empezar ahora
       </a>
     </div>
   </section>
@@ -968,17 +987,17 @@
         </div>
         <!-- Columna 2: Enlaces de Navegación -->
         <div class="col-md-4 col-lg-3 mb-4">
-          <h5 class="text-white mb-3">Explorar</h5>
+          <h5 class="text-white mb-3" data-lang="footerExplore">Explorar</h5>
           <ul class="list-unstyled">
-            <li class="mb-2"><a href="#caracteristicas" class="footer-link">Características</a></li>
-            <li class="mb-2"><a href="#casos-de-uso" class="footer-link">Casos de Uso</a></li>
-            <li class="mb-2"><a href="#planes" class="footer-link">Planes</a></li>
-            <li class="mb-2"><a href="#faq" class="footer-link">FAQ</a></li>
+            <li class="mb-2"><a href="#caracteristicas" class="footer-link" data-lang="navFeatures">Características</a></li>
+            <li class="mb-2"><a href="#casos-de-uso" class="footer-link" data-lang="navUseCases">Casos de Uso</a></li>
+            <li class="mb-2"><a href="#planes" class="footer-link" data-lang="navPlans">Planes</a></li>
+            <li class="mb-2"><a href="#faq" class="footer-link" data-lang="navFaq">FAQ</a></li>
           </ul>
         </div>
         <!-- Columna 3: Contacto y Redes Sociales -->
         <div class="col-md-4 col-lg-4 mb-4">
-          <h5 class="text-white mb-3">Conecta con Nosotros</h5>
+          <h5 class="text-white mb-3" data-lang="footerConnect">Conecta con Nosotros</h5>
           <a href="mailto:contacto@nexusplay.com" class="footer-link d-block mb-3">contacto@nexusplay.com</a>
           <div class="d-flex justify-content-center justify-content-md-start gap-3">
             <a href="#" class="footer-social-icon"><i class="bi bi-twitter-x"></i></a>
@@ -988,7 +1007,7 @@
         </div>
       </div>
       <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
-      <p class="text-muted text-center mb-0">© 2024 NexusPlay. Todos los derechos reservados.</p>
+      <p class="text-muted text-center mb-0" data-lang="footerRights">© 2024 NexusPlay. Todos los derechos reservados.</p>
     </div>
   </footer>
 
@@ -1005,6 +1024,253 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   
   <script>
+    // --- TRADUCCIONES PARA LA LANDING PAGE ---
+    const landingTranslations = {
+      es: {
+        loginButton: "Iniciar Sesión",
+        heroTitle: "Transforma tus Pantallas. Comunica, Vende e Impacta como Nunca Antes.",
+        heroSubtitle: "La plataforma de cartelería digital definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.",
+        heroCtaButton: "Ver Planes",
+        featuresTitle: "Todo lo que necesitas en un solo lugar",
+        featuresSubtitle: "Diseñado para ser potente pero increíblemente fácil de usar. Empieza a comunicar en minutos.",
+        feature1Title: "Control Total y Remoto",
+        feature1Text: "Actualiza cualquier pantalla, en cualquier lugar y al instante desde nuestra plataforma web.",
+        feature2Title: "Programación Inteligente",
+        feature2Text: "Planifica tu contenido por día y franjas horarias. Perfecto para menús, promociones y eventos.",
+        feature3Title: "Contenido Dinámico",
+        feature3Text: "Atrae todas las miradas con widgets de clima, noticias, reloj, videos de YouTube y más.",
+        platformTitle: "Una Interfaz Intuitiva y Potente",
+        platformSubtitle: "Diseñada para que gestionar tu contenido sea una tarea rápida y sencilla, sin complicaciones técnicas.",
+        solutionsTitle: "Una Solución para Cada Necesidad",
+        solutionsSubtitle: "Tanto si quieres potenciar tu negocio como si buscas lanzar tu propia marca de cartelería digital, tenemos el plan perfecto para ti.",
+        solution1Title: "Para tu Negocio",
+        solution1Text: "Ideal para restaurantes, tiendas, gimnasios y oficinas que quieren gestionar sus propias pantallas de forma sencilla y profesional para potenciar sus ventas y comunicación.",
+        solution1Button: "Ver Plan Profesional",
+        solution2Title: "Para Agencias y Revendedores",
+        solution2Text: "La solución White-Label perfecta para escalar tu oferta de servicios. Ofrece cartelería digital a tus clientes con tu propia marca, gestionando todo desde un único panel.",
+        solution2Button: "Conocer Plan Corporativo",
+        useCasesTitle: "Inspírate con lo que puedes lograr",
+        useCasesSubtitle: "Desde menús digitales hasta anuncios de ofertas, NexusPlay se adapta a cualquier industria.",
+        useCase1: "Tiendas Retail",
+        useCase2: "Restaurantes y Cafés",
+        useCase3: "Oficinas y Recepciones",
+        useCase4: "Gimnasios y Deporte",
+        plansTitle: "Planes Flexibles para Crecer Contigo",
+        plansSubtitle: "Elige el plan que se ajusta a tus objetivos. Sin contratos a largo plazo, cancela cuando quieras.",
+        plan1Title: "Plan Profesional",
+        plan1Subtitle: "Ideal para negocios, tiendas y empresas que gestionan sus propias pantallas.",
+        planFeatureRemote: "Gestión Remota de Contenido",
+        planFeatureSchedule: "Programación por Horas, Días y Grupos",
+        planFeatureLibrary: "Biblioteca de Medios (Videos, Imágenes, Audio)",
+        planFeatureWidgets: "Widgets Dinámicos (Clima, Reloj, Noticias RSS)",
+        planFeatureQr: "Menú Digital con Código QR",
+        planFeatureWeb: "Exhibición de Páginas Web y Videos de YouTube",
+        planFeatureSupport: "Soporte Técnico",
+        contactButton: "Contacto",
+        plan2Title: "Plan Corporativo",
+        plan2Subtitle: "Para agencias y revendedores que quieren ofrecer el servicio con su propia marca.",
+        plan2Includes: "Todo lo del Plan Profesional, y además:",
+        planFeatureWhitelabel: "100% Marca Blanca: Usa tu propio logo y dominio.",
+        planFeatureReseller: "Panel de Revendedor para crear y administrar clientes.",
+        planFeatureResources: "Asignación de Recursos (pantallas y almacenamiento).",
+        planFeaturePricing: "Modelo de Negocio Propio: Establece tus precios.",
+        planFeaturePrioritySupport: "Soporte Prioritario para Socios.",
+        faqTitle: "Resolvemos tus Dudas",
+        faqSubtitle: "Encuentra aquí las respuestas a las preguntas más comunes sobre NexusPlay.",
+        faq1Title: "¿Qué necesito para empezar a usar NexusPlay?",
+        faq1Text: "Solo dos cosas: una cuenta en NexusPlay y una pantalla con conexión a internet. Nuestro software es compatible con una amplia gama de dispositivos, desde televisores con Android TV hasta reproductores multimedia (media players) dedicados. ¡Podemos asesorarte para que elijas el mejor hardware!",
+        faq2Title: "¿Es difícil de usar? ¿Necesito conocimientos técnicos?",
+        faq2Text: "¡Para nada! Hemos diseñado NexusPlay para que sea extremadamente intuitivo. Con nuestra interfaz de 'arrastrar y soltar', podrás crear y programar contenido en minutos, sin necesidad de escribir ni una sola línea de código.",
+        faq3Title: "¿Qué tipo de contenido puedo mostrar en las pantallas?",
+        faq3Text: "Puedes mostrar casi cualquier cosa que imagines: imágenes (JPG, PNG, GIF), videos (MP4), páginas web, videos de YouTube y enriquecer tu comunicación con nuestros widgets dinámicos como el clima, noticias RSS y reloj digital.",
+        faq4Title: '(Para Agencias) ¿Qué significa exactamente "White-Label" o Marca Blanca?',
+        faq4Text: "Significa que puedes ofrecer nuestra plataforma como si fuera tuya. Podrás usar tu propio logo, tus colores de marca y gestionar a todos tus clientes desde un panel centralizado. Es la solución ideal para añadir un nuevo flujo de ingresos recurrentes a tu negocio.",
+        faq5Title: "(Para Agencias) ¿Puedo usar mi propio dominio para la plataforma?",
+        faq5Text: "Sí. Con el Plan Corporativo, puedes configurar el servicio para que funcione bajo tu propio subdominio (ej: portal.tuagencia.com), ofreciendo una experiencia 100% transparente y profesional a tus clientes finales.",
+        faq6Title: "¿Cómo funciona el soporte técnico?",
+        faq6Text: "Ofrecemos soporte completo a todos nuestros clientes a través de email y chat. Para nuestros socios con Plan Corporativo, brindamos un soporte prioritario para asegurar que siempre puedan dar el mejor servicio a sus propios clientes.",
+        contactTitle: "¿Listo para Empezar? Hablemos.",
+        contactSubtitle: "Estamos aquí para responder tus preguntas y ayudarte a encontrar la solución perfecta para tu negocio.",
+        contactEmailTitle: "Escríbenos un Email",
+        contactEmailText: "La mejor opción para consultas detalladas sobre planes, características o soporte técnico.",
+        contactWhatsappTitle: "Chatea por WhatsApp",
+        contactWhatsappText: "Perfecto para preguntas rápidas y una atención más directa. Te responderemos lo antes posible.",
+        contactWhatsappButton: "Iniciar Chat",
+        ctaTitle: "¿Listo para transformar tus pantallas?",
+        ctaSubtitle: "Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusPlay hoy mismo y lleva tu negocio al siguiente nivel.",
+        ctaButton: "Empezar Ahora",
+        footerExplore: "Explorar",
+        navFeatures: "Características",
+        navUseCases: "Casos de Uso",
+        navPlans: "Planes",
+        navFaq: "FAQ",
+        footerConnect: "Conecta con Nosotros",
+        footerRights: "© 2024 NexusPlay. Todos los derechos reservados."
+      },
+      en: {
+        loginButton: "Login",
+        heroTitle: "Transform Your Screens. Communicate, Sell, and Impact Like Never Before.",
+        heroSubtitle: "The ultimate digital signage platform to manage your visual content easily, remotely, and professionally.",
+        heroCtaButton: "View Plans",
+        featuresTitle: "Everything you need in one place",
+        featuresSubtitle: "Designed to be powerful yet incredibly easy to use. Start communicating in minutes.",
+        feature1Title: "Total and Remote Control",
+        feature1Text: "Update any screen, anywhere, and instantly from our web platform.",
+        feature2Title: "Intelligent Scheduling",
+        feature2Text: "Plan your content by day and time slots. Perfect for menus, promotions, and events.",
+        feature3Title: "Dynamic Content",
+        feature3Text: "Capture everyone's attention with widgets for weather, news, clock, YouTube videos, and more.",
+        platformTitle: "An Intuitive and Powerful Interface",
+        platformSubtitle: "Designed to make managing your content a quick and simple task, without technical complications.",
+        solutionsTitle: "A Solution for Every Need",
+        solutionsSubtitle: "Whether you want to boost your business or launch your own digital signage brand, we have the perfect plan for you.",
+        solution1Title: "For Your Business",
+        solution1Text: "Ideal for restaurants, shops, gyms, and offices that want to manage their own screens simply and professionally to boost sales and communication.",
+        solution1Button: "View Professional Plan",
+        solution2Title: "For Agencies and Resellers",
+        solution2Text: "The perfect White-Label solution to scale your service offerings. Offer digital signage to your clients with your own brand, managing everything from a single panel.",
+        solution2Button: "Learn About Corporate Plan",
+        useCasesTitle: "Get Inspired by What You Can Achieve",
+        useCasesSubtitle: "From digital menus to promotional ads, NexusPlay adapts to any industry.",
+        useCase1: "Retail Stores",
+        useCase2: "Restaurants & Cafes",
+        useCase3: "Offices & Receptions",
+        useCase4: "Gyms & Sports",
+        plansTitle: "Flexible Plans to Grow With You",
+        plansSubtitle: "Choose the plan that fits your goals. No long-term contracts, cancel anytime.",
+        plan1Title: "Professional Plan",
+        plan1Subtitle: "Ideal for businesses, shops, and companies managing their own screens.",
+        planFeatureRemote: "Remote Content Management",
+        planFeatureSchedule: "Scheduling by Hours, Days, and Groups",
+        planFeatureLibrary: "Media Library (Videos, Images, Audio)",
+        planFeatureWidgets: "Dynamic Widgets (Weather, Clock, RSS News)",
+        planFeatureQr: "Digital Menu with QR Code",
+        planFeatureWeb: "Display Web Pages and YouTube Videos",
+        planFeatureSupport: "Technical Support",
+        contactButton: "Contact",
+        plan2Title: "Corporate Plan",
+        plan2Subtitle: "For agencies and resellers who want to offer the service with their own brand.",
+        plan2Includes: "Everything in the Professional Plan, plus:",
+        planFeatureWhitelabel: "100% White-Label: Use your own logo and domain.",
+        planFeatureReseller: "Reseller Panel to create and manage clients.",
+        planFeatureResources: "Resource Allocation (screens and storage).",
+        planFeaturePricing: "Your Own Business Model: Set your own prices.",
+        planFeaturePrioritySupport: "Priority Support for Partners.",
+        faqTitle: "We Answer Your Doubts",
+        faqSubtitle: "Find the answers to the most common questions about NexusPlay here.",
+        faq1Title: "What do I need to start using NexusPlay?",
+        faq1Text: "Just two things: a NexusPlay account and a screen with an internet connection. Our software is compatible with a wide range of devices, from Android TV-enabled televisions to dedicated media players. We can advise you on choosing the best hardware!",
+        faq2Title: "Is it difficult to use? Do I need technical skills?",
+        faq2Text: "Not at all! We designed NexusPlay to be extremely intuitive. With our 'drag and drop' interface, you can create and schedule content in minutes, without writing a single line of code.",
+        faq3Title: "What kind of content can I display on the screens?",
+        faq3Text: "You can display almost anything you can imagine: images (JPG, PNG, GIF), videos (MP4), web pages, YouTube videos, and enrich your communication with our dynamic widgets like weather, RSS news, and a digital clock.",
+        faq4Title: '(For Agencies) What exactly does "White-Label" mean?',
+        faq4Text: "It means you can offer our platform as if it were your own. You can use your own logo, your brand colors, and manage all your clients from a centralized panel. It's the ideal solution to add a new recurring revenue stream to your business.",
+        faq5Title: "(For Agencies) Can I use my own domain for the platform?",
+        faq5Text: "Yes. With the Corporate Plan, you can configure the service to run under your own subdomain (e.g., portal.youragency.com), offering a 100% transparent and professional experience to your end clients.",
+        faq6Title: "How does technical support work?",
+        faq6Text: "We offer full support to all our clients via email and chat. For our Corporate Plan partners, we provide priority support to ensure they can always give the best service to their own customers.",
+        contactTitle: "Ready to Start? Let's Talk.",
+        contactSubtitle: "We're here to answer your questions and help you find the perfect solution for your business.",
+        contactEmailTitle: "Send Us an Email",
+        contactEmailText: "The best option for detailed inquiries about plans, features, or technical support.",
+        contactWhatsappTitle: "Chat on WhatsApp",
+        contactWhatsappText: "Perfect for quick questions and more direct attention. We'll get back to you as soon as possible.",
+        contactWhatsappButton: "Start Chat",
+        ctaTitle: "Ready to transform your screens?",
+        ctaSubtitle: "Start communicating, selling, and impacting like never before. Join NexusPlay today and take your business to the next level.",
+        ctaButton: "Get Started Now",
+        footerExplore: "Explore",
+        navFeatures: "Features",
+        navUseCases: "Use Cases",
+        navPlans: "Plans",
+        navFaq: "FAQ",
+        footerConnect: "Connect with Us",
+        footerRights: "© 2024 NexusPlay. All rights reserved."
+      },
+      pt: {
+        loginButton: "Entrar",
+        heroTitle: "Transforme Suas Telas. Comunique, Venda e Impacte como Nunca Antes.",
+        heroSubtitle: "A plataforma definitiva de sinalização digital para gerenciar seu conteúdo visual de forma fácil, remota e profissional.",
+        heroCtaButton: "Ver Planos",
+        featuresTitle: "Tudo o que você precisa em um só lugar",
+        featuresSubtitle: "Projetado para ser poderoso, mas incrivelmente fácil de usar. Comece a comunicar em minutos.",
+        feature1Title: "Controle Total e Remoto",
+        feature1Text: "Atualize qualquer tela, em qualquer lugar e instantaneamente a partir de nossa plataforma web.",
+        feature2Title: "Programação Inteligente",
+        feature2Text: "Planeje seu conteúdo por dia e horários. Perfeito para cardápios, promoções e eventos.",
+        feature3Title: "Conteúdo Dinâmico",
+        feature3Text: "Atraia todos os olhares com widgets de clima, notícias, relógio, vídeos do YouTube e muito mais.",
+        platformTitle: "Uma Interface Intuitiva e Poderosa",
+        platformSubtitle: "Projetada para que gerenciar seu conteúdo seja uma tarefa rápida e simples, sem complicações técnicas.",
+        solutionsTitle: "Uma Solução para Cada Necessidade",
+        solutionsSubtitle: "Seja para impulsionar seu negócio ou para lançar sua própria marca de sinalização digital, temos o plano perfeito para você.",
+        solution1Title: "Para o seu Negócio",
+        solution1Text: "Ideal para restaurantes, lojas, academias e escritórios que desejam gerenciar suas próprias telas de forma simples e profissional para impulsionar vendas e comunicação.",
+        solution1Button: "Ver Plano Profissional",
+        solution2Title: "Para Agências e Revendedores",
+        solution2Text: "A solução White-Label perfeita para escalar sua oferta de serviços. Ofereça sinalização digital aos seus clientes com sua própria marca, gerenciando tudo a partir de um único painel.",
+        solution2Button: "Conhecer Plano Corporativo",
+        useCasesTitle: "Inspire-se com o que você pode alcançar",
+        useCasesSubtitle: "De cardápios digitais a anúncios de ofertas, o NexusPlay se adapta a qualquer indústria.",
+        useCase1: "Lojas de Varejo",
+        useCase2: "Restaurantes e Cafés",
+        useCase3: "Escritórios e Recepções",
+        useCase4: "Academias e Esportes",
+        plansTitle: "Planos Flexíveis para Crescer com Você",
+        plansSubtitle: "Escolha o plano que se ajusta aos seus objetivos. Sem contratos de longo prazo, cancele quando quiser.",
+        plan1Title: "Plano Profissional",
+        plan1Subtitle: "Ideal para negócios, lojas e empresas que gerenciam suas próprias telas.",
+        planFeatureRemote: "Gerenciamento Remoto de Conteúdo",
+        planFeatureSchedule: "Programação por Horas, Dias e Grupos",
+        planFeatureLibrary: "Biblioteca de Mídia (Vídeos, Imagens, Áudio)",
+        planFeatureWidgets: "Widgets Dinâmicos (Clima, Relógio, Notícias RSS)",
+        planFeatureQr: "Cardápio Digital com Código QR",
+        planFeatureWeb: "Exibição de Páginas Web e Vídeos do YouTube",
+        planFeatureSupport: "Suporte Técnico",
+        contactButton: "Contato",
+        plan2Title: "Plano Corporativo",
+        plan2Subtitle: "Para agências e revendedores que desejam oferecer o serviço com sua própria marca.",
+        plan2Includes: "Tudo do Plano Profissional, e mais:",
+        planFeatureWhitelabel: "100% Marca Branca: Use seu próprio logo e domínio.",
+        planFeatureReseller: "Painel de Revendedor para criar e gerenciar clientes.",
+        planFeatureResources: "Alocação de Recursos (telas e armazenamento).",
+        planFeaturePricing: "Modelo de Negócio Próprio: Defina seus próprios preços.",
+        planFeaturePrioritySupport: "Suporte Prioritário para Parceiros.",
+        faqTitle: "Resolvemos suas Dúvidas",
+        faqSubtitle: "Encontre aqui as respostas para as perguntas mais comuns sobre o NexusPlay.",
+        faq1Title: "O que preciso para começar a usar o NexusPlay?",
+        faq1Text: "Apenas duas coisas: uma conta no NexusPlay e uma tela com conexão à internet. Nosso software é compatível com uma vasta gama de dispositivos, desde televisores com Android TV até media players dedicados. Podemos te assessorar na escolha do melhor hardware!",
+        faq2Title: "É difícil de usar? Preciso de conhecimentos técnicos?",
+        faq2Text: "De forma alguma! Projetamos o NexusPlay para ser extremamente intuitivo. Com nossa interface de 'arrastar e soltar', você pode criar e programar conteúdo em minutos, sem precisar escrever uma única linha de código.",
+        faq3Title: "Que tipo de conteúdo posso exibir nas telas?",
+        faq3Text: "Você pode exibir quase tudo que imaginar: imagens (JPG, PNG, GIF), vídeos (MP4), páginas da web, vídeos do YouTube e enriquecer sua comunicação com nossos widgets dinâmicos como clima, notícias RSS e relógio digital.",
+        faq4Title: '(Para Agências) O que significa exatamente "White-Label" ou Marca Branca?',
+        faq4Text: "Significa que você pode oferecer nossa plataforma como se fosse sua. Você poderá usar seu próprio logo, suas cores de marca e gerenciar todos os seus clientes a partir de um painel centralizado. É a solução ideal para adicionar um novo fluxo de receita recorrente ao seu negócio.",
+        faq5Title: "(Para Agências) Posso usar meu próprio domínio para a plataforma?",
+        faq5Text: "Sim. Com o Plano Corporativo, você pode configurar o serviço para funcionar sob seu próprio subdomínio (ex: portal.suaagencia.com), oferecendo uma experiência 100% transparente e profissional aos seus clientes finais.",
+        faq6Title: "Como funciona o suporte técnico?",
+        faq6Text: "Oferecemos suporte completo a todos os nossos clientes por e-mail e chat. Para nossos parceiros do Plano Corporativo, fornecemos suporte prioritário para garantir que eles sempre possam oferecer o melhor serviço aos seus próprios clientes.",
+        contactTitle: "Pronto para Começar? Vamos Conversar.",
+        contactSubtitle: "Estamos aqui para responder suas perguntas e ajudá-lo a encontrar a solução perfeita para o seu negócio.",
+        contactEmailTitle: "Envie-nos um E-mail",
+        contactEmailText: "A melhor opção para consultas detalhadas sobre planos, recursos ou suporte técnico.",
+        contactWhatsappTitle: "Converse pelo WhatsApp",
+        contactWhatsappText: "Perfeito para perguntas rápidas e um atendimento mais direto. Responderemos o mais breve possível.",
+        contactWhatsappButton: "Iniciar Conversa",
+        ctaTitle: "Pronto para transformar suas telas?",
+        ctaSubtitle: "Comece a comunicar, vender e impactar como nunca antes. Junte-se ao NexusPlay hoje e leve seu negócio para o próximo nível.",
+        ctaButton: "Começar Agora",
+        footerExplore: "Explorar",
+        navFeatures: "Recursos",
+        navUseCases: "Casos de Uso",
+        navPlans: "Planos",
+        navFaq: "FAQ",
+        footerConnect: "Conecte-se Conosco",
+        footerRights: "© 2024 NexusPlay. Todos os direitos reservados."
+      }
+    };
+
     // Script para hacer la barra de navegación sólida al hacer scroll
     const nav = document.querySelector('.navbar');
     window.addEventListener('scroll', () => {
@@ -1072,6 +1338,32 @@
     });
 
     // El href="#" ya se encarga de llevar arriba, el scroll-behavior: smooth lo hace suave.
+
+    // --- SCRIPT DE TRADUCCIÓN PARA LA LANDING ---
+    const langSelector = document.getElementById('landing-lang-selector');
+    const flags = langSelector.querySelectorAll('.lang-flag');
+
+    function setLandingLanguage(lang) {
+      document.documentElement.lang = lang;
+      const translations = landingTranslations[lang];
+      
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        const key = el.getAttribute('data-lang');
+        if (translations[key]) {
+          el.textContent = translations[key];
+        }
+      });
+
+      flags.forEach(flag => {
+        flag.classList.toggle('active', flag.dataset.langId === lang);
+      });
+    }
+
+    langSelector.addEventListener('click', (e) => {
+      if (e.target.classList.contains('lang-flag')) {
+        setLandingLanguage(e.target.dataset.langId);
+      }
+    });
 
     // Script para animaciones al hacer scroll
     const animatedSections = document.querySelectorAll('.fade-in-section');
