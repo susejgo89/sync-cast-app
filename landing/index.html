@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NexusPlay - Transforma tus Pantallas</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  
+  <!-- Bootstrap Icons (para los iconos de características) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    /* =============================================== */
+    /* ========= CUSTOM BOOTSTRAP OVERRIDES ========== */
+    /* =============================================== */
+    .btn-primary {
+      background-color: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .btn-primary:hover {
+      background-color: #6d28d9;
+      border-color: #6d28d9;
+    }
+    .btn-outline-primary {
+      color: #7c3aed;
+      border-color: #7c3aed;
+    }
+    .btn-outline-primary:hover {
+      background-color: #7c3aed;
+      color: white;
+    }
+
+    /* Estilos para la barra de navegación */
+    .navbar {
+      transition: background-color 0.3s ease-in-out;
+    }
+    .navbar-scrolled {
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px); /* Para Safari */
+    }
+
+    /* Estilos para los enlaces de navegación (NUEVO DISEÑO) */
+    .navbar-nav .nav-link {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+      padding: 0.5rem 1rem;
+      margin: 0 0.5rem;
+      position: relative; /* Necesario para el pseudo-elemento ::after */
+      background-color: transparent; /* Sin fondo por defecto */
+      border-radius: 0;
+      transition: color 0.3s ease;
+    }
+
+    /* Efecto de subrayado animado */
+    .navbar-nav .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; /* Posición justo debajo del texto */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background-color: #7c3aed; /* Color de la marca */
+      transition: width 0.3s ease-out;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.active {
+      color: white;
+    }
+
+    .navbar-nav .nav-link:hover::after,
+    .navbar-nav .nav-link.active::after {
+      width: 70%; /* El subrayado crece al pasar el ratón */
+    }
+
+    /* Estilos para las animaciones de scroll */
+    .fade-in-section {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-in-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Scroll suave y padding para el anclaje */
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 110px; /* Altura aproximada de la navbar (ajustada para el logo más grande) */
+    }
+
+    /* Fondo de la página */
+    body {
+      background-image: url('../assets/background.png');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center center;
+      min-height: 100vh;
+    }
+
+    /* Estilos personalizados para la sección Héroe */
+    .hero-section {
+      height: 100vh; /* Ocupa toda la altura de la pantalla */
+      color: white;
+      position: relative; /* Necesario para posicionar los fondos */
+      overflow: hidden; /* Oculta partes de la imagen que se salgan */
+    }
+
+    .hero-background-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1; /* Detrás del contenido */
+    }
+
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center center;
+      opacity: 0;
+      animation-name: imageFade;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-duration: 20s; /* 4 imágenes * 5s cada una */
+      /* La superposición oscura se aplica a cada imagen */
+      box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.6);
+    }
+
+    /* Asignamos cada imagen y un retraso en la animación (ahora funciona correctamente) */
+    .hero-background:nth-child(1) { background-image: url('../assets/1.png'); animation-delay: 0s; }
+    .hero-background:nth-child(2) { background-image: url('../assets/2.png'); animation-delay: 5s; }
+    .hero-background:nth-child(3) { background-image: url('../assets/3.png'); animation-delay: 10s; }
+    .hero-background:nth-child(4) { background-image: url('../assets/4.png'); animation-delay: 15s; }
+
+    @keyframes imageFade {
+      0% { opacity: 0; } /* Inicio, invisible */
+      8% { opacity: 1; } /* Aparece */
+      25% { opacity: 1; } /* Se mantiene visible */
+      33% { opacity: 0; } /* Desaparece */
+      100% { opacity: 0; } /* Permanece invisible hasta el próximo ciclo */
+    }
+
+    .hero-content {
+      position: relative; /* Asegura que el contenido esté sobre el fondo */
+      z-index: 2;
+      text-align: center;
+      max-width: 800px;
+    }
+
+    .hero-section h1 {
+      font-weight: 700;
+      font-size: 3.5rem;
+    }
+
+    .hero-section .lead {
+      font-size: 1.4rem;
+      font-weight: 300;
+    }
+
+    /* Ajustes para pantallas más pequeñas */
+    @media (max-width: 768px) {
+      .hero-section h1 {
+        font-size: 2.5rem;
+      }
+      .hero-section .lead {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* Estilos para la sección de Características */
+    #caracteristicas {
+      background-color: rgba(248, 249, 250, 0.8); /* Un gris muy claro para separar secciones */
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px); /* Para Safari */
+    }
+
+    .section-title {
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 4rem;
+    }
+
+    .feature-card {
+      background-color: white;
+      border-radius: 15px;
+      padding: 2.5rem 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      height: 100%; /* Para que todas las tarjetas tengan la misma altura */
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 25px rgba(124, 58, 237, 0.1); /* Sombra con el color de la marca */
+    }
+
+    .feature-icon {
+      font-size: 3.5rem; /* Hacer los iconos más grandes */
+      color: #7c3aed; /* Color violeta de la marca */
+    }
+
+    /* Estilos para la sección de Plataforma */
+    #plataforma {
+      background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco para que resalte el mockup */
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px); /* Para Safari */
+    }
+
+    .platform-mockup-container {
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .platform-main-img {
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .platform-thumbnails {
+      flex-wrap: wrap; /* Permite que las miniaturas pasen a la siguiente línea en pantallas pequeñas */
+    }
+
+    .platform-thumbnail {
+      width: 120px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.3s ease;
+      opacity: 0.7;
+    }
+
+    .platform-thumbnail:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .platform-thumbnail.active {
+      border-color: #7c3aed;
+      opacity: 1;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .platform-thumbnail {
+        width: 80px;
+        height: 50px;
+      }
+    }
+
+    /* Estilos para la sección de Soluciones */
+    #soluciones {
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px); /* Para Safari */
+    }
+
+    .solution-card {
+      border: 1px solid #e9ecef;
+      border-radius: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+      background-color: #f8f9fa;
+    }
+
+    .solution-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 30px rgba(0,0,0,0.08);
+    }
+
+    /* Destacar la tarjeta de Agencias/Resellers */
+    .solution-card.highlight {
+      background-color: #ffffff;
+      border: 2px solid #7c3aed;
+      box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1);
+    }
+
+    /* Estilos para la sección de Planes */
+    #planes {
+      background-color: rgba(248, 249, 250, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px); /* Para Safari */
+    }
+
+    .plan-card {
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .plan-card .card-header, .plan-card .card-footer {
+      background-color: transparent;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .plan-card .card-footer {
+      border-top: 1px solid #e9ecef;
+      border-bottom: 0;
+    }
+
+    .plan-card.highlight {
+      border: 2px solid #7c3aed;
+      box-shadow: 0 15px 25px rgba(124, 58, 237, 0.1);
+    }
+
+    .plan-features {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .plan-features .bi {
+      color: #198754; /* Verde de Bootstrap para los checks */
+      margin-right: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Estilos para la sección de Casos de Uso */
+    #casos-de-uso {
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px); /* Para Safari */
+    }
+
+    .use-case-card {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+      position: relative;
+    }
+
+    .use-case-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+    }
+
+    .use-case-img {
+      width: 100%;
+      height: 350px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .use-case-card:hover .use-case-img {
+      transform: scale(1.05);
+    }
+
+    .use-case-title {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      color: white;
+      padding: 2.5rem 1.5rem 1.5rem;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    /* Estilos para la sección de FAQ */
+    #faq {
+      background-color: rgba(248, 249, 250, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px); /* Para Safari */
+    }
+
+    .accordion-item {
+      background-color: #ffffff;
+      border: 1px solid #e9ecef;
+      border-radius: 15px !important; /* Override Bootstrap */
+      margin-bottom: 1rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      overflow: hidden; /* Para que el radio se aplique bien */
+    }
+
+    .accordion-button {
+      font-weight: 600;
+      color: #343a40;
+      background-color: #ffffff;
+      padding: 1.5rem;
+    }
+
+    .accordion-button:focus {
+      box-shadow: none;
+      border-color: rgba(0,0,0,.125);
+    }
+
+    .accordion-button:not(.collapsed) {
+      color: #ffffff;
+      background-color: #7c3aed;
+    }
+
+    /* Custom accordion icon (plus/minus) */
+    .accordion-button::after {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23343a40'%3e%3cpath fill-rule='evenodd' d='M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z'/%3e%3c/svg%3e");
+      transform: scale(1.3);
+    }
+
+    .accordion-button:not(.collapsed)::after {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z'/%3e%3c/svg%3e");
+      transform: scale(1.3);
+    }
+
+    /* Estilos para la sección de CTA */
+    #cta {
+      background: linear-gradient(45deg, #6d28d9, #8b5cf6);
+    }
+
+    #cta .btn-light {
+      transition: transform 0.3s ease;
+    }
+
+    #cta .btn-light:hover {
+      transform: scale(1.05);
+    }
+
+    /* Estilos para el Footer */
+    .footer {
+      background-color: #212529;
+    }
+
+    .footer-link {
+      color: #adb5bd;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: #ffffff;
+    }
+
+    .footer-social-icon {
+      font-size: 1.5rem;
+      color: #adb5bd;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .footer-social-icon:hover {
+      color: #ffffff;
+      transform: scale(1.2);
+    }
+
+    /* Estilos para la sección de Contacto */
+    #contacto {
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .contact-card {
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+    }
+
+    .contact-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 25px rgba(124, 58, 237, 0.1);
+    }
+
+    .contact-icon {
+      font-size: 3.5rem;
+      color: #7c3aed;
+    }
+
+
+    /* Estilos para el botón de Volver Arriba */
+    #back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #7c3aed;
+      color: white;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    #back-to-top.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    #back-to-top:hover {
+      background-color: #6d28d9;
+      transform: translateY(-5px);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =============================================== -->
+  <!-- =========== BARRA DE NAVEGACIÓN =============== -->
+  <!-- =============================================== -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="../assets/Sync (vert blan).png" alt="NexusPlay Logo" height="85">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="#caracteristicas">Características</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#casos-de-uso">Casos de Uso</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#planes">Planes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#faq">FAQ</a>
+          </li>
+        </ul>
+        <a href="../index.html" class="btn btn-outline-light">
+          Iniciar Sesión
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- =============================================== -->
+  <!-- =========== SECCIÓN 1: HÉROE ================== -->
+  <!-- =============================================== -->
+  <main class="hero-section d-flex justify-content-center align-items-center">
+    <!-- Contenedor para los fondos animados (CORREGIDO) -->
+    <div class="hero-background-container">
+      <div class="hero-background"></div>
+      <div class="hero-background"></div>
+      <div class="hero-background"></div>
+      <div class="hero-background"></div>
+    </div>
+
+    <div class="hero-content px-3">
+      
+      <h1 class="display-4 mb-4">
+        Transforma tus Pantallas. Comunica, Vende e Impacta como Nunca Antes.
+      </h1>
+      
+      <p class="lead mb-5">
+        La plataforma de cartelería digital definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.
+      </p>
+      
+      <a href="#planes" class="btn btn-primary btn-lg px-5 py-3 text-uppercase">
+        Ver Planes y Precios
+      </a>
+
+    </div>
+  </main>
+
+  <!-- =============================================== -->
+  <!-- ======== SECCIÓN 2: CARACTERÍSTICAS =========== -->
+  <!-- =============================================== -->
+  <section id="caracteristicas" class="py-5">
+    <div class="container py-5">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <h2 class="section-title display-5">Todo lo que necesitas en un solo lugar</h2>
+                <p class="section-subtitle lead text-muted">Diseñado para ser potente pero increíblemente fácil de usar. Empieza a comunicar en minutos.</p>
+            </div>
+        </div>
+        <div class="row text-center">
+            <!-- Característica 1 -->
+            <div class="col-lg-4 mb-4 mb-lg-0 fade-in-section">
+                <div class="feature-card d-flex flex-column align-items-center">
+                    <i class="bi bi-cloud-arrow-up-fill feature-icon mb-4"></i>
+                    <h3 class="h4 mb-3">Control Total y Remoto</h3>
+                    <p class="text-muted mb-0">Actualiza cualquier pantalla, en cualquier lugar y al instante desde nuestra plataforma web.</p>
+                </div>
+            </div>
+            <!-- Característica 2 -->
+            <div class="col-lg-4 mb-4 mb-lg-0 fade-in-section" style="transition-delay: 100ms;">
+                <div class="feature-card d-flex flex-column align-items-center">
+                    <i class="bi bi-calendar-week-fill feature-icon mb-4"></i>
+                    <h3 class="h4 mb-3">Programación Inteligente</h3>
+                    <p class="text-muted mb-0">Planifica tu contenido por día y franjas horarias. Perfecto para menús, promociones y eventos.</p>
+                </div>
+            </div>
+            <!-- Característica 3 -->
+            <div class="col-lg-4 fade-in-section" style="transition-delay: 200ms;">
+                <div class="feature-card d-flex flex-column align-items-center">
+                    <i class="bi bi-magic feature-icon mb-4"></i>
+                    <h3 class="h4 mb-3">Contenido Dinámico</h3>
+                    <p class="text-muted mb-0">Atrae todas las miradas con widgets de clima, noticias, reloj, videos de YouTube y más.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- ======== SECCIÓN 3: VISUALIZACIÓN ============= -->
+  <!-- =============================================== -->
+  <section id="plataforma" class="py-5">
+    <div class="container py-5">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h2 class="section-title display-5">Una Interfaz Intuitiva y Potente</h2>
+                <p class="section-subtitle lead text-muted">Diseñada para que gestionar tu contenido sea una tarea rápida y sencilla, sin complicaciones técnicas.</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-11">
+                <!-- Main Image Display -->
+                <div class="platform-mockup-container mb-4">
+                    <img src="../assets/5.png" class="img-fluid platform-main-img" alt="Interfaz de la plataforma NexusPlay" id="platform-main-image">
+                </div>
+                
+                <!-- Thumbnails -->
+                <div class="platform-thumbnails d-flex justify-content-center gap-3">
+                    <img src="../assets/5.png" class="img-fluid platform-thumbnail active" data-image="../assets/5.png" alt="Vista Pantallas">
+                    <img src="../assets/app1.png" class="img-fluid platform-thumbnail" data-image="../assets/app1.png" alt="Vista Login">
+                    <img src="../assets/app2.png" class="img-fluid platform-thumbnail" data-image="../assets/app2.png" alt="Vista Medios">
+                    <img src="../assets/app3.png" class="img-fluid platform-thumbnail" data-image="../assets/app3.png" alt="Vista Playlists">
+                    <img src="../assets/app4.png" class="img-fluid platform-thumbnail" data-image="../assets/app4.png" alt="Vista Clientes">
+                    <img src="../assets/app5.png" class="img-fluid platform-thumbnail" data-image="../assets/app5.png" alt="Vista Grupos">
+                </div>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- =========== SECCIÓN 4: SOLUCIONES ============= -->
+  <!-- =============================================== -->
+  <section id="soluciones" class="py-5">
+    <div class="container py-5">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h2 class="section-title display-5">Una Solución para Cada Necesidad</h2>
+                <p class="section-subtitle lead text-muted">Tanto si quieres potenciar tu negocio como si buscas lanzar tu propia marca de cartelería digital, tenemos el plan perfecto para ti.</p>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Solución 1: Para tu Negocio -->
+            <div class="col-lg-6 mb-4 mb-lg-0 d-flex fade-in-section">
+                <div class="solution-card w-100">
+                    <div class="card-body p-5 text-center d-flex flex-column">
+                        <i class="bi bi-shop-window feature-icon mb-4"></i>
+                        <h3 class="card-title h4 mb-3">Para tu Negocio</h3>
+                        <p class="card-text text-muted flex-grow-1">Ideal para restaurantes, tiendas, gimnasios y oficinas que quieren gestionar sus propias pantallas de forma sencilla y profesional para potenciar sus ventas y comunicación.</p>
+                        <a href="#planes" class="btn btn-outline-primary mt-4 px-4 py-2">Ver Plan Profesional</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Solución 2: Para Agencias (Destacada) -->
+            <div class="col-lg-6 d-flex fade-in-section" style="transition-delay: 100ms;">
+                <div class="solution-card highlight w-100">
+                    <div class="card-body p-5 text-center d-flex flex-column">
+                        <i class="bi bi-briefcase-fill feature-icon mb-4"></i>
+                        <h3 class="card-title h4 mb-3">Para Agencias y Revendedores</h3>
+                        <p class="card-text text-muted flex-grow-1">La solución White-Label perfecta para escalar tu oferta de servicios. Ofrece cartelería digital a tus clientes con tu propia marca, gestionando todo desde un único panel.</p>
+                        <a href="#planes" class="btn btn-primary mt-4 px-4 py-2">Conocer Plan Corporativo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- =========== SECCIÓN 5: CASOS DE USO ============= -->
+  <!-- =============================================== -->
+  <section id="casos-de-uso" class="py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+          <h2 class="section-title display-5">Inspírate con lo que puedes lograr</h2>
+          <p class="section-subtitle lead text-muted">Desde menús digitales hasta anuncios de ofertas, NexusPlay se adapta a cualquier industria.</p>
+        </div>
+      </div>
+      <div class="row g-4">
+        <!-- Caso de Uso 1: Tiendas -->
+        <div class="col-md-6 col-lg-3 fade-in-section">
+          <div class="use-case-card">
+            <img src="../assets/1.png" class="use-case-img" alt="Cartelería digital en tienda de ropa">
+            <div class="use-case-title">Tiendas Retail</div>
+          </div>
+        </div>
+        <!-- Caso de Uso 2: Restaurantes -->
+        <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 100ms;">
+          <div class="use-case-card">
+            <img src="../assets/2.png" class="use-case-img" alt="Menú digital en cafetería">
+            <div class="use-case-title">Restaurantes y Cafés</div>
+          </div>
+        </div>
+        <!-- Caso de Uso 3: Oficinas -->
+        <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 200ms;">
+          <div class="use-case-card">
+            <img src="../assets/3.png" class="use-case-img" alt="Pantalla de bienvenida en recepción de oficina">
+            <div class="use-case-title">Oficinas y Recepciones</div>
+          </div>
+        </div>
+        <!-- Caso de Uso 4: Gimnasios -->
+        <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 300ms;">
+          <div class="use-case-card">
+            <img src="../assets/4.png" class="use-case-img" alt="Horario de clases en pantalla de gimnasio">
+            <div class="use-case-title">Gimnasios y Deporte</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- ============= SECCIÓN 6: PLANES =============== -->
+  <!-- =============================================== -->
+  <section id="planes" class="py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+            <h2 class="section-title display-5">Planes Flexibles para Crecer Contigo</h2>
+            <p class="section-subtitle lead text-muted">Elige el plan que se ajusta a tus objetivos. Sin contratos a largo plazo, cancela cuando quieras.</p>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <!-- Plan Profesional -->
+        <div class="col-lg-5 mb-4 mb-lg-0 d-flex fade-in-section">
+          <div class="plan-card w-100">
+            <div class="card-header text-center p-4">
+              <h3 class="h2 font-weight-bold mb-2">Plan Profesional</h3>
+              <p class="text-muted">Ideal para negocios, tiendas y empresas que gestionan sus propias pantallas.</p>
+            </div>
+            <div class="card-body p-4 flex-grow-1">
+              <ul class="plan-features">
+                <li><i class="bi bi-check-circle-fill"></i><span><strong>Gestión Remota</strong> de Contenido</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span><strong>Programación</strong> por Horas, Días y Grupos</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span>Biblioteca de Medios (Videos, Imágenes, Audio)</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span><strong>Widgets Dinámicos</strong> (Clima, Reloj, Noticias RSS)</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span>Menú Digital con <strong>Código QR</strong></span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span>Exhibición de Páginas Web y Videos de YouTube</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span>Soporte Técnico</span></li>
+              </ul>
+            </div>
+            <div class="card-footer text-center p-4">
+              <a href="#contacto" class="btn btn-outline-primary btn-lg w-100">Contacto</a>
+            </div>
+          </div>
+        </div>
+        <!-- Plan Corporativo (White-Label) -->
+        <div class="col-lg-5 d-flex fade-in-section" style="transition-delay: 100ms;">
+          <div class="plan-card highlight w-100">
+            <div class="card-header text-center p-4">
+              <h3 class="h2 font-weight-bold mb-2">Plan Corporativo</h3>
+              <p class="text-muted">Para agencias y revendedores que quieren ofrecer el servicio con su propia marca.</p>
+            </div>
+            <div class="card-body p-4 flex-grow-1">
+              <p class="fw-bold mb-3">Todo lo del Plan Profesional, y además:</p>
+              <ul class="plan-features">
+                <li><i class="bi bi-check-circle-fill"></i><span><strong>100% Marca Blanca:</strong> Usa tu propio logo y dominio.</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span><strong>Panel de Revendedor</strong> para crear y administrar clientes.</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span><strong>Asignación de Recursos</strong> (pantallas y almacenamiento).</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span>Modelo de Negocio Propio: Establece tus precios.</span></li>
+                <li><i class="bi bi-check-circle-fill"></i><span>Soporte Prioritario para Socios.</span></li>
+              </ul>
+            </div>
+            <div class="card-footer text-center p-4">
+              <a href="#contacto" class="btn btn-primary btn-lg w-100">Contacto</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- ======== SECCIÓN 7: PREGUNTAS FRECUENTES ====== -->
+  <!-- =============================================== -->
+  <section id="faq" class="py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+            <h2 class="section-title display-5">Resolvemos tus Dudas</h2>
+            <p class="section-subtitle lead text-muted">Encuentra aquí las respuestas a las preguntas más comunes sobre NexusPlay.</p>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          <div class="accordion" id="faqAccordion">
+            <!-- Pregunta 1 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1" aria-expanded="true" aria-controls="faq-1">
+                  ¿Qué necesito para empezar a usar NexusPlay?
+                </button>
+              </h2>
+              <div id="faq-1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Solo dos cosas: una cuenta en NexusPlay y una pantalla con conexión a internet. Nuestro software es compatible con una amplia gama de dispositivos, desde televisores con Android TV hasta reproductores multimedia (media players) dedicados. ¡Podemos asesorarte para que elijas el mejor hardware!
+                </div>
+              </div>
+            </div>
+            <!-- Pregunta 2 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2" aria-expanded="false" aria-controls="faq-2">
+                  ¿Es difícil de usar? ¿Necesito conocimientos técnicos?
+                </button>
+              </h2>
+              <div id="faq-2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  ¡Para nada! Hemos diseñado NexusPlay para que sea extremadamente intuitivo. Con nuestra interfaz de "arrastrar y soltar", podrás crear y programar contenido en minutos, sin necesidad de escribir ni una sola línea de código.
+                </div>
+              </div>
+            </div>
+            <!-- Pregunta 3 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3" aria-expanded="false" aria-controls="faq-3">
+                  ¿Qué tipo de contenido puedo mostrar en las pantallas?
+                </button>
+              </h2>
+              <div id="faq-3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Puedes mostrar casi cualquier cosa que imagines: imágenes (JPG, PNG, GIF), videos (MP4), páginas web, videos de YouTube y enriquecer tu comunicación con nuestros widgets dinámicos como el clima, noticias RSS y reloj digital.
+                </div>
+              </div>
+            </div>
+            <!-- Pregunta 4 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-4" aria-expanded="false" aria-controls="faq-4">
+                  (Para Agencias) ¿Qué significa exactamente "White-Label" o Marca Blanca?
+                </button>
+              </h2>
+              <div id="faq-4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Significa que puedes ofrecer nuestra plataforma como si fuera tuya. Podrás usar tu propio logo, tus colores de marca y gestionar a todos tus clientes desde un panel centralizado. Es la solución ideal para añadir un nuevo flujo de ingresos recurrentes a tu negocio.
+                </div>
+              </div>
+            </div>
+            <!-- Pregunta 5 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-5" aria-expanded="false" aria-controls="faq-5">
+                  (Para Agencias) ¿Puedo usar mi propio dominio para la plataforma?
+                </button>
+              </h2>
+              <div id="faq-5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Sí. Con el Plan Corporativo, puedes configurar el servicio para que funcione bajo tu propio subdominio (ej: portal.tuagencia.com), ofreciendo una experiencia 100% transparente y profesional a tus clientes finales.
+                </div>
+              </div>
+            </div>
+            <!-- Pregunta 6 -->
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-6" aria-expanded="false" aria-controls="faq-6">
+                  ¿Cómo funciona el soporte técnico?
+                </button>
+              </h2>
+              <div id="faq-6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Ofrecemos soporte completo a todos nuestros clientes a través de email y chat. Para nuestros socios con Plan Corporativo, brindamos un soporte prioritario para asegurar que siempre puedan dar el mejor servicio a sus propios clientes.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- =========== SECCIÓN 8: CONTACTO =============== -->
+  <!-- =============================================== -->
+  <section id="contacto" class="py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+          <h2 class="section-title display-5">¿Listo para Empezar? Hablemos.</h2>
+          <p class="section-subtitle lead text-muted">Estamos aquí para responder tus preguntas y ayudarte a encontrar la solución perfecta para tu negocio.</p>
+        </div>
+      </div>
+      <div class="row justify-content-center g-4">
+        <!-- Tarjeta de Email -->
+        <div class="col-md-5">
+          <div class="contact-card text-center p-5">
+            <i class="bi bi-envelope-fill contact-icon mb-4"></i>
+            <h3 class="h4 mb-3">Escríbenos un Email</h3>
+            <p class="text-muted">La mejor opción para consultas detalladas sobre planes, características o soporte técnico.</p>
+            <a href="mailto:contacto@nexusplay.com" class="btn btn-outline-primary mt-4">contacto@nexusplay.com</a>
+          </div>
+        </div>
+        <!-- Tarjeta de WhatsApp -->
+        <div class="col-md-5">
+          <div class="contact-card text-center p-5">
+            <i class="bi bi-whatsapp contact-icon mb-4"></i>
+            <h3 class="h4 mb-3">Chatea por WhatsApp</h3>
+            <p class="text-muted">Perfecto para preguntas rápidas y una atención más directa. Te responderemos lo antes posible.</p>
+            <a href="https://wa.me/15551234567" target="_blank" rel="noopener noreferrer" class="btn btn-primary mt-4">Iniciar Chat</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- ======== SECCIÓN 9: LLAMADA A LA ACCIÓN ======= -->
+  <!-- =============================================== -->
+  <section id="cta" class="py-5">
+    <div class="container text-center text-white py-5">
+      <h2 class="display-5 fw-bold">¿Listo para transformar tus pantallas?</h2>
+      <p class="lead my-4 mx-auto" style="max-width: 600px;">Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusPlay hoy mismo y lleva tu negocio al siguiente nivel.</p>
+      <a href="../index.html" class="btn btn-light btn-lg px-5 py-3 text-primary fw-bold text-uppercase mt-3">
+        Empezar Ahora
+      </a>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- ================== FOOTER (SECCIÓN 10) ===================== -->
+  <!-- =============================================== -->
+  <footer class="footer pt-5 pb-4">
+    <div class="container">
+      <div class="row text-center text-md-start">
+        <!-- Columna 1: Logo y Descripción -->
+        <div class="col-md-4 col-lg-5 mb-4">
+          <img src="../assets/Sync (vert blan).png" alt="NexusPlay Logo" height="60" class="mb-3">
+          <p class="text-muted pe-lg-5">La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.</p>
+        </div>
+        <!-- Columna 2: Enlaces de Navegación -->
+        <div class="col-md-4 col-lg-3 mb-4">
+          <h5 class="text-white mb-3">Explorar</h5>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#caracteristicas" class="footer-link">Características</a></li>
+            <li class="mb-2"><a href="#casos-de-uso" class="footer-link">Casos de Uso</a></li>
+            <li class="mb-2"><a href="#planes" class="footer-link">Planes</a></li>
+            <li class="mb-2"><a href="#faq" class="footer-link">FAQ</a></li>
+          </ul>
+        </div>
+        <!-- Columna 3: Contacto y Redes Sociales -->
+        <div class="col-md-4 col-lg-4 mb-4">
+          <h5 class="text-white mb-3">Conecta con Nosotros</h5>
+          <a href="mailto:contacto@nexusplay.com" class="footer-link d-block mb-3">contacto@nexusplay.com</a>
+          <div class="d-flex justify-content-center justify-content-md-start gap-3">
+            <a href="#" class="footer-social-icon"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="footer-social-icon"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="footer-social-icon"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+      <p class="text-muted text-center mb-0">© 2024 NexusPlay. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- =============================================== -->
+  <!-- =========== BOTÓN VOLVER ARRIBA =============== -->
+  <!-- =============================================== -->
+  <a href="#" id="back-to-top">
+    <i class="bi bi-arrow-up-short fs-3"></i>
+  </a>
+  
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  
+  <script>
+    // Script para hacer la barra de navegación sólida al hacer scroll
+    const nav = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.classList.add('navbar-scrolled');
+      } else {
+        nav.classList.remove('navbar-scrolled');
+      }
+    });
+
+    // Script para la galería de la plataforma
+    const mainImage = document.getElementById('platform-main-image');
+    const thumbnails = document.querySelectorAll('.platform-thumbnail');
+    let currentImageIndex = 0;
+    let galleryInterval;
+
+    function showImage(index) {
+      // Quita la clase 'active' de todas las miniaturas
+      thumbnails.forEach(t => t.classList.remove('active'));
+      // Añade la clase 'active' a la miniatura correspondiente
+      thumbnails[index].classList.add('active');
+      
+      // Cambia la imagen principal con efecto de desvanecimiento
+      const newImageSrc = thumbnails[index].getAttribute('data-image');
+      mainImage.style.opacity = 0;
+      setTimeout(() => {
+        mainImage.src = newImageSrc;
+        mainImage.style.opacity = 1;
+      }, 300);
+
+      currentImageIndex = index;
+    }
+
+    function startGalleryAutoplay() {
+      galleryInterval = setInterval(() => {
+        const nextIndex = (currentImageIndex + 1) % thumbnails.length;
+        showImage(nextIndex);
+      }, 5000); // Cambia de imagen cada 5 segundos
+    }
+
+    function stopGalleryAutoplay() {
+      clearInterval(galleryInterval);
+    }
+
+    // Añadir evento de click a cada miniatura
+    thumbnails.forEach((thumb, index) => {
+      thumb.addEventListener('click', function() {
+        stopGalleryAutoplay(); // Detiene el carrusel automático al hacer clic
+        showImage(index);
+      });
+    });
+
+    // Iniciar el carrusel automático al cargar la página
+    startGalleryAutoplay();
+
+    // Script para el botón de "Volver Arriba"
+    const backToTopButton = document.getElementById('back-to-top');
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) { // Muestra el botón después de 300px de scroll
+        backToTopButton.classList.add('show');
+      } else {
+        backToTopButton.classList.remove('show');
+      }
+    });
+
+    // El href="#" ya se encarga de llevar arriba, el scroll-behavior: smooth lo hace suave.
+
+    // Script para animaciones al hacer scroll
+    const animatedSections = document.querySelectorAll('.fade-in-section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target); // Para que la animación ocurra solo una vez
+        }
+      });
+    }, {
+      threshold: 0.1 // La animación se dispara cuando el 10% del elemento es visible
+    });
+
+    animatedSections.forEach(section => {
+      observer.observe(section);
+    });
+
+    // Script para el Scroll-Spy de la navegación
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+    const spyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+          });
+        }
+      });
+    }, { rootMargin: "-50% 0px -50% 0px" }); // Activa el link cuando la sección está en el centro de la pantalla
+
+    sections.forEach(section => spyObserver.observe(section));
+  </script>
+  
+</body>
+</html>

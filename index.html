@@ -22,7 +22,9 @@
     <div id="auth-container" style="display: none;" class="min-h-screen flex items-center justify-center";">
         <div class="w-full max-w-md p-8 space-y-6 bg-neutral-800 bg-opacity-70 rounded-xl shadow-lg form-container border border-violet-500/30">
             <div class="flex justify-center mb-4">
-                <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-22 w-auto">
+                <a href="landing/index.html">
+                    <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-22 w-auto">
+                </a>
             </div>
             <div id="login-form-container">
                 <h2 class="text-3xl font-bold text-center text-white" data-lang="loginTitle">Iniciar Sesión</h2>
@@ -75,7 +77,9 @@
 
     <div id="dashboard-container" style="display: none;" class="h-screen flex flex-col">
         <header class="lg:hidden bg-neutral-800 text-white flex items-center justify-between p-4 shadow-md z-20">
-            <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-10 w-auto">
+            <a href="landing/index.html">
+                <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-10 w-auto">
+            </a>
             <button id="hamburger-btn" class="p-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
@@ -83,9 +87,11 @@
 
         <div class="flex flex-1 overflow-hidden">
             <aside id="sidebar" class="fixed inset-y-0 left-0 bg-neutral-800 text-neutral-300 flex flex-col flex-shrink-0 w-64 border-r border-neutral-700/50 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out z-30">
-                <div class="h-22 hidden lg:flex items-center justify-center border-b border-neutral-700 px-4">
-                    <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-18 w-auto">
-                </div>
+                <a href="landing/index.html" class="h-22 hidden lg:flex items-center justify-center border-b border-neutral-700 px-4">
+                    <div class="h-22 flex items-center justify-center">
+                        <img src="assets/Sync (vert blan).png" alt="NexusPlay Logo" class="h-18 w-auto">
+                    </div>
+                </a>
                 <nav id="main-nav" class="flex-1 px-4 py-6 space-y-2">
                     <a href="/dashboard" data-route="/dashboard" class="nav-link flex items-center px-4 py-2.5 rounded-lg bg-neutral-700 text-white"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg><span data-lang="navDashboard">Dashboard</span></a>
                     <a href="/media" data-route="/media" class="nav-link flex items-center px-4 py-2.5 rounded-lg hover:bg-neutral-700"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span data-lang="navMedia">Medios</span></a>
