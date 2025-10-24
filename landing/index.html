@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NexusPlay - Transforma tus Pantallas</title>
+  <title>NexusRePlay - Transforma tus Pantallas</title>
+
+  <!-- Favicon -->
+  <link id="favicon" rel="icon" href="../assets/Sync (3).png">
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -78,7 +81,7 @@
       width: 70%; /* El subrayado crece al pasar el ratón */
     }
 
-    /* Estilos para el selector de idioma del landing */
+ este a    /* Estilos para el selector de idioma del landing */
     .lang-flag {
       border-radius: 50%;
       cursor: pointer;
@@ -375,28 +378,55 @@
       box-shadow: 0 15px 25px rgba(0,0,0,0.1);
     }
 
-    .use-case-img {
+    .use-case-card .card-img-top {
       width: 100%;
-      height: 350px;
+      height: 220px; /* Altura ajustada para la imagen */
       object-fit: cover;
       transition: transform 0.3s ease;
     }
 
-    .use-case-card:hover .use-case-img {
+    .use-case-card:hover .card-img-top {
       transform: scale(1.05);
     }
 
-    .use-case-title {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-      color: white;
-      padding: 2.5rem 1.5rem 1.5rem;
-      text-align: center;
-      font-size: 1.25rem;
-      font-weight: 600;
+    .use-case-card .card-body {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    /* Estilos para la sección de Beneficios */
+    #beneficios {
+      background-color: rgba(248, 249, 250, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .benefit-card {
+      background-color: #ffffff;
+      border-radius: 15px;
+      padding: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      height: 100%;
+      border-left: 4px solid #7c3aed;
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 25px rgba(124, 58, 237, 0.1);
+    }
+
+    .benefit-icon {
+      font-size: 2.5rem;
+      color: #7c3aed;
+    }
+
+    .benefit-hook {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #343a40;
+      line-height: 1.2;
     }
 
     /* Estilos para la sección de FAQ */
@@ -541,6 +571,30 @@
       transform: translateY(-5px);
       color: white;
     }
+
+    /* Estilos para el botón flotante de WhatsApp */
+    #whatsapp-float-btn {
+      position: fixed;
+      bottom: 90px; /* 30px (bottom) + 50px (height of back-to-top) + 10px (margin) */
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #25D366;
+      color: white;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    #whatsapp-float-btn:hover {
+      background-color: #1DA851;
+      transform: scale(1.1);
+    }
   </style>
 </head>
 <body>
@@ -551,7 +605,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
       <a class="navbar-brand" href="#">
-        <img src="../assets/Sync (vert blan).png" alt="NexusPlay Logo" height="85">
+        <img src="../assets/Sync (vert blan).png" alt="NexusRePlay Logo" height="85">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -560,6 +614,9 @@
         <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <a class="nav-link" href="#caracteristicas">Características</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#beneficios" data-lang="navBenefits">Beneficios</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#casos-de-uso">Casos de Uso</a>
@@ -578,7 +635,7 @@
             <img src="https://flagcdn.com/br.svg" width="25" alt="Português" data-lang-id="pt" class="lang-flag">
         </div>
 
-        <a href="../index.html" class="btn btn-outline-light">
+        <a href="/app.html" class="btn btn-outline-light">
           <span data-lang="loginButton">Iniciar Sesión</span>
         </a>
       </div>
@@ -655,6 +712,54 @@
   </section>
 
   <!-- =============================================== -->
+  <!-- =========== SECCIÓN 2.5: BENEFICIOS =========== -->
+  <!-- =============================================== -->
+  <section id="beneficios" class="py-5">
+    <div class="container py-5">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+          <h2 class="section-title display-5" data-lang="benefitsTitle">Resultados que puedes medir</h2>
+          <p class="section-subtitle lead text-muted" data-lang="benefitsSubtitle">Descubre cómo la cartelería digital impacta directamente en el crecimiento de tu negocio.</p>
+        </div>
+      </div>
+      <div class="row g-4">
+        <!-- Beneficio 1: Ventas -->
+        <div class="col-md-6 fade-in-section">
+          <div class="benefit-card">
+            <i class="bi bi-graph-up-arrow benefit-icon mb-3"></i>
+            <h3 class="benefit-hook mb-3" data-lang="benefit1Hook">Incrementa tus Ventas hasta un 33%</h3>
+            <p class="text-muted" data-lang="benefit1Text">Promociona ofertas, productos destacados y extras (upselling) en el momento exacto de la compra. Ideal para menús digitales y promociones en tiendas.</p>
+          </div>
+        </div>
+        <!-- Beneficio 2: Atención -->
+        <div class="col-md-6 fade-in-section" style="transition-delay: 100ms;">
+          <div class="benefit-card">
+            <i class="bi bi-eye-fill benefit-icon mb-3"></i>
+            <h3 class="benefit-hook mb-3" data-lang="benefit2Hook">Atrae 4x Más Miradas que los Carteles Estáticos</h3>
+            <p class="text-muted" data-lang="benefit2Text">El contenido dinámico como videos y animaciones captura un 400% más vistas que los carteles impresos. Haz que tu mensaje realmente se vea.</p>
+          </div>
+        </div>
+        <!-- Beneficio 3: Ahorro -->
+        <div class="col-md-6 fade-in-section" style="transition-delay: 200ms;">
+          <div class="benefit-card">
+            <i class="bi bi-clock-history benefit-icon mb-3"></i>
+            <h3 class="benefit-hook mb-3" data-lang="benefit3Hook">Reduce Costos y Ahorra Tiempo</h3>
+            <p class="text-muted" data-lang="benefit3Text">Elimina el 100% de tus costos de impresión. Lanza una nueva oferta en 5 minutos desde tu panel, no en 5 días esperando a la imprenta.</p>
+          </div>
+        </div>
+        <!-- Beneficio 4: Marca -->
+        <div class="col-md-6 fade-in-section" style="transition-delay: 300ms;">
+          <div class="benefit-card">
+            <i class="bi bi-gem benefit-icon mb-3"></i>
+            <h3 class="benefit-hook mb-3" data-lang="benefit4Hook">Moderniza la Imagen de tu Marca</h3>
+            <p class="text-muted" data-lang="benefit4Text">Más del 70% de los clientes cree que la cartelería digital hace que una marca parezca más moderna. Proyecta una imagen de calidad e innovación.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
   <!-- ======== SECCIÓN 3: VISUALIZACIÓN ============= -->
   <!-- =============================================== -->
   <section id="plataforma" class="py-5">
@@ -669,7 +774,7 @@
             <div class="col-lg-11">
                 <!-- Main Image Display -->
                 <div class="platform-mockup-container mb-4">
-                    <img src="../assets/5.png" class="img-fluid platform-main-img" alt="Interfaz de la plataforma NexusPlay" id="platform-main-image">
+                    <img src="../assets/5.png" class="img-fluid platform-main-img" alt="Interfaz de la plataforma NexusRePlay" id="platform-main-image">
                 </div>
                 
                 <!-- Thumbnails -->
@@ -732,36 +837,88 @@
       <div class="row justify-content-center text-center">
         <div class="col-lg-8">
           <h2 class="section-title display-5" data-lang="useCasesTitle">Inspírate con lo que puedes lograr</h2>
-          <p class="section-subtitle lead text-muted" data-lang="useCasesSubtitle">Desde menús digitales hasta anuncios de ofertas, NexusPlay se adapta a cualquier industria.</p>
+          <p class="section-subtitle lead text-muted" data-lang="useCasesSubtitle">Desde el comercio minorista hasta los restaurantes, la cartelería digital lleva tu mensaje a las personas adecuadas en el momento adecuado.</p>
         </div>
       </div>
       <div class="row g-4">
         <!-- Caso de Uso 1: Tiendas -->
-        <div class="col-md-6 col-lg-3 fade-in-section">
-          <div class="use-case-card">
-            <img src="../assets/1.png" class="use-case-img" alt="Cartelería digital en tienda de ropa">
-            <div class="use-case-title" data-lang="useCase1">Tiendas Retail</div>
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section">
+          <div class="use-case-card card">
+            <img src="../assets/1.png" class="card-img-top" alt="Cartelería digital en tienda de ropa">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase1Title">Tiendas Retail</h5>
+              <p class="card-text text-muted" data-lang="useCase1Text">Anuncia ofertas, muestra nuevos productos y mejora la experiencia de compra con contenido visual dinámico.</p>
+            </div>
           </div>
         </div>
         <!-- Caso de Uso 2: Restaurantes -->
-        <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 100ms;">
-          <div class="use-case-card">
-            <img src="../assets/2.png" class="use-case-img" alt="Menú digital en cafetería">
-            <div class="use-case-title" data-lang="useCase2">Restaurantes y Cafés</div>
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section" style="transition-delay: 100ms;">
+          <div class="use-case-card card">
+            <img src="../assets/2.png" class="card-img-top" alt="Menú digital en cafetería">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase2Title">Restaurantes y Cafés</h5>
+              <p class="card-text text-muted" data-lang="useCase2Text">Digitaliza tus menús, programa ofertas para el desayuno o la cena y reduce los tiempos de espera percibidos.</p>
+            </div>
           </div>
         </div>
         <!-- Caso de Uso 3: Oficinas -->
-        <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 200ms;">
-          <div class="use-case-card">
-            <img src="../assets/3.png" class="use-case-img" alt="Pantalla de bienvenida en recepción de oficina">
-            <div class="use-case-title" data-lang="useCase3">Oficinas y Recepciones</div>
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section" style="transition-delay: 200ms;">
+          <div class="use-case-card card">
+            <img src="../assets/3.png" class="card-img-top" alt="Pantalla de bienvenida en recepción de oficina">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase3Title">Oficinas y Recepciones</h5>
+              <p class="card-text text-muted" data-lang="useCase3Text">Da la bienvenida a tus visitantes, comparte noticias internas y refuerza la cultura de tu empresa.</p>
+            </div>
           </div>
         </div>
         <!-- Caso de Uso 4: Gimnasios -->
-        <div class="col-md-6 col-lg-3 fade-in-section" style="transition-delay: 300ms;">
-          <div class="use-case-card">
-            <img src="../assets/4.png" class="use-case-img" alt="Horario de clases en pantalla de gimnasio">
-            <div class="use-case-title" data-lang="useCase4">Gimnasios y Deporte</div>
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section" style="transition-delay: 300ms;">
+          <div class="use-case-card card">
+            <img src="../assets/4.png" class="card-img-top" alt="Horario de clases en pantalla de gimnasio">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase4Title">Gimnasios y Deporte</h5>
+              <p class="card-text text-muted" data-lang="useCase4Text">Muestra horarios de clases, perfiles de entrenadores, consejos de salud y promociones para motivar a tus miembros.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Caso de Uso 5: Sector Salud -->
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section">
+          <div class="use-case-card card">
+            <img src="../assets/6.png" class="card-img-top" alt="Pantalla en sala de espera de clínica">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase5Title">Sector Salud</h5>
+              <p class="card-text text-muted" data-lang="useCase5Text">Reduce la ansiedad en salas de espera con contenido educativo, muestra turnos de médicos y ofrece consejos de salud.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Caso de Uso 6: Transporte Público -->
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section" style="transition-delay: 100ms;">
+          <div class="use-case-card card">
+            <img src="../assets/7.png" class="card-img-top" alt="Pantallas informativas en estación de metro">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase6Title">Transporte Público</h5>
+              <p class="card-text text-muted" data-lang="useCase6Text">Informa a los pasajeros sobre horarios, rutas, incidencias del servicio y publicidad relevante en tiempo real.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Caso de Uso 7: Salones de Belleza -->
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section" style="transition-delay: 200ms;">
+          <div class="use-case-card card">
+            <img src="../assets/8.png" class="card-img-top" alt="Pantalla en salón de belleza mostrando estilos">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase7Title">Salones de Belleza</h5>
+              <p class="card-text text-muted" data-lang="useCase7Text">Muestra tu portafolio de estilos, promociona productos y ofrece inspiración a tus clientes mientras esperan.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Caso de Uso 8: Mercados y Ferias -->
+        <div class="col-md-6 col-lg-3 d-flex fade-in-section" style="transition-delay: 300ms;">
+          <div class="use-case-card card">
+            <img src="../assets/9.png" class="card-img-top" alt="Pantallas en mercado de abastos">
+            <div class="card-body">
+              <h5 class="card-title fw-bold" data-lang="useCase8Title">Mercados y Ferias</h5>
+              <p class="card-text text-muted" data-lang="useCase8Text">Destaca ofertas del día, informa sobre el origen de los productos y guía a los visitantes por los diferentes puestos.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -837,7 +994,7 @@
       <div class="row justify-content-center text-center">
         <div class="col-lg-8">
             <h2 class="section-title display-5" data-lang="faqTitle">Resolvemos tus Dudas</h2>
-            <p class="section-subtitle lead text-muted" data-lang="faqSubtitle">Encuentra aquí las respuestas a las preguntas más comunes sobre NexusPlay.</p>
+            <p class="section-subtitle lead text-muted" data-lang="faqSubtitle">Encuentra aquí las respuestas a las preguntas más comunes sobre NexusRePlay.</p>
         </div>
       </div>
       <div class="row justify-content-center">
@@ -852,7 +1009,7 @@
               </h2>
               <div id="faq-1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                 <div class="accordion-body" data-lang="faq1Text">
-                  Solo dos cosas: una cuenta en NexusPlay y una pantalla con conexión a internet. Nuestro software es compatible con una amplia gama de dispositivos, desde televisores con Android TV hasta reproductores multimedia (media players) dedicados. ¡Podemos asesorarte para que elijas el mejor hardware!
+                  Solo dos cosas: una cuenta en NexusRePlay y una pantalla con conexión a internet. Nuestro software es compatible con una amplia gama de dispositivos, desde televisores con Android TV hasta reproductores multimedia (media players) dedicados. ¡Podemos asesorarte para que elijas el mejor hardware!
                 </div>
               </div>
             </div>
@@ -865,7 +1022,7 @@
               </h2>
               <div id="faq-2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                 <div class="accordion-body" data-lang="faq2Text">
-                  ¡Para nada! Hemos diseñado NexusPlay para que sea extremadamente intuitivo. Con nuestra interfaz de "arrastrar y soltar", podrás crear y programar contenido en minutos, sin necesidad de escribir ni una sola línea de código.
+                  ¡Para nada! Hemos diseñado NexusRePlay para que sea extremadamente intuitivo. Con nuestra interfaz de "arrastrar y soltar", podrás crear y programar contenido en minutos, sin necesidad de escribir ni una sola línea de código.
                 </div>
               </div>
             </div>
@@ -967,8 +1124,8 @@
   <section id="cta" class="py-5">
     <div class="container text-center text-white py-5">
       <h2 class="display-5 fw-bold" data-lang="ctaTitle">¿Listo para transformar tus pantallas?</h2>
-      <p class="lead my-4 mx-auto" style="max-width: 600px;" data-lang="ctaSubtitle">Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusPlay hoy mismo y lleva tu negocio al siguiente nivel.</p>
-      <a href="../index.html" class="btn btn-light btn-lg px-5 py-3 text-primary fw-bold text-uppercase mt-3" data-lang="ctaButton">
+      <p class="lead my-4 mx-auto" style="max-width: 600px;" data-lang="ctaSubtitle">Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusRePlay hoy mismo y lleva tu negocio al siguiente nivel.</p>
+      <a href="/app.html" class="btn btn-light btn-lg px-5 py-3 text-primary fw-bold text-uppercase mt-3" data-lang="ctaButton">
         Empezar ahora
       </a>
     </div>
@@ -982,7 +1139,7 @@
       <div class="row text-center text-md-start">
         <!-- Columna 1: Logo y Descripción -->
         <div class="col-md-4 col-lg-5 mb-4">
-          <img src="../assets/Sync (vert blan).png" alt="NexusPlay Logo" height="60" class="mb-3">
+          <img src="../assets/Sync (vert blan).png" alt="NexusRePlay Logo" height="60" class="mb-3">
           <p class="text-muted pe-lg-5">La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.</p>
         </div>
         <!-- Columna 2: Enlaces de Navegación -->
@@ -991,6 +1148,7 @@
           <ul class="list-unstyled">
             <li class="mb-2"><a href="#caracteristicas" class="footer-link" data-lang="navFeatures">Características</a></li>
             <li class="mb-2"><a href="#casos-de-uso" class="footer-link" data-lang="navUseCases">Casos de Uso</a></li>
+            <li class="mb-2"><a href="#beneficios" class="footer-link" data-lang="navBenefits">Beneficios</a></li>
             <li class="mb-2"><a href="#planes" class="footer-link" data-lang="navPlans">Planes</a></li>
             <li class="mb-2"><a href="#faq" class="footer-link" data-lang="navFaq">FAQ</a></li>
           </ul>
@@ -1007,7 +1165,7 @@
         </div>
       </div>
       <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
-      <p class="text-muted text-center mb-0" data-lang="footerRights">© 2024 NexusPlay. Todos los derechos reservados.</p>
+      <p class="text-muted text-center mb-0" data-lang="footerRights">© 2024 NexusRePlay. Todos los derechos reservados.</p>
     </div>
   </footer>
 
@@ -1016,6 +1174,13 @@
   <!-- =============================================== -->
   <a href="#" id="back-to-top">
     <i class="bi bi-arrow-up-short fs-3"></i>
+  </a>
+  
+  <!-- =============================================== -->
+  <!-- =========== BOTÓN FLOTANTE WHATSAPP =========== -->
+  <!-- =============================================== -->
+  <a href="https://wa.me/15551234567" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" title="Chatea con nosotros en WhatsApp">
+    <i class="bi bi-whatsapp fs-4"></i>
   </a>
   
 
@@ -1041,6 +1206,16 @@
         feature3Text: "Atrae todas las miradas con widgets de clima, noticias, reloj, videos de YouTube y más.",
         platformTitle: "Una Interfaz Intuitiva y Potente",
         platformSubtitle: "Diseñada para que gestionar tu contenido sea una tarea rápida y sencilla, sin complicaciones técnicas.",
+        benefitsTitle: "Resultados que puedes medir",
+        benefitsSubtitle: "Descubre cómo la cartelería digital impacta directamente en el crecimiento de tu negocio.",
+        benefit1Hook: "Incrementa tus Ventas hasta un 33%",
+        benefit1Text: "Promociona ofertas, productos destacados y extras (upselling) en el momento exacto de la compra. Ideal para menús digitales y promociones en tiendas.",
+        benefit2Hook: "Atrae 4x Más Miradas que los Carteles Estáticos",
+        benefit2Text: "El contenido dinámico como videos y animaciones captura un 400% más vistas que los carteles impresos. Haz que tu mensaje realmente se vea.",
+        benefit3Hook: "Reduce Costos y Ahorra Tiempo",
+        benefit3Text: "Elimina el 100% de tus costos de impresión. Lanza una nueva oferta en 5 minutos desde tu panel, no en 5 días esperando a la imprenta.",
+        benefit4Hook: "Moderniza la Imagen de tu Marca",
+        benefit4Text: "Más del 70% de los clientes cree que la cartelería digital hace que una marca parezca más moderna. Proyecta una imagen de calidad e innovación.",
         solutionsTitle: "Una Solución para Cada Necesidad",
         solutionsSubtitle: "Tanto si quieres potenciar tu negocio como si buscas lanzar tu propia marca de cartelería digital, tenemos el plan perfecto para ti.",
         solution1Title: "Para tu Negocio",
@@ -1050,11 +1225,23 @@
         solution2Text: "La solución White-Label perfecta para escalar tu oferta de servicios. Ofrece cartelería digital a tus clientes con tu propia marca, gestionando todo desde un único panel.",
         solution2Button: "Conocer Plan Corporativo",
         useCasesTitle: "Inspírate con lo que puedes lograr",
-        useCasesSubtitle: "Desde menús digitales hasta anuncios de ofertas, NexusPlay se adapta a cualquier industria.",
-        useCase1: "Tiendas Retail",
-        useCase2: "Restaurantes y Cafés",
-        useCase3: "Oficinas y Recepciones",
-        useCase4: "Gimnasios y Deporte",
+        useCasesSubtitle: "Desde el comercio minorista hasta los restaurantes, la cartelería digital lleva tu mensaje a las personas adecuadas en el momento adecuado.",
+        useCase1Title: "Tiendas Retail",
+        useCase1Text: "Anuncia ofertas, muestra nuevos productos y mejora la experiencia de compra con contenido visual dinámico.",
+        useCase2Title: "Restaurantes y Cafés",
+        useCase2Text: "Digitaliza tus menús, programa ofertas para el desayuno o la cena y reduce los tiempos de espera percibidos.",
+        useCase3Title: "Oficinas y Recepciones",
+        useCase3Text: "Da la bienvenida a tus visitantes, comparte noticias internas y refuerza la cultura de tu empresa.",
+        useCase4Title: "Gimnasios y Deporte",
+        useCase4Text: "Muestra horarios de clases, perfiles de entrenadores, consejos de salud y promociones para motivar a tus miembros.",
+        useCase5Title: "Sector Salud",
+        useCase5Text: "Reduce la ansiedad en salas de espera con contenido educativo, muestra turnos de médicos y ofrece consejos de salud.",
+        useCase6Title: "Transporte Público",
+        useCase6Text: "Informa a los pasajeros sobre horarios, rutas, incidencias del servicio y publicidad relevante en tiempo real.",
+        useCase7Title: "Salones de Belleza",
+        useCase7Text: "Muestra tu portafolio de estilos, promociona productos y ofrece inspiración a tus clientes mientras esperan.",
+        useCase8Title: "Mercados y Ferias",
+        useCase8Text: "Destaca ofertas del día, informa sobre el origen de los productos y guía a los visitantes por los diferentes puestos.",
         plansTitle: "Planes Flexibles para Crecer Contigo",
         plansSubtitle: "Elige el plan que se ajusta a tus objetivos. Sin contratos a largo plazo, cancela cuando quieras.",
         plan1Title: "Plan Profesional",
@@ -1076,11 +1263,11 @@
         planFeaturePricing: "Modelo de Negocio Propio: Establece tus precios.",
         planFeaturePrioritySupport: "Soporte Prioritario para Socios.",
         faqTitle: "Resolvemos tus Dudas",
-        faqSubtitle: "Encuentra aquí las respuestas a las preguntas más comunes sobre NexusPlay.",
-        faq1Title: "¿Qué necesito para empezar a usar NexusPlay?",
-        faq1Text: "Solo dos cosas: una cuenta en NexusPlay y una pantalla con conexión a internet. Nuestro software es compatible con una amplia gama de dispositivos, desde televisores con Android TV hasta reproductores multimedia (media players) dedicados. ¡Podemos asesorarte para que elijas el mejor hardware!",
+        faqSubtitle: "Encuentra aquí las respuestas a las preguntas más comunes sobre NexusRePlay.",
+        faq1Title: "¿Qué necesito para empezar a usar NexusRePlay?",
+        faq1Text: "Solo dos cosas: una cuenta en NexusRePlay y una pantalla con conexión a internet. Nuestro software es compatible con una amplia gama de dispositivos, desde televisores con Android TV hasta reproductores multimedia (media players) dedicados. ¡Podemos asesorarte para que elijas el mejor hardware!",
         faq2Title: "¿Es difícil de usar? ¿Necesito conocimientos técnicos?",
-        faq2Text: "¡Para nada! Hemos diseñado NexusPlay para que sea extremadamente intuitivo. Con nuestra interfaz de 'arrastrar y soltar', podrás crear y programar contenido en minutos, sin necesidad de escribir ni una sola línea de código.",
+        faq2Text: "¡Para nada! Hemos diseñado NexusRePlay para que sea extremadamente intuitivo. Con nuestra interfaz de 'arrastrar y soltar', podrás crear y programar contenido en minutos, sin necesidad de escribir ni una sola línea de código.",
         faq3Title: "¿Qué tipo de contenido puedo mostrar en las pantallas?",
         faq3Text: "Puedes mostrar casi cualquier cosa que imagines: imágenes (JPG, PNG, GIF), videos (MP4), páginas web, videos de YouTube y enriquecer tu comunicación con nuestros widgets dinámicos como el clima, noticias RSS y reloj digital.",
         faq4Title: '(Para Agencias) ¿Qué significa exactamente "White-Label" o Marca Blanca?',
@@ -1097,15 +1284,16 @@
         contactWhatsappText: "Perfecto para preguntas rápidas y una atención más directa. Te responderemos lo antes posible.",
         contactWhatsappButton: "Iniciar Chat",
         ctaTitle: "¿Listo para transformar tus pantallas?",
-        ctaSubtitle: "Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusPlay hoy mismo y lleva tu negocio al siguiente nivel.",
+        ctaSubtitle: "Empieza a comunicar, vender e impactar como nunca antes. Únete a NexusRePlay hoy mismo y lleva tu negocio al siguiente nivel.",
         ctaButton: "Empezar Ahora",
         footerExplore: "Explorar",
         navFeatures: "Características",
+        navBenefits: "Beneficios",
         navUseCases: "Casos de Uso",
         navPlans: "Planes",
         navFaq: "FAQ",
         footerConnect: "Conecta con Nosotros",
-        footerRights: "© 2024 NexusPlay. Todos los derechos reservados."
+        footerRights: "© 2024 NexusRePlay. Todos los derechos reservados."
       },
       en: {
         loginButton: "Login",
@@ -1122,6 +1310,16 @@
         feature3Text: "Capture everyone's attention with widgets for weather, news, clock, YouTube videos, and more.",
         platformTitle: "An Intuitive and Powerful Interface",
         platformSubtitle: "Designed to make managing your content a quick and simple task, without technical complications.",
+        benefitsTitle: "Results You Can Measure",
+        benefitsSubtitle: "Discover how digital signage directly impacts your business growth.",
+        benefit1Hook: "Increase Your Sales by up to 33%",
+        benefit1Text: "Promote offers, featured products, and upselling at the exact moment of purchase. Ideal for digital menus and in-store promotions.",
+        benefit2Hook: "Attract 4x More Views Than Static Posters",
+        benefit2Text: "Dynamic content like videos and animations captures 400% more views than printed posters. Make your message truly seen.",
+        benefit3Hook: "Reduce Costs and Save Time",
+        benefit3Text: "Eliminate 100% of your printing costs. Launch a new offer in 5 minutes from your dashboard, not 5 days waiting for the printer.",
+        benefit4Hook: "Modernize Your Brand Image",
+        benefit4Text: "Over 70% of customers believe digital signage makes a brand look more modern. Project an image of quality and innovation.",
         solutionsTitle: "A Solution for Every Need",
         solutionsSubtitle: "Whether you want to boost your business or launch your own digital signage brand, we have the perfect plan for you.",
         solution1Title: "For Your Business",
@@ -1131,11 +1329,23 @@
         solution2Text: "The perfect White-Label solution to scale your service offerings. Offer digital signage to your clients with your own brand, managing everything from a single panel.",
         solution2Button: "Learn About Corporate Plan",
         useCasesTitle: "Get Inspired by What You Can Achieve",
-        useCasesSubtitle: "From digital menus to promotional ads, NexusPlay adapts to any industry.",
-        useCase1: "Retail Stores",
-        useCase2: "Restaurants & Cafes",
-        useCase3: "Offices & Receptions",
-        useCase4: "Gyms & Sports",
+        useCasesSubtitle: "From retail to restaurants, digital signage gets your message to the right people at the right time.",
+        useCase1Title: "Retail Stores",
+        useCase1Text: "Announce sales, showcase new products, and enhance the shopping experience with dynamic visual content.",
+        useCase2Title: "Restaurants & Cafes",
+        useCase2Text: "Digitize your menus, schedule breakfast or dinner specials, and reduce perceived wait times.",
+        useCase3Title: "Offices & Receptions",
+        useCase3Text: "Welcome your visitors, share internal news, and reinforce your company culture.",
+        useCase4Title: "Gyms & Sports",
+        useCase4Text: "Display class schedules, trainer profiles, health tips, and promotions to motivate your members.",
+        useCase5Title: "Healthcare Sector",
+        useCase5Text: "Reduce anxiety in waiting rooms with educational content, display doctor shifts, and offer health tips.",
+        useCase6Title: "Public Transport",
+        useCase6Text: "Inform passengers about schedules, routes, service disruptions, and relevant advertising in real time.",
+        useCase7Title: "Beauty Salons",
+        useCase7Text: "Showcase your portfolio of styles, promote products, and offer inspiration to your clients while they wait.",
+        useCase8Title: "Markets & Fairs",
+        useCase8Text: "Highlight daily deals, inform about product origins, and guide visitors through the different stalls.",
         plansTitle: "Flexible Plans to Grow With You",
         plansSubtitle: "Choose the plan that fits your goals. No long-term contracts, cancel anytime.",
         plan1Title: "Professional Plan",
@@ -1157,11 +1367,11 @@
         planFeaturePricing: "Your Own Business Model: Set your own prices.",
         planFeaturePrioritySupport: "Priority Support for Partners.",
         faqTitle: "We Answer Your Doubts",
-        faqSubtitle: "Find the answers to the most common questions about NexusPlay here.",
-        faq1Title: "What do I need to start using NexusPlay?",
-        faq1Text: "Just two things: a NexusPlay account and a screen with an internet connection. Our software is compatible with a wide range of devices, from Android TV-enabled televisions to dedicated media players. We can advise you on choosing the best hardware!",
+        faqSubtitle: "Find the answers to the most common questions about NexusRePlay here.",
+        faq1Title: "What do I need to start using NexusRePlay?",
+        faq1Text: "Just two things: a NexusRePlay account and a screen with an internet connection. Our software is compatible with a wide range of devices, from Android TV-enabled televisions to dedicated media players. We can advise you on choosing the best hardware!",
         faq2Title: "Is it difficult to use? Do I need technical skills?",
-        faq2Text: "Not at all! We designed NexusPlay to be extremely intuitive. With our 'drag and drop' interface, you can create and schedule content in minutes, without writing a single line of code.",
+        faq2Text: "Not at all! We designed NexusRePlay to be extremely intuitive. With our 'drag and drop' interface, you can create and schedule content in minutes, without writing a single line of code.",
         faq3Title: "What kind of content can I display on the screens?",
         faq3Text: "You can display almost anything you can imagine: images (JPG, PNG, GIF), videos (MP4), web pages, YouTube videos, and enrich your communication with our dynamic widgets like weather, RSS news, and a digital clock.",
         faq4Title: '(For Agencies) What exactly does "White-Label" mean?',
@@ -1178,15 +1388,16 @@
         contactWhatsappText: "Perfect for quick questions and more direct attention. We'll get back to you as soon as possible.",
         contactWhatsappButton: "Start Chat",
         ctaTitle: "Ready to transform your screens?",
-        ctaSubtitle: "Start communicating, selling, and impacting like never before. Join NexusPlay today and take your business to the next level.",
+        ctaSubtitle: "Start communicating, selling, and impacting like never before. Join NexusRePlay today and take your business to the next level.",
         ctaButton: "Get Started Now",
         footerExplore: "Explore",
         navFeatures: "Features",
+        navBenefits: "Benefits",
         navUseCases: "Use Cases",
         navPlans: "Plans",
         navFaq: "FAQ",
         footerConnect: "Connect with Us",
-        footerRights: "© 2024 NexusPlay. All rights reserved."
+        footerRights: "© 2024 NexusRePlay. All rights reserved."
       },
       pt: {
         loginButton: "Entrar",
@@ -1203,6 +1414,16 @@
         feature3Text: "Atraia todos os olhares com widgets de clima, notícias, relógio, vídeos do YouTube e muito mais.",
         platformTitle: "Uma Interface Intuitiva e Poderosa",
         platformSubtitle: "Projetada para que gerenciar seu conteúdo seja uma tarefa rápida e simples, sem complicações técnicas.",
+        benefitsTitle: "Resultados que Você Pode Medir",
+        benefitsSubtitle: "Descubra como a sinalização digital impacta diretamente no crescimento do seu negócio.",
+        benefit1Hook: "Aumente Suas Vendas em até 33%",
+        benefit1Text: "Promova ofertas, produtos em destaque e upselling no momento exato da compra. Ideal para cardápios digitais e promoções em lojas.",
+        benefit2Hook: "Atraia 4x Mais Olhares que Cartazes Estáticos",
+        benefit2Text: "Conteúdo dinâmico como vídeos e animações captura 400% mais visualizações do que cartazes impressos. Faça sua mensagem ser realmente vista.",
+        benefit3Hook: "Reduza Custos e Economize Tempo",
+        benefit3Text: "Elimine 100% dos seus custos de impressão. Lance uma nova oferta em 5 minutos no seu painel, não em 5 dias esperando a gráfica.",
+        benefit4Hook: "Modernize a Imagem da Sua Marca",
+        benefit4Text: "Mais de 70% dos clientes acreditam que a sinalização digital faz uma marca parecer mais moderna. Projete uma imagem de qualidade e inovação.",
         solutionsTitle: "Uma Solução para Cada Necessidade",
         solutionsSubtitle: "Seja para impulsionar seu negócio ou para lançar sua própria marca de sinalização digital, temos o plano perfeito para você.",
         solution1Title: "Para o seu Negócio",
@@ -1212,11 +1433,23 @@
         solution2Text: "A solução White-Label perfeita para escalar sua oferta de serviços. Ofereça sinalização digital aos seus clientes com sua própria marca, gerenciando tudo a partir de um único painel.",
         solution2Button: "Conhecer Plano Corporativo",
         useCasesTitle: "Inspire-se com o que você pode alcançar",
-        useCasesSubtitle: "De cardápios digitais a anúncios de ofertas, o NexusPlay se adapta a qualquer indústria.",
-        useCase1: "Lojas de Varejo",
-        useCase2: "Restaurantes e Cafés",
-        useCase3: "Escritórios e Recepções",
-        useCase4: "Academias e Esportes",
+        useCasesSubtitle: "Do varejo aos restaurantes, a sinalização digital leva sua mensagem às pessoas certas no momento certo.",
+        useCase1Title: "Lojas de Varejo",
+        useCase1Text: "Anuncie promoções, exiba novos produtos e melhore a experiência de compra com conteúdo visual dinâmico.",
+        useCase2Title: "Restaurantes e Cafés",
+        useCase2Text: "Digitalize seus cardápios, programe ofertas para o café da manhã ou jantar e reduza os tempos de espera percebidos.",
+        useCase3Title: "Escritórios e Recepções",
+        useCase3Text: "Dê as boas-vindas aos seus visitantes, compartilhe notícias internas e reforce a cultura da sua empresa.",
+        useCase4Title: "Academias e Esportes",
+        useCase4Text: "Exiba horários de aulas, perfis de treinadores, dicas de saúde e promoções para motivar seus membros.",
+        useCase5Title: "Setor de Saúde",
+        useCase5Text: "Reduza a ansiedade em salas de espera com conteúdo educativo, mostre turnos de médicos e ofereça dicas de saúde.",
+        useCase6Title: "Transporte Público",
+        useCase6Text: "Informe os passageiros sobre horários, rotas, interrupções no serviço e publicidade relevante em tempo real.",
+        useCase7Title: "Salões de Beleza",
+        useCase7Text: "Mostre seu portfólio de estilos, promova produtos e ofereça inspiração aos seus clientes enquanto esperam.",
+        useCase8Title: "Mercados e Feiras",
+        useCase8Text: "Destaque ofertas do dia, informe sobre a origem dos produtos e guie os visitantes pelas diferentes barracas.",
         plansTitle: "Planos Flexíveis para Crescer com Você",
         plansSubtitle: "Escolha o plano que se ajusta aos seus objetivos. Sem contratos de longo prazo, cancele quando quiser.",
         plan1Title: "Plano Profissional",
@@ -1238,11 +1471,11 @@
         planFeaturePricing: "Modelo de Negócio Próprio: Defina seus próprios preços.",
         planFeaturePrioritySupport: "Suporte Prioritário para Parceiros.",
         faqTitle: "Resolvemos suas Dúvidas",
-        faqSubtitle: "Encontre aqui as respostas para as perguntas mais comuns sobre o NexusPlay.",
-        faq1Title: "O que preciso para começar a usar o NexusPlay?",
-        faq1Text: "Apenas duas coisas: uma conta no NexusPlay e uma tela com conexão à internet. Nosso software é compatível com uma vasta gama de dispositivos, desde televisores com Android TV até media players dedicados. Podemos te assessorar na escolha do melhor hardware!",
+        faqSubtitle: "Encontre aqui as respostas para as perguntas mais comuns sobre o NexusRePlay.",
+        faq1Title: "O que preciso para começar a usar o NexusRePlay?",
+        faqText: "Apenas duas coisas: uma conta no NexusRePlay e uma tela com conexão à internet. Nosso software é compatível com uma vasta gama de dispositivos, desde televisores com Android TV até media players dedicados. Podemos te assessorar na escolha do melhor hardware!",
         faq2Title: "É difícil de usar? Preciso de conhecimentos técnicos?",
-        faq2Text: "De forma alguma! Projetamos o NexusPlay para ser extremamente intuitivo. Com nossa interface de 'arrastar e soltar', você pode criar e programar conteúdo em minutos, sem precisar escrever uma única linha de código.",
+        faq2Text: "De forma alguma! Projetamos o NexusRePlay para ser extremamente intuitivo. Com nossa interface de 'arrastar e soltar', você pode criar e programar conteúdo em minutos, sem precisar escrever uma única linha de código.",
         faq3Title: "Que tipo de conteúdo posso exibir nas telas?",
         faq3Text: "Você pode exibir quase tudo que imaginar: imagens (JPG, PNG, GIF), vídeos (MP4), páginas da web, vídeos do YouTube e enriquecer sua comunicação com nossos widgets dinâmicos como clima, notícias RSS e relógio digital.",
         faq4Title: '(Para Agências) O que significa exatamente "White-Label" ou Marca Branca?',
@@ -1259,15 +1492,16 @@
         contactWhatsappText: "Perfeito para perguntas rápidas e um atendimento mais direto. Responderemos o mais breve possível.",
         contactWhatsappButton: "Iniciar Conversa",
         ctaTitle: "Pronto para transformar suas telas?",
-        ctaSubtitle: "Comece a comunicar, vender e impactar como nunca antes. Junte-se ao NexusPlay hoje e leve seu negócio para o próximo nível.",
+        ctaSubtitle: "Comece a comunicar, vender e impactar como nunca antes. Junte-se ao NexusRePlay hoje e leve seu negócio para o próximo nível.",
         ctaButton: "Começar Agora",
         footerExplore: "Explorar",
         navFeatures: "Recursos",
+        navBenefits: "Benefícios",
         navUseCases: "Casos de Uso",
         navPlans: "Planos",
         navFaq: "FAQ",
         footerConnect: "Conecte-se Conosco",
-        footerRights: "© 2024 NexusPlay. Todos os direitos reservados."
+        footerRights: "© 2024 NexusRePlay. Todos os direitos reservados."
       }
     };
 

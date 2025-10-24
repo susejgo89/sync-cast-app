@@ -326,7 +326,7 @@ function handleQrCodeWidget(screenId, settings) {
 
     if (show && enabled) {
         qrContainer.innerHTML = ''; // Limpia el QR anterior para evitar duplicados
-        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?screenId=${screenId}`, width: 128, height: 128 });
+        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?screenId=${screenId}`, width: 128, height: 128 });no 
         
         // Usa el texto personalizado si existe, si no, usa el de las traducciones.
         const displayText = text && text.trim() !== '' ? text : (translations[lang]?.scanForMenu || "Escanea para más info");
@@ -376,7 +376,7 @@ function resetPlayer() {
     if (unsubscribeMusicPlaylistListener) unsubscribeMusicPlaylistListener();
 
     // Limpiamos el ID guardado y recargamos la página.
-    localStorage.removeItem('nexusplay_screen_id');    
+    localStorage.removeItem('nexusreplay_screen_id');    
     window.location.replace(window.location.origin + window.location.pathname); // Método más robusto para recargar
 }
 
@@ -899,7 +899,7 @@ pairBtn.addEventListener('click', async () => {
             inputs[0].focus();
         } else {
             // ¡Éxito! La pantalla es válida y no está enlazada.
-            localStorage.setItem('nexusplay_screen_id', screenId);
+            localStorage.setItem('nexusreplay_screen_id', screenId);
 
             await updateDoc(screenDocRef, {
                 isPaired: true
@@ -944,7 +944,7 @@ function init() {
     setLanguage(userLang);
 
     // Comprobamos si el dispositivo ya está enlazado
-    const savedScreenId = localStorage.getItem('nexusplay_screen_id');
+    const savedScreenId = localStorage.getItem('nexusreplay_screen_id');
     if (savedScreenId) {
         // Si ya lo está, iniciamos la reproducción directamente
         // Si ya está enlazado, iniciamos la reproducción Y el heartbeat

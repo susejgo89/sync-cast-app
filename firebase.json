@@ -6,5 +6,24 @@
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "functions/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/landing/index.html"
+      },
+      {
+        "source": "/[!/](**)",
+        "destination": "/app.html"
+      }
+    ]
   }
 }

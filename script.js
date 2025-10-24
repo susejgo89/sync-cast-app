@@ -39,8 +39,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         }
         
         document.addEventListener('DOMContentLoaded', async () => {
-            await applyWhiteLabeling();
-
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -56,10 +54,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 hamburgerBtn.addEventListener('click', toggleSidebar);
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
-
-            initRouter(); // <-- INICIALIZAMOS EL NUEVO ROUTER
-
-        // --- DOM Elements ---
         const loader = document.getElementById('loader');
         const authContainer = document.getElementById('auth-container');
         const dashboardContainer = document.getElementById('dashboard-container');
@@ -188,6 +182,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             
             if (userData.role === 'reseller') {
                 adminNavLink.classList.remove('hidden');
+                // Solo aplicamos la marca blanca si el usuario es un reseller.
+                await applyWhiteLabeling();
             } else {
                 adminNavLink.classList.add('hidden');
             }
@@ -228,6 +224,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     if (!currentUserId) {
         setLanguage('es');
     }
+
+    // Inicializamos el router DESPUÉS de que la lógica de autenticación haya decidido qué mostrar.
+    initRouter();
 });
         
         const showMessage = (message, isError = false) => {
