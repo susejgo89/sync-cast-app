@@ -532,16 +532,6 @@
       box-shadow: 0 15px 25px rgba(124, 58, 237, 0.1);
     }
 
-    .service-card {
-      background: linear-gradient(135deg, #1f2937, #374151);
-      border: none;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .service-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
-
     .contact-icon {
       font-size: 3.5rem;
       color: #7c3aed;
@@ -766,26 +756,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Tarjeta de Servicio de Creación de Contenido -->
-      <div class="row justify-content-center mt-5">
-        <div class="col-lg-10 fade-in-section" style="transition-delay: 200ms;">
-          <div class="service-card card text-white p-4 p-md-5 rounded-4">
-            <div class="row align-items-center">
-              <div class="col-md-2 text-center mb-4 mb-md-0">
-                <i class="bi bi-stars" style="font-size: 5rem; color: #f59e0b;"></i>
-              </div>
-              <div class="col-md-7">
-                <h3 class="h4 fw-bold" data-lang="serviceCardTitle">¿Necesitas contenido impactante? Lo creamos por ti.</h3>
-                <p class="mb-0" data-lang="serviceCardText">Nuestro equipo creativo diseña videos, imágenes y animaciones profesionales optimizadas para tus pantallas. Potencia tu marca sin esfuerzo.</p>
-              </div>
-              <div class="col-md-3 text-center text-md-end mt-4 mt-md-0">
-                <a href="#contacto" class="btn btn-warning btn-lg" data-lang="serviceCardButton">Solicitar Info</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -949,6 +919,51 @@
               <h5 class="card-title fw-bold" data-lang="useCase8Title">Mercados y Ferias</h5>
               <p class="card-text text-muted" data-lang="useCase8Text">Destaca ofertas del día, informa sobre el origen de los productos y guía a los visitantes por los diferentes puestos.</p>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================== -->
+  <!-- ======== SECCIÓN SERVICIO DE CONTENIDO ======== -->
+  <!-- =============================================== -->
+  <section id="servicio-contenido" class="py-5" style="background-color: #f8f9fa;">
+    <div class="container py-5">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6 fade-in-section">
+          <h2 class="display-5 fw-bold mb-3" data-lang="serviceTitle">¿Sin tiempo para diseñar? <br> <span class="text-primary">Lo hacemos por ti.</span></h2>
+          <p class="lead text-muted mb-4" data-lang="serviceSubtitle">Dedícate a tu negocio mientras nuestro equipo de creativos produce contenido visual que captura miradas y genera resultados.</p>
+          
+          <ul class="list-unstyled mb-4 fs-5">
+            <li class="d-flex align-items-center mb-3">
+              <i class="bi bi-camera-reels-fill text-primary fs-4 me-3"></i>
+              <span data-lang="serviceFeature1">Videos promocionales y animaciones de logo.</span>
+            </li>
+            <li class="d-flex align-items-center mb-3">
+              <i class="bi bi-image-fill text-primary fs-4 me-3"></i>
+              <span data-lang="serviceFeature2">Diseño de menús digitales y carteles de ofertas.</span>
+            </li>
+            <li class="d-flex align-items-center">
+              <i class="bi bi-palette-fill text-primary fs-4 me-3"></i>
+              <span data-lang="serviceFeature3">Plantillas personalizadas con tu marca.</span>
+            </li>
+          </ul>
+
+          <a href="#contacto" class="btn btn-primary btn-lg px-5 py-3 mt-3">
+            <i class="bi bi-arrow-right-circle me-2"></i>
+            <span data-lang="serviceButton">Quiero saber más</span>
+          </a>
+        </div>
+        <div class="col-lg-6 fade-in-section" style="transition-delay: 100ms;">
+          <!-- Contenedor del video -->
+          <div class="rounded-4 overflow-hidden shadow-lg" style="aspect-ratio: 1/1; background-color: #e0e0e0;">
+            <!-- 
+              REEMPLAZA ESTE VIDEO:
+              Sube un video corto (15-30s) a tu carpeta 'assets' que muestre ejemplos de tus diseños.
+              Debe ser un MP4 optimizado para la web.
+            -->
+            <video src="../assets/content-showcase.mp4" autoplay loop muted playsinline class="w-100 h-100" style="object-fit: cover;"></video>
           </div>
         </div>
       </div>
@@ -1292,9 +1307,12 @@
         planFeatureResources: "Asignación de Recursos (pantallas y almacenamiento).",
         planFeaturePricing: "Modelo de Negocio Propio: Establece tus precios.",
         planFeaturePrioritySupport: "Soporte Prioritario para Socios.",
-        serviceCardTitle: "¿Necesitas contenido impactante? Lo creamos por ti.",
-        serviceCardText: "Nuestro equipo creativo diseña videos, imágenes y animaciones profesionales optimizadas para tus pantallas. Potencia tu marca sin esfuerzo.",
-        serviceCardButton: "Solicitar Info",
+        serviceTitle: "¿Sin tiempo para diseñar? Lo hacemos por ti.",
+        serviceSubtitle: "Dedícate a tu negocio mientras nuestro equipo de creativos produce contenido visual que captura miradas y genera resultados.",
+        serviceFeature1: "Videos promocionales y animaciones de logo.",
+        serviceFeature2: "Diseño de menús digitales y carteles de ofertas.",
+        serviceFeature3: "Plantillas personalizadas con tu marca.",
+        serviceButton: "Quiero saber más",
         faqTitle: "Resolvemos tus Dudas",
         faqSubtitle: "Encuentra aquí las respuestas a las preguntas más comunes sobre NexusRePlay.",
         faq1Title: "¿Qué necesito para empezar a usar NexusRePlay?",
@@ -1399,9 +1417,12 @@
         planFeatureResources: "Resource Allocation (screens and storage).",
         planFeaturePricing: "Your Own Business Model: Set your own prices.",
         planFeaturePrioritySupport: "Priority Support for Partners.",
-        serviceCardTitle: "Need impactful content? We create it for you.",
-        serviceCardText: "Our creative team designs professional videos, images, and animations optimized for your screens. Boost your brand effortlessly.",
-        serviceCardButton: "Request Info",
+        serviceTitle: "No time to design? We'll do it for you.",
+        serviceSubtitle: "Focus on your business while our creative team produces visual content that captures attention and drives results.",
+        serviceFeature1: "Promotional videos and logo animations.",
+        serviceFeature2: "Design of digital menus and offer posters.",
+        serviceFeature3: "Custom templates with your brand.",
+        serviceButton: "I want to know more",
         faqTitle: "We Answer Your Doubts",
         faqSubtitle: "Find the answers to the most common questions about NexusRePlay here.",
         faq1Title: "What do I need to start using NexusRePlay?",
@@ -1506,9 +1527,12 @@
         planFeatureResources: "Alocação de Recursos (telas e armazenamento).",
         planFeaturePricing: "Modelo de Negócio Próprio: Defina seus próprios preços.",
         planFeaturePrioritySupport: "Suporte Prioritário para Parceiros.",
-        serviceCardTitle: "Precisa de conteúdo impactante? Nós criamos para você.",
-        serviceCardText: "Nossa equipe criativa desenvolve vídeos, imagens e animações profissionais otimizadas para suas telas. Potencialize sua marca sem esforço.",
-        serviceCardButton: "Solicitar Informações",
+        serviceTitle: "Sem tempo para criar? Nós fazemos por você.",
+        serviceSubtitle: "Dedique-se ao seu negócio enquanto nossa equipe de criativos produz conteúdo visual que captura olhares e gera resultados.",
+        serviceFeature1: "Vídeos promocionais e animações de logo.",
+        serviceFeature2: "Design de cardápios digitais e cartazes de ofertas.",
+        serviceFeature3: "Templates personalizados com a sua marca.",
+        serviceButton: "Quero saber mais",
         faqTitle: "Resolvemos suas Dúvidas",
         faqSubtitle: "Encontre aqui as respostas para as perguntas mais comuns sobre o NexusRePlay.",
         faq1Title: "O que preciso para começar a usar o NexusRePlay?",

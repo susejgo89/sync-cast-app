@@ -902,7 +902,8 @@ pairBtn.addEventListener('click', async () => {
             localStorage.setItem('nexusreplay_screen_id', screenId);
 
             await updateDoc(screenDocRef, {
-                isPaired: true
+                isPaired: true,
+                lastSeen: serverTimestamp() // Actualizamos lastSeen en el momento del emparejamiento
             });
 
             messageBox.textContent = translations[lang].pairingSuccess;
