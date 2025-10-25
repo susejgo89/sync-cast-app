@@ -45,6 +45,17 @@
       -webkit-backdrop-filter: blur(10px); /* Para Safari */
     }
 
+    /* Fondo para el menú desplegable en móvil */
+    @media (max-width: 991.98px) { /* Breakpoint LG de Bootstrap */
+      .navbar-collapse.show {
+        background-color: rgba(10, 10, 10, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 1rem 1.5rem;
+        border-radius: 0 0 1rem 1rem;
+      }
+    }
+
     /* Estilos para los enlaces de navegación (NUEVO DISEÑO) */
     .navbar-nav .nav-link {
       font-weight: 600;
@@ -81,7 +92,7 @@
       width: 70%; /* El subrayado crece al pasar el ratón */
     }
 
- este a    /* Estilos para el selector de idioma del landing */
+    /* Estilos para el selector de idioma del landing */
     .lang-flag {
       border-radius: 50%;
       cursor: pointer;
@@ -622,7 +633,10 @@
             <a class="nav-link" href="#casos-de-uso">Casos de Uso</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#planes">Planes</a>
+            <a class="nav-link" href="#planes" data-lang="navService">Servicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#servicio-contenido" data-lang="navDesign">Diseñamos por Ti</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#faq">FAQ</a>
@@ -796,36 +810,37 @@
   <!-- =============================================== -->
   <section id="soluciones" class="py-5">
     <div class="container py-5">
-        <div class="row justify-content-center text-center">
-            <div class="col-lg-8">
-                <h2 class="section-title display-5" data-lang="solutionsTitle">Una Solución para Cada Necesidad</h2>
-                <p class="section-subtitle lead text-muted" data-lang="solutionsSubtitle">Tanto si quieres potenciar tu negocio como si buscas lanzar tu propia marca de cartelería digital, tenemos el plan perfecto para ti.</p>
-            </div>
+      <div class="row align-items-center g-5">
+        <!-- Columna de la Imagen -->
+        <div class="col-lg-6 fade-in-section">
+          <img src="../assets/soluciones-mockup.png" class="img-fluid rounded-4 shadow-lg" alt="Ejemplos de contenido en pantallas">
         </div>
-        <div class="row">
-            <!-- Solución 1: Para tu Negocio -->
-            <div class="col-lg-6 mb-4 mb-lg-0 d-flex fade-in-section">
-                <div class="solution-card w-100">
-                    <div class="card-body p-5 text-center d-flex flex-column">
-                        <i class="bi bi-shop-window feature-icon mb-4"></i>
-                        <h3 class="card-title h4 mb-3" data-lang="solution1Title">Para tu Negocio</h3>
-                        <p class="card-text text-muted flex-grow-1" data-lang="solution1Text">Ideal para restaurantes, tiendas, gimnasios y oficinas que quieren gestionar sus propias pantallas de forma sencilla y profesional para potenciar sus ventas y comunicación.</p>
-                        <a href="#planes" class="btn btn-outline-primary mt-4 px-4 py-2" data-lang="solution1Button">Ver Plan Profesional</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Solución 2: Para Agencias (Destacada) -->
-            <div class="col-lg-6 d-flex fade-in-section" style="transition-delay: 100ms;">
-                <div class="solution-card highlight w-100">
-                    <div class="card-body p-5 text-center d-flex flex-column">
-                        <i class="bi bi-briefcase-fill feature-icon mb-4"></i>
-                        <h3 class="card-title h4 mb-3" data-lang="solution2Title">Para Agencias y Revendedores</h3>
-                        <p class="card-text text-muted flex-grow-1" data-lang="solution2Text">La solución White-Label perfecta para escalar tu oferta de servicios. Ofrece cartelería digital a tus clientes con tu propia marca, gestionando todo desde un único panel.</p>
-                        <a href="#planes" class="btn btn-primary mt-4 px-4 py-2" data-lang="solution2Button">Conocer Plan Corporativo</a>
-                    </div>
-                </div>
-            </div>
+        <!-- Columna del Texto -->
+        <div class="col-lg-6 fade-in-section" style="transition-delay: 100ms;">
+          <h2 class="display-5 fw-bold mb-3" data-lang="solutionsTitle">Tu negocio, <span class="text-primary">en todas las pantallas.</span></h2>
+          <p class="lead text-muted mb-4" data-lang="solutionsSubtitle">Convierte tus televisores en potentes herramientas de marketing y comunicación. NexusRePlay es la solución perfecta para cualquier negocio que quiera destacar.</p>
+          
+          <ul class="list-unstyled mb-4 fs-5">
+            <li class="d-flex align-items-center mb-3">
+              <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+              <span data-lang="solutionPoint1"><strong>Atrae más clientes</strong> con promociones visuales impactantes.</span>
+            </li>
+            <li class="d-flex align-items-center mb-3">
+              <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+              <span data-lang="solutionPoint2"><strong>Ahorra en costos</strong> de impresión y actualiza tu contenido al instante.</span>
+            </li>
+            <li class="d-flex align-items-center">
+              <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+              <span data-lang="solutionPoint3"><strong>Mejora la experiencia</strong> en tu local y reduce la percepción del tiempo de espera.</span>
+            </li>
+          </ul>
+
+          <a href="#casos-de-uso" class="btn btn-outline-primary btn-lg px-5 py-3 mt-3">
+            <i class="bi bi-lightbulb-fill me-2"></i>
+            <span data-lang="solutionButton">Ver ideas para mi negocio</span>
+          </a>
         </div>
+      </div>
     </div>
   </section>
 
@@ -977,53 +992,65 @@
     <div class="container py-5">
       <div class="row justify-content-center text-center">
         <div class="col-lg-8">
-            <h2 class="section-title display-5" data-lang="plansTitle">Planes Flexibles para Crecer Contigo</h2>
-            <p class="section-subtitle lead text-muted" data-lang="plansSubtitle">Elige el plan que se ajusta a tus objetivos. Sin contratos a largo plazo, cancela cuando quieras.</p>
+            <h2 class="section-title display-5" data-lang="serviceFeaturesTitle">Una Solución Completa para tu Comunicación Visual</h2>
+            <p class="section-subtitle lead text-muted" data-lang="serviceFeaturesSubtitle">Todas las herramientas que necesitas para gestionar tus pantallas de forma profesional, centralizada y sin complicaciones.</p>
         </div>
       </div>
       <div class="row justify-content-center">
-        <!-- Plan Profesional -->
-        <div class="col-lg-5 mb-4 mb-lg-0 d-flex fade-in-section">
-          <div class="plan-card w-100">
-            <div class="card-header text-center p-4">
-              <h3 class="h2 font-weight-bold mb-2" data-lang="plan1Title">Plan Profesional</h3>
-              <p class="text-muted" data-lang="plan1Subtitle">Ideal para negocios, tiendas y empresas que gestionan sus propias pantallas.</p>
+        <div class="col-lg-11">
+          <div class="card shadow-lg border-0 rounded-4 p-4 p-md-5" style="background-color: #ffffff;">
+            <div class="row g-4 g-lg-5">
+              <!-- Feature 1 -->
+              <div class="col-md-6 col-lg-4 d-flex fade-in-section">
+                <i class="bi bi-cloud-arrow-up-fill text-primary fs-2 me-4"></i>
+                <div>
+                  <h5 class="fw-bold" data-lang="planFeatureRemoteTitle">Gestión Remota</h5>
+                  <p class="text-muted mb-0" data-lang="planFeatureRemote">Actualiza tus pantallas desde cualquier lugar del mundo.</p>
+                </div>
+              </div>
+              <!-- Feature 2 -->
+              <div class="col-md-6 col-lg-4 d-flex fade-in-section" style="transition-delay: 50ms;">
+                <i class="bi bi-calendar-week-fill text-primary fs-2 me-4"></i>
+                <div>
+                  <h5 class="fw-bold" data-lang="planFeatureScheduleTitle">Programación Avanzada</h5>
+                  <p class="text-muted mb-0" data-lang="planFeatureSchedule">Define qué y cuándo se muestra por horas, días y grupos.</p>
+                </div>
+              </div>
+              <!-- Feature 3 -->
+              <div class="col-md-6 col-lg-4 d-flex fade-in-section" style="transition-delay: 100ms;">
+                <i class="bi bi-collection-play-fill text-primary fs-2 me-4"></i>
+                <div>
+                  <h5 class="fw-bold" data-lang="planFeatureLibraryTitle">Biblioteca Multimedia</h5>
+                  <p class="text-muted mb-0" data-lang="planFeatureLibrary">Organiza tus videos, imágenes y archivos de audio.</p>
+                </div>
+              </div>
+              <!-- Feature 4 -->
+              <div class="col-md-6 col-lg-4 d-flex fade-in-section" style="transition-delay: 150ms;">
+                <i class="bi bi-magic text-primary fs-2 me-4"></i>
+                <div>
+                  <h5 class="fw-bold" data-lang="planFeatureWidgetsTitle">Widgets Dinámicos</h5>
+                  <p class="text-muted mb-0" data-lang="planFeatureWidgets">Enriquece tu contenido con Clima, Reloj y Noticias RSS.</p>
+                </div>
+              </div>
+              <!-- Feature 5 -->
+              <div class="col-md-6 col-lg-4 d-flex fade-in-section" style="transition-delay: 200ms;">
+                <i class="bi bi-qr-code text-primary fs-2 me-4"></i>
+                <div>
+                  <h5 class="fw-bold" data-lang="planFeatureQrTitle">Menú Digital QR</h5>
+                  <p class="text-muted mb-0" data-lang="planFeatureQr">Muestra contenido interactivo en los móviles de tus clientes.</p>
+                </div>
+              </div>
+              <!-- Feature 6 -->
+              <div class="col-md-6 col-lg-4 d-flex fade-in-section" style="transition-delay: 250ms;">
+                <i class="bi bi-globe2 text-primary fs-2 me-4"></i>
+                <div>
+                  <h5 class="fw-bold" data-lang="planFeatureWebTitle">Contenido Web</h5>
+                  <p class="text-muted mb-0" data-lang="planFeatureWeb">Integra páginas web y videos de YouTube en tus playlists.</p>
+                </div>
+              </div>
             </div>
-            <div class="card-body p-4 flex-grow-1">
-              <ul class="plan-features">
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureRemote"><strong>Gestión Remota</strong> de Contenido</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureSchedule"><strong>Programación</strong> por Horas, Días y Grupos</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureLibrary">Biblioteca de Medios (Videos, Imágenes, Audio)</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureWidgets"><strong>Widgets Dinámicos</strong> (Clima, Reloj, Noticias RSS)</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureQr">Menú Digital con <strong>Código QR</strong></span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureWeb">Exhibición de Páginas Web y Videos de YouTube</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureSupport">Soporte Técnico</span></li>
-              </ul>
-            </div>
-            <div class="card-footer text-center p-4">
-              <a href="#contacto" class="btn btn-outline-primary btn-lg w-100" data-lang="contactButton">Contacto</a>
-            </div>
-          </div>
-        </div>
-        <!-- Plan Corporativo (White-Label) -->
-        <div class="col-lg-5 d-flex fade-in-section" style="transition-delay: 100ms;">
-          <div class="plan-card highlight w-100">
-            <div class="card-header text-center p-4">
-              <h3 class="h2 font-weight-bold mb-2" data-lang="plan2Title">Plan Corporativo</h3>
-              <p class="text-muted" data-lang="plan2Subtitle">Para agencias y revendedores que quieren ofrecer el servicio con su propia marca.</p>
-            </div>
-            <div class="card-body p-4 flex-grow-1">
-              <p class="fw-bold mb-3" data-lang="plan2Includes">Todo lo del Plan Profesional, y además:</p>
-              <ul class="plan-features">
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureWhitelabel"><strong>100% Marca Blanca:</strong> Usa tu propio logo y dominio.</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureReseller"><strong>Panel de Revendedor</strong> para crear y administrar clientes.</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeatureResources"><strong>Asignación de Recursos</strong> (pantallas y almacenamiento).</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeaturePricing">Modelo de Negocio Propio: Establece tus precios.</span></li>
-                <li><i class="bi bi-check-circle-fill"></i><span data-lang="planFeaturePrioritySupport">Soporte Prioritario para Socios.</span></li>
-              </ul>
-            </div>
-            <div class="card-footer text-center p-4">
-              <a href="#contacto" class="btn btn-primary btn-lg w-100" data-lang="contactButton">Contacto</a>
+            <div class="text-center mt-5">
+              <a href="#contacto" class="btn btn-primary btn-lg px-5 py-3" data-lang="contactButton">Solicitar una Demo</a>
             </div>
           </div>
         </div>
@@ -1195,6 +1222,7 @@
             <li class="mb-2"><a href="#casos-de-uso" class="footer-link" data-lang="navUseCases">Casos de Uso</a></li>
             <li class="mb-2"><a href="#beneficios" class="footer-link" data-lang="navBenefits">Beneficios</a></li>
             <li class="mb-2"><a href="#planes" class="footer-link" data-lang="navPlans">Planes</a></li>
+            <li class="mb-2"><a href="#servicio-contenido" class="footer-link" data-lang="navDesign">Diseñamos por Ti</a></li>
             <li class="mb-2"><a href="#faq" class="footer-link" data-lang="navFaq">FAQ</a></li>
           </ul>
         </div>
@@ -1261,14 +1289,12 @@
         benefit3Text: "Elimina el 100% de tus costos de impresión. Lanza una nueva oferta en 5 minutos desde tu panel, no en 5 días esperando a la imprenta.",
         benefit4Hook: "Moderniza la Imagen de tu Marca",
         benefit4Text: "Más del 70% de los clientes cree que la cartelería digital hace que una marca parezca más moderna. Proyecta una imagen de calidad e innovación.",
-        solutionsTitle: "Una Solución para Cada Necesidad",
-        solutionsSubtitle: "Tanto si quieres potenciar tu negocio como si buscas lanzar tu propia marca de cartelería digital, tenemos el plan perfecto para ti.",
-        solution1Title: "Para tu Negocio",
-        solution1Text: "Ideal para restaurantes, tiendas, gimnasios y oficinas que quieren gestionar sus propias pantallas de forma sencilla y profesional para potenciar sus ventas y comunicación.",
-        solution1Button: "Ver Plan Profesional",
-        solution2Title: "Para Agencias y Revendedores",
-        solution2Text: "La solución White-Label perfecta para escalar tu oferta de servicios. Ofrece cartelería digital a tus clientes con tu propia marca, gestionando todo desde un único panel.",
-        solution2Button: "Conocer Plan Corporativo",
+        solutionsTitle: "Tu negocio, en todas las pantallas.",
+        solutionsSubtitle: "Convierte tus televisores en potentes herramientas de marketing y comunicación. NexusRePlay es la solución perfecta para cualquier negocio que quiera destacar.",
+        solutionPoint1: "Atrae más clientes con promociones visuales impactantes.",
+        solutionPoint2: "Ahorra en costos de impresión y actualiza tu contenido al instante.",
+        solutionPoint3: "Mejora la experiencia en tu local y reduce la percepción del tiempo de espera.",
+        solutionButton: "Ver ideas para mi negocio",
         useCasesTitle: "Inspírate con lo que puedes lograr",
         useCasesSubtitle: "Desde el comercio minorista hasta los restaurantes, la cartelería digital lleva tu mensaje a las personas adecuadas en el momento adecuado.",
         useCase1Title: "Tiendas Retail",
@@ -1287,26 +1313,21 @@
         useCase7Text: "Muestra tu portafolio de estilos, promociona productos y ofrece inspiración a tus clientes mientras esperan.",
         useCase8Title: "Mercados y Ferias",
         useCase8Text: "Destaca ofertas del día, informa sobre el origen de los productos y guía a los visitantes por los diferentes puestos.",
-        plansTitle: "Planes Flexibles para Crecer Contigo",
-        plansSubtitle: "Elige el plan que se ajusta a tus objetivos. Sin contratos a largo plazo, cancela cuando quieras.",
-        plan1Title: "Plan Profesional",
-        plan1Subtitle: "Ideal para negocios, tiendas y empresas que gestionan sus propias pantallas.",
-        planFeatureRemote: "Gestión Remota de Contenido",
-        planFeatureSchedule: "Programación por Horas, Días y Grupos",
-        planFeatureLibrary: "Biblioteca de Medios (Videos, Imágenes, Audio)",
-        planFeatureWidgets: "Widgets Dinámicos (Clima, Reloj, Noticias RSS)",
-        planFeatureQr: "Menú Digital con Código QR",
-        planFeatureWeb: "Exhibición de Páginas Web y Videos de YouTube",
-        planFeatureSupport: "Soporte Técnico",
-        contactButton: "Contacto",
-        plan2Title: "Plan Corporativo",
-        plan2Subtitle: "Para agencias y revendedores que quieren ofrecer el servicio con su propia marca.",
-        plan2Includes: "Todo lo del Plan Profesional, y además:",
-        planFeatureWhitelabel: "100% Marca Blanca: Usa tu propio logo y dominio.",
-        planFeatureReseller: "Panel de Revendedor para crear y administrar clientes.",
-        planFeatureResources: "Asignación de Recursos (pantallas y almacenamiento).",
-        planFeaturePricing: "Modelo de Negocio Propio: Establece tus precios.",
-        planFeaturePrioritySupport: "Soporte Prioritario para Socios.",
+        serviceFeaturesTitle: "Una Solución Completa para tu Comunicación Visual",
+        serviceFeaturesSubtitle: "Todas las herramientas que necesitas para gestionar tus pantallas de forma profesional, centralizada y sin complicaciones.",
+        planFeatureRemoteTitle: "Gestión Remota",
+        planFeatureRemote: "Actualiza tus pantallas desde cualquier lugar del mundo.",
+        planFeatureScheduleTitle: "Programación Avanzada",
+        planFeatureSchedule: "Define qué y cuándo se muestra por horas, días y grupos.",
+        planFeatureLibraryTitle: "Biblioteca Multimedia",
+        planFeatureLibrary: "Organiza tus videos, imágenes y archivos de audio.",
+        planFeatureWidgetsTitle: "Widgets Dinámicos",
+        planFeatureWidgets: "Enriquece tu contenido con Clima, Reloj y Noticias RSS.",
+        planFeatureQrTitle: "Menú Digital QR",
+        planFeatureQr: "Muestra contenido interactivo en los móviles de tus clientes.",
+        planFeatureWebTitle: "Contenido Web",
+        planFeatureWeb: "Integra páginas web y videos de YouTube en tus playlists.",
+        contactButton: "Solicitar una Demo",
         serviceTitle: "¿Sin tiempo para diseñar? Lo hacemos por ti.",
         serviceSubtitle: "Dedícate a tu negocio mientras nuestro equipo de creativos produce contenido visual que captura miradas y genera resultados.",
         serviceFeature1: "Videos promocionales y animaciones de logo.",
@@ -1341,7 +1362,8 @@
         navFeatures: "Características",
         navBenefits: "Beneficios",
         navUseCases: "Casos de Uso",
-        navPlans: "Planes",
+        navService: "Servicio",
+        navDesign: "Diseñamos por Ti",
         navFaq: "FAQ",
         footerConnect: "Conecta con Nosotros",
         footerRights: "© 2024 NexusRePlay. Todos los derechos reservados."
@@ -1371,14 +1393,12 @@
         benefit3Text: "Eliminate 100% of your printing costs. Launch a new offer in 5 minutes from your dashboard, not 5 days waiting for the printer.",
         benefit4Hook: "Modernize Your Brand Image",
         benefit4Text: "Over 70% of customers believe digital signage makes a brand look more modern. Project an image of quality and innovation.",
-        solutionsTitle: "A Solution for Every Need",
-        solutionsSubtitle: "Whether you want to boost your business or launch your own digital signage brand, we have the perfect plan for you.",
-        solution1Title: "For Your Business",
-        solution1Text: "Ideal for restaurants, shops, gyms, and offices that want to manage their own screens simply and professionally to boost sales and communication.",
-        solution1Button: "View Professional Plan",
-        solution2Title: "For Agencies and Resellers",
-        solution2Text: "The perfect White-Label solution to scale your service offerings. Offer digital signage to your clients with your own brand, managing everything from a single panel.",
-        solution2Button: "Learn About Corporate Plan",
+        solutionsTitle: "Your business, on all screens.",
+        solutionsSubtitle: "Turn your TVs into powerful marketing and communication tools. NexusRePlay is the perfect solution for any business that wants to stand out.",
+        solutionPoint1: "Attract more customers with impactful visual promotions.",
+        solutionPoint2: "Save on printing costs and update your content instantly.",
+        solutionPoint3: "Enhance the in-store experience and reduce perceived waiting times.",
+        solutionButton: "See ideas for my business",
         useCasesTitle: "Get Inspired by What You Can Achieve",
         useCasesSubtitle: "From retail to restaurants, digital signage gets your message to the right people at the right time.",
         useCase1Title: "Retail Stores",
@@ -1397,26 +1417,21 @@
         useCase7Text: "Showcase your portfolio of styles, promote products, and offer inspiration to your clients while they wait.",
         useCase8Title: "Markets & Fairs",
         useCase8Text: "Highlight daily deals, inform about product origins, and guide visitors through the different stalls.",
-        plansTitle: "Flexible Plans to Grow With You",
-        plansSubtitle: "Choose the plan that fits your goals. No long-term contracts, cancel anytime.",
-        plan1Title: "Professional Plan",
-        plan1Subtitle: "Ideal for businesses, shops, and companies managing their own screens.",
-        planFeatureRemote: "Remote Content Management",
-        planFeatureSchedule: "Scheduling by Hours, Days, and Groups",
-        planFeatureLibrary: "Media Library (Videos, Images, Audio)",
-        planFeatureWidgets: "Dynamic Widgets (Weather, Clock, RSS News)",
-        planFeatureQr: "Digital Menu with QR Code",
-        planFeatureWeb: "Display Web Pages and YouTube Videos",
-        planFeatureSupport: "Technical Support",
-        contactButton: "Contact",
-        plan2Title: "Corporate Plan",
-        plan2Subtitle: "For agencies and resellers who want to offer the service with their own brand.",
-        plan2Includes: "Everything in the Professional Plan, plus:",
-        planFeatureWhitelabel: "100% White-Label: Use your own logo and domain.",
-        planFeatureReseller: "Reseller Panel to create and manage clients.",
-        planFeatureResources: "Resource Allocation (screens and storage).",
-        planFeaturePricing: "Your Own Business Model: Set your own prices.",
-        planFeaturePrioritySupport: "Priority Support for Partners.",
+        serviceFeaturesTitle: "A Complete Solution for Your Visual Communication",
+        serviceFeaturesSubtitle: "All the tools you need to manage your screens professionally, centrally, and without complications.",
+        planFeatureRemoteTitle: "Remote Management",
+        planFeatureRemote: "Update your screens from anywhere in the world.",
+        planFeatureScheduleTitle: "Advanced Scheduling",
+        planFeatureSchedule: "Define what and when is displayed by hours, days, and groups.",
+        planFeatureLibraryTitle: "Multimedia Library",
+        planFeatureLibrary: "Organize your videos, images, and audio files.",
+        planFeatureWidgetsTitle: "Dynamic Widgets",
+        planFeatureWidgets: "Enrich your content with Weather, Clock, and RSS News.",
+        planFeatureQrTitle: "QR Digital Menu",
+        planFeatureQr: "Display interactive content on your customers' mobile phones.",
+        planFeatureWebTitle: "Web Content",
+        planFeatureWeb: "Integrate web pages and YouTube videos into your playlists.",
+        contactButton: "Request a Demo",
         serviceTitle: "No time to design? We'll do it for you.",
         serviceSubtitle: "Focus on your business while our creative team produces visual content that captures attention and drives results.",
         serviceFeature1: "Promotional videos and logo animations.",
@@ -1451,7 +1466,8 @@
         navFeatures: "Features",
         navBenefits: "Benefits",
         navUseCases: "Use Cases",
-        navPlans: "Plans",
+        navService: "Service",
+        navDesign: "We Design For You",
         navFaq: "FAQ",
         footerConnect: "Connect with Us",
         footerRights: "© 2024 NexusRePlay. All rights reserved."
@@ -1481,14 +1497,12 @@
         benefit3Text: "Elimine 100% dos seus custos de impressão. Lance uma nova oferta em 5 minutos no seu painel, não em 5 dias esperando a gráfica.",
         benefit4Hook: "Modernize a Imagem da Sua Marca",
         benefit4Text: "Mais de 70% dos clientes acreditam que a sinalização digital faz uma marca parecer mais moderna. Projete uma imagem de qualidade e inovação.",
-        solutionsTitle: "Uma Solução para Cada Necessidade",
-        solutionsSubtitle: "Seja para impulsionar seu negócio ou para lançar sua própria marca de sinalização digital, temos o plano perfeito para você.",
-        solution1Title: "Para o seu Negócio",
-        solution1Text: "Ideal para restaurantes, lojas, academias e escritórios que desejam gerenciar suas próprias telas de forma simples e profissional para impulsionar vendas e comunicação.",
-        solution1Button: "Ver Plano Profissional",
-        solution2Title: "Para Agências e Revendedores",
-        solution2Text: "A solução White-Label perfeita para escalar sua oferta de serviços. Ofereça sinalização digital aos seus clientes com sua própria marca, gerenciando tudo a partir de um único painel.",
-        solution2Button: "Conhecer Plano Corporativo",
+        solutionsTitle: "Seu negócio, em todas as telas.",
+        solutionsSubtitle: "Transforme suas TVs em poderosas ferramentas de marketing e comunicação. O NexusRePlay é a solução perfeita para qualquer negócio que queira se destacar.",
+        solutionPoint1: "Atraia mais clientes com promoções visuais impactantes.",
+        solutionPoint2: "Economize em custos de impressão e atualize seu conteúdo instantaneamente.",
+        solutionPoint3: "Melhore a experiência no seu local e reduza a percepção do tempo de espera.",
+        solutionButton: "Ver ideias para o meu negócio",
         useCasesTitle: "Inspire-se com o que você pode alcançar",
         useCasesSubtitle: "Do varejo aos restaurantes, a sinalização digital leva sua mensagem às pessoas certas no momento certo.",
         useCase1Title: "Lojas de Varejo",
@@ -1507,26 +1521,21 @@
         useCase7Text: "Mostre seu portfólio de estilos, promova produtos e ofereça inspiração aos seus clientes enquanto esperam.",
         useCase8Title: "Mercados e Feiras",
         useCase8Text: "Destaque ofertas do dia, informe sobre a origem dos produtos e guie os visitantes pelas diferentes barracas.",
-        plansTitle: "Planos Flexíveis para Crescer com Você",
-        plansSubtitle: "Escolha o plano que se ajusta aos seus objetivos. Sem contratos de longo prazo, cancele quando quiser.",
-        plan1Title: "Plano Profissional",
-        plan1Subtitle: "Ideal para negócios, lojas e empresas que gerenciam suas próprias telas.",
-        planFeatureRemote: "Gerenciamento Remoto de Conteúdo",
-        planFeatureSchedule: "Programação por Horas, Dias e Grupos",
-        planFeatureLibrary: "Biblioteca de Mídia (Vídeos, Imagens, Áudio)",
-        planFeatureWidgets: "Widgets Dinâmicos (Clima, Relógio, Notícias RSS)",
-        planFeatureQr: "Cardápio Digital com Código QR",
-        planFeatureWeb: "Exibição de Páginas Web e Vídeos do YouTube",
-        planFeatureSupport: "Suporte Técnico",
-        contactButton: "Contato",
-        plan2Title: "Plano Corporativo",
-        plan2Subtitle: "Para agências e revendedores que desejam oferecer o serviço com sua própria marca.",
-        plan2Includes: "Tudo do Plano Profissional, e mais:",
-        planFeatureWhitelabel: "100% Marca Branca: Use seu próprio logo e domínio.",
-        planFeatureReseller: "Painel de Revendedor para criar e gerenciar clientes.",
-        planFeatureResources: "Alocação de Recursos (telas e armazenamento).",
-        planFeaturePricing: "Modelo de Negócio Próprio: Defina seus próprios preços.",
-        planFeaturePrioritySupport: "Suporte Prioritário para Parceiros.",
+        serviceFeaturesTitle: "Uma Solução Completa para sua Comunicação Visual",
+        serviceFeaturesSubtitle: "Todas as ferramentas que você precisa para gerenciar suas telas de forma profissional, centralizada e sem complicações.",
+        planFeatureRemoteTitle: "Gestão Remota",
+        planFeatureRemote: "Atualize suas telas de qualquer lugar do mundo.",
+        planFeatureScheduleTitle: "Programação Avançada",
+        planFeatureSchedule: "Defina o que e quando é exibido por horas, dias e grupos.",
+        planFeatureLibraryTitle: "Biblioteca Multimídia",
+        planFeatureLibrary: "Organize seus vídeos, imagens e arquivos de áudio.",
+        planFeatureWidgetsTitle: "Widgets Dinâmicos",
+        planFeatureWidgets: "Enriqueça seu conteúdo com Clima, Relógio e Notícias RSS.",
+        planFeatureQrTitle: "Cardápio Digital QR",
+        planFeatureQr: "Exiba conteúdo interativo nos celulares de seus clientes.",
+        planFeatureWebTitle: "Conteúdo da Web",
+        planFeatureWeb: "Integre páginas da web e vídeos do YouTube em suas playlists.",
+        contactButton: "Solicitar uma Demo",
         serviceTitle: "Sem tempo para criar? Nós fazemos por você.",
         serviceSubtitle: "Dedique-se ao seu negócio enquanto nossa equipe de criativos produz conteúdo visual que captura olhares e gera resultados.",
         serviceFeature1: "Vídeos promocionais e animações de logo.",
@@ -1561,7 +1570,8 @@
         navFeatures: "Recursos",
         navBenefits: "Benefícios",
         navUseCases: "Casos de Uso",
-        navPlans: "Planos",
+        navService: "Serviço",
+        navDesign: "Nós Criamos para Você",
         navFaq: "FAQ",
         footerConnect: "Conecte-se Conosco",
         footerRights: "© 2024 NexusRePlay. Todos os direitos reservados."
