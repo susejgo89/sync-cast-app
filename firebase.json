@@ -17,12 +17,12 @@
     ],
     "rewrites": [
       {
-        "source": "/",
-        "destination": "/landing/index.html"
+        "source": "/@(dashboard|media|playlists|music-playlists|screens|groups|admin){,/**}",
+        "destination": "/app.html"
       },
       {
-        "source": "/[!/](**)",
-        "destination": "/app.html"
+        "source": "**",
+        "destination": "/landing/index.html"
       }
     ]
   }

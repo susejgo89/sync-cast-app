@@ -59,7 +59,7 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
             .finally(() => {
                 deleteDoc(doc(db, "media", docId));
             });
-    }
+    };
 
     fileUploadInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -83,7 +83,7 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
     // --- CORRECCIÓN CLAVE ---
     // Usamos 'userId', que es el parámetro que recibe la función initMediaView.
     // La variable 'currentUserId' no existe en este archivo.
-    uploadFile(file, userId); 
+    uploadFile(file); 
 });
 
     const q = query(collection(db, 'media'), where('userId', '==', userId));

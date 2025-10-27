@@ -550,38 +550,46 @@ function displayMedia(item) {
         const durationInSeconds = item.duration || 10;
         setTimeout(playNextItem, durationInSeconds * 1000);
 
-    } else if (item.type.startsWith('video')) {
-        // Pausamos la música de fondo para dar prioridad al audio del video.
-        if (!audioPlayer.paused) {
-            audioPlayer.pause();
-        }
+    } else if (item.type.startsWith('video')) { // Videos nativos (MP4, etc.)
+        if (!audioPlayer.paused) audioPlayer.pause();
 
         const video = document.createElement('video');
         video.src = item.url;
         video.className = 'w-full h-full object-contain';
         video.autoplay = true;
-        video.muted = false; // Permitimos el sonido del video
+        video.muted = false;
         
         const resumeMusicAndPlayNext = () => {
-            if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
-                audioPlayer.play().catch(e => console.error("Error al reanudar audio:", e));
-            }
+            if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) audioPlayer.play().catch(e => console.error("Error al reanudar audio:", e));
             playNextItem();
         };
         
         video.onended = resumeMusicAndPlayNext;
-        video.onerror = () => {
-            console.error("Error al cargar o reproducir el video:", item.url);
-            resumeMusicAndPlayNext(); // Si hay un error, también reanudamos y pasamos al siguiente.
-        };
+        video.onerror = () => { console.error("Error al cargar o reproducir el video:", item.url); resumeMusicAndPlayNext(); };
         
         contentScreen.appendChild(video);
 
-    } else if (item.type === 'youtube' || item.type === 'iframe') {
-        // Si hay música de fondo, la pausamos para dar prioridad a la web/video.
-        if (!audioPlayer.paused) {
-            audioPlayer.pause();
-        }
+    } else if (item.type === 'youtube') {
+        if (!audioPlayer.paused) audioPlayer.pause();
+        const videoId = new URL(item.url).searchParams.get('v');
+        if (!videoId) { playNextItem(); return; }
+
+        const playerContainer = document.createElement('div');
+        playerContainer.id = 'youtube-player-' + new Date().getTime();
+        playerContainer.className = 'w-full h-full';
+        contentScreen.appendChild(playerContainer);
+
+        new YT.Player(playerContainer.id, {
+            videoId: videoId,
+            playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'showinfo': 0, 'mute': 0 },
+            events: {
+                'onReady': (event) => event.target.playVideo(),
+                'onStateChange': (event) => { if (event.data === YT.PlayerState.ENDED) playNextItem(); }
+            }
+        });
+
+    } else if (item.type === 'iframe') {
+        if (!audioPlayer.paused) audioPlayer.pause();
 
         const iframe = document.createElement('iframe');
         iframe.src = item.url;
@@ -594,7 +602,7 @@ function displayMedia(item) {
         contentScreen.appendChild(iframe);
 
         // Pasamos al siguiente item después de la duración especificada
-        const durationInSeconds = item.duration || 15; // 15 segundos por defecto
+        const durationInSeconds = item.duration || 15;
         setTimeout(playNextItem, durationInSeconds * 1000);
     }
 }

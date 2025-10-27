@@ -326,7 +326,7 @@ function handleQrCodeWidget(screenId, settings) {
 
     if (show && enabled) {
         qrContainer.innerHTML = ''; // Limpia el QR anterior para evitar duplicados
-        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?screenId=${screenId}`, width: 128, height: 128 });no 
+        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?screenId=${screenId}`, width: 128, height: 128 });
         
         // Usa el texto personalizado si existe, si no, usa el de las traducciones.
         const displayText = text && text.trim() !== '' ? text : (translations[lang]?.scanForMenu || "Escanea para más info");
@@ -591,6 +591,10 @@ function playNextItem() { // Ya no necesita ser 'async'
 
 // Muestra un archivo (imagen o video) en la pantalla
 function displayMedia(item) {
+    // Prepara el nuevo contenido con opacidad 0
+    const newContent = document.createElement('div');
+    newContent.className = 'w-full h-full absolute top-0 left-0 transition-opacity duration-500 ease-in-out opacity-0';
+
     contentScreen.innerHTML = ''; 
 
     if (item.type.startsWith('image')) {
@@ -610,10 +614,18 @@ function displayMedia(item) {
 
         const img = document.createElement('img');
         img.src = item.url;
-        img.className = 'w-full h-full object-contain';
-        contentScreen.appendChild(img);
+        img.className = 'w-full h-full object-contain'; // object-contain para que se vea completa
+        newContent.appendChild(img);
+        contentScreen.appendChild(newContent);
         
         const durationInSeconds = item.duration || 10;
+
+        // Una vez que la imagen carga, la hacemos visible
+        img.onload = () => {
+            setTimeout(() => { newContent.style.opacity = 1; }, 100); // Pequeño delay para asegurar la transición
+        };
+        img.onerror = () => playNextItem(); // Si la imagen no carga, pasa a la siguiente
+
         setTimeout(playNextItem, durationInSeconds * 1000);
 
     } else if (item.type.startsWith('video')) {
@@ -625,10 +637,18 @@ function displayMedia(item) {
         const video = document.createElement('video');
         // Añadimos un parámetro único para evitar errores de caché del navegador (net::ERR_CACHE_OPERATION_NOT_SUPPORTED)
         video.src = `${item.url}&_cacheBust=${new Date().getTime()}`;
-        video.className = 'w-full h-full object-contain';
+        video.className = 'w-full h-full object-contain'; // object-contain para que se vea completo
         video.autoplay = true;
         video.muted = false; // Permitimos el sonido del video
         
+        newContent.appendChild(video);
+        contentScreen.appendChild(newContent);
+
+        // Hacemos el video visible solo cuando realmente empieza a reproducirse
+        video.addEventListener('playing', () => {
+            newContent.style.opacity = 1;
+        }, { once: true });
+
         const resumeMusicAndPlayNext = () => {
             if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
                 audioPlayer.play().catch(e => console.error("Error al reanudar audio:", e));
@@ -641,8 +661,6 @@ function displayMedia(item) {
             console.error("Error al cargar o reproducir el video:", item.url);
             resumeMusicAndPlayNext(); // Si hay un error, también reanudamos y pasamos al siguiente.
         };
-        
-        contentScreen.appendChild(video);
 
     } else if (item.type === 'weather') {
         // Si hay música de fondo, la reanudamos si estaba pausada.
@@ -653,7 +671,9 @@ function displayMedia(item) {
         const weatherContainer = document.createElement('div');
         weatherContainer.className = 'w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600 text-white p-8';
         weatherContainer.innerHTML = `<div class="text-3xl font-light">Cargando pronóstico...</div>`;
-        contentScreen.appendChild(weatherContainer);
+        newContent.appendChild(weatherContainer);
+        contentScreen.appendChild(newContent);
+        setTimeout(() => { newContent.style.opacity = 1; }, 100);
 
         const fetchAndDisplayWeather = async () => {
             let location = item.location; // Prioridad 1: la ubicación del propio item.
@@ -739,12 +759,14 @@ function displayMedia(item) {
             <div class="font-bold text-8xl md:text-9xl tracking-wider" id="fullscreen-clock-time"></div>
             <div class="font-medium text-2xl md:text-3xl mt-4" id="fullscreen-clock-date"></div>
         `;
-        contentScreen.appendChild(clockContainer);
+        newContent.appendChild(clockContainer);
+        contentScreen.appendChild(newContent);
+        setTimeout(() => { newContent.style.opacity = 1; }, 100);
 
         const updateFullscreenClock = () => {
             const timeEl = document.getElementById('fullscreen-clock-time');
             const dateEl = document.getElementById('fullscreen-clock-date');
-            if (!timeEl || !dateEl) return;
+            if (!timeEl || !dateEl) return; // Si el elemento ya no existe, no hacemos nada
 
             const now = new Date();
             const options = { hour: '2-digit', minute: '2-digit', hour12: false };
@@ -755,9 +777,11 @@ function displayMedia(item) {
             dateEl.textContent = now.toLocaleDateString(document.documentElement.lang || 'es', { weekday: 'long', day: 'numeric', month: 'long' });
         };
 
+        const clockInterval = setInterval(updateFullscreenClock, 1000);
         updateFullscreenClock(); // Primera llamada
         const durationInSeconds = item.duration || 10;
-        setTimeout(playNextItem, durationInSeconds * 1000);
+        // Limpiamos el intervalo cuando el item termina para no dejar procesos corriendo
+        setTimeout(() => { clearInterval(clockInterval); playNextItem(); }, durationInSeconds * 1000);
 
     } else if (item.type === 'qrcode') {
         // Si hay música de fondo, la reanudamos si estaba pausada.
@@ -773,7 +797,9 @@ function displayMedia(item) {
         qrTextEl.className = 'text-3xl md:text-4xl font-semibold mt-8 text-center';
 
         qrContainer.append(qrCodeEl, qrTextEl);
-        contentScreen.appendChild(qrContainer);
+        newContent.appendChild(qrContainer);
+        contentScreen.appendChild(newContent);
+        setTimeout(() => { newContent.style.opacity = 1; }, 100);
 
         const screenId = localStorage.getItem('nexusplay_screen_id');
         if (screenId) {
@@ -795,26 +821,94 @@ function displayMedia(item) {
         const durationInSeconds = item.duration || 15;
         setTimeout(playNextItem, durationInSeconds * 1000);
 
-    } else if (item.type === 'youtube' || item.type === 'iframe') {
-        // Si hay música de fondo, la pausamos para dar prioridad a la web/video.
-        if (!audioPlayer.paused) {
-            audioPlayer.pause();
-        }
+    } else if (item.type === 'youtube') {
+        // Si hay música de fondo, la pausamos.
+        if (!audioPlayer.paused) audioPlayer.pause();
 
+        const videoId = new URL(item.url).searchParams.get('v');
+        if (videoId) {
+            const playerContainer = document.createElement('div');
+            playerContainer.id = 'youtube-player-' + new Date().getTime(); // ID único
+            playerContainer.className = 'w-full h-full';
+            newContent.appendChild(playerContainer);
+            contentScreen.appendChild(newContent);
+
+            const createPlayer = () => {
+                let hasUnmuted = false; // Flag para asegurar que solo quitamos el silencio una vez.
+
+                new YT.Player(playerContainer.id, {
+                    videoId: videoId,
+                    // IMPORTANTE: Forzamos el inicio en silencio (mute: 1) para garantizar el autoplay.
+                    // Luego intentaremos quitar el silencio en el evento 'onStateChange'.
+                    playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'showinfo': 0, 'loop': 0, 'mute': 1 },
+                    events: {
+                        'onReady': (event) => {
+                            // En 'onReady', solo nos aseguramos de que el video se reproduzca y se muestre.
+                            event.target.playVideo();
+                            setTimeout(() => { newContent.style.opacity = 1; }, 100);
+                        },
+                        'onStateChange': (event) => {
+                            // --- ESTA ES LA LÓGICA CLAVE ---
+                            // Cuando el video realmente empieza a reproducirse (estado PLAYING)...
+                            if (event.data === YT.PlayerState.PLAYING && !hasUnmuted) {
+                                // ...intentamos quitar el silencio y subir el volumen.
+                                event.target.unMute();
+                                event.target.setVolume(100);
+                                hasUnmuted = true; // Marcamos que ya lo hemos intentado.
+                            }
+                            // Cuando el video termina, pasamos al siguiente.
+                            else if (event.data === YT.PlayerState.ENDED) {
+                                playNextItem();
+                            }
+                        }
+                    }
+                });
+            };
+
+            // Usamos la cola para asegurarnos que la API de YouTube esté lista.
+            if (window.isYouTubeApiReady) {
+                createPlayer();
+            } else {
+                window.youtubePlayerQueue.push(createPlayer);
+            }
+        } else {
+            // Si la URL de YouTube no es válida, simplemente pasamos al siguiente.
+            playNextItem();
+        }
+    } else if (item.type === 'iframe') {
+        if (!audioPlayer.paused) audioPlayer.pause();
         const iframe = document.createElement('iframe');
         iframe.src = item.url;
-        // Añadimos atributos de seguridad y para permitir autoplay
         iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allow', 'autoplay; encrypted-media');
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
         iframe.setAttribute('allowfullscreen', 'true');
         iframe.className = 'w-full h-full';
 
-        contentScreen.appendChild(iframe);
+        newContent.appendChild(iframe);
+        contentScreen.appendChild(newContent);
+        setTimeout(() => { newContent.style.opacity = 1; }, 100);
 
-        // Pasamos al siguiente item después de la duración especificada
-        const durationInSeconds = item.duration || 15; // 15 segundos por defecto
+        const durationInSeconds = item.duration || 15;
         setTimeout(playNextItem, durationInSeconds * 1000);
     }
+}
+
+// --- Carga de la API de YouTube ---
+window.youtubePlayerQueue = []; // Cola de reproductores a crear
+window.isYouTubeApiReady = false;
+window.onYouTubeIframeAPIReady = function() {
+    console.log("YouTube IFrame API Ready.");
+    window.isYouTubeApiReady = true;
+    // Procesa todos los reproductores que estaban en espera
+    window.youtubePlayerQueue.forEach(playerFunc => playerFunc());
+    window.youtubePlayerQueue = []; // Limpia la cola
+};
+
+function loadYouTubeAPI() {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 }
 
 // Función para mostrar mensajes en la pantalla de contenido (ej. errores)
@@ -943,6 +1037,9 @@ function sendHeartbeat(screenId) {
 function init() {
     const userLang = navigator.language.split('-')[0];
     setLanguage(userLang);
+
+    // Cargamos la API de YouTube
+    loadYouTubeAPI();
 
     // Comprobamos si el dispositivo ya está enlazado
     const savedScreenId = localStorage.getItem('nexusreplay_screen_id');
