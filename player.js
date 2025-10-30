@@ -581,12 +581,14 @@ function playNextItem() { // Ya no necesita ser 'async'
     // Obtenemos el objeto completo del item directamente del array
     const itemData = currentPlaylistItems[currentItemIndex];
 
+    // ¡CORRECCIÓN CLAVE 1! Incrementamos el índice ANTES de mostrar el medio.
+    // Así, si displayMedia falla y llama a playNextItem, el índice ya habrá avanzado.
+    currentItemIndex++;
+
     // Verificamos que el objeto exista y lo mostramos
     if (itemData) {
         displayMedia(itemData);
     }
-
-    currentItemIndex++;
 }
 
 // Muestra un archivo (imagen o video) en la pantalla
@@ -649,17 +651,20 @@ function displayMedia(item) {
             newContent.style.opacity = 1;
         }, { once: true });
 
-        const resumeMusicAndPlayNext = () => {
-            if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
-                audioPlayer.play().catch(e => console.error("Error al reanudar audio:", e));
-            }
+        // Usamos la función unificada para reanudar la música y pasar al siguiente item.
+        video.onended = () => {
+            // No es necesario llamar a resumeMusicAndPlayNext() aquí,
+            // porque el onended del video ya se encarga de llamar a playNextItem()
+            // y la lógica de reanudación está en el tipo 'image' o similar.
+            // La lógica actual ya pausa la música para el video y la reanuda para la imagen.
             playNextItem();
         };
-        
-        video.onended = resumeMusicAndPlayNext;
-        video.onerror = () => {
-            console.error("Error al cargar o reproducir el video:", item.url);
-            resumeMusicAndPlayNext(); // Si hay un error, también reanudamos y pasamos al siguiente.
+        // ¡CORRECCIÓN CLAVE! Rompemos el bucle infinito.
+        // Si un video falla, en lugar de llamar a playNextItem() inmediatamente,
+        // lo hacemos después de un breve instante. Esto evita el "Maximum call stack size exceeded".
+        video.onerror = () => { 
+            console.error("Error al cargar o reproducir el video, saltando al siguiente:", item.url); 
+            setTimeout(playNextItem, 100); 
         };
 
     } else if (item.type === 'weather') {
@@ -825,8 +830,12 @@ function displayMedia(item) {
         // Si hay música de fondo, la pausamos.
         if (!audioPlayer.paused) audioPlayer.pause();
 
-        const videoId = new URL(item.url).searchParams.get('v');
-        if (videoId) {
+        // ¡CORRECCIÓN CLAVE 2! Expresión regular para extraer el ID de cualquier formato de URL de YouTube
+        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const match = item.url.match(youtubeRegex);
+        const videoId = match ? match[1] : null;
+
+        if (videoId) { // Ahora esto funcionará con URLs de tipo "embed"
             const playerContainer = document.createElement('div');
             playerContainer.id = 'youtube-player-' + new Date().getTime(); // ID único
             playerContainer.className = 'w-full h-full';
@@ -850,15 +859,31 @@ function displayMedia(item) {
                         'onStateChange': (event) => {
                             // --- ESTA ES LA LÓGICA CLAVE ---
                             // Cuando el video realmente empieza a reproducirse (estado PLAYING)...
-                            if (event.data === YT.PlayerState.PLAYING && !hasUnmuted) {
+                            if (event.data === YT.PlayerState.PLAYING) {
+                                // ¡CORRECCIÓN CLAVE! Pausamos la música de fondo aquí, justo cuando el video empieza.
+                                if (!audioPlayer.paused) audioPlayer.pause();
+
                                 // ...intentamos quitar el silencio y subir el volumen.
-                                event.target.unMute();
-                                event.target.setVolume(100);
-                                hasUnmuted = true; // Marcamos que ya lo hemos intentado.
+                                if (!hasUnmuted) {
+                                    event.target.unMute();
+                                    event.target.setVolume(100);
+                                    hasUnmuted = true; // Marcamos que ya lo hemos intentado.
+                                }
+                                // VERIFICACIÓN: Comprobamos si el navegador nos ha ignorado.
+                                setTimeout(() => {
+                                    if (event.target.isMuted()) {
+                                        console.warn("El navegador bloqueó el sonido automático de YouTube. Mostrando overlay.");
+                                        showAudioOverlay();
+                                    }
+                                }, 500); // Damos un pequeño margen para que el navegador procese el unmute.
                             }
                             // Cuando el video termina, pasamos al siguiente.
                             else if (event.data === YT.PlayerState.ENDED) {
-                                playNextItem();
+                                // ¡CORRECCIÓN! Reanudamos la música de fondo antes de pasar al siguiente item.
+                                if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
+                                    audioPlayer.play().catch(e => console.error("Error al reanudar audio tras YouTube:", e));
+                                }
+                                playNextItem(); // Ahora sí, pasamos al siguiente.
                             }
                         }
                     }
