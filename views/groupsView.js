@@ -299,8 +299,15 @@ export function initGroupsView(userId, langGetter, screensGetter, playlistsGette
                 if (e.target.checked) {
                     const groupSnap = await getDoc(groupRef);
                     const groupData = groupSnap.data();
-                    // Marcamos la pantalla para que sepa que está gestionada por un grupo.
-                    await updateDoc(screenRef, { managedByGroup: true, ...groupData });
+                    // Marcamos la pantalla para que sepa que está gestionada por un grupo
+                    // y le pasamos SOLO la configuración relevante, sin sobreescribir su nombre.
+                    await updateDoc(screenRef, { 
+                        managedByGroup: true,
+                        playlistId: groupData.playlistId || null,
+                        musicPlaylistId: groupData.musicPlaylistId || null,
+                        schedulingMode: groupData.schedulingMode || 'simple',
+                        scheduleRules: groupData.scheduleRules || []
+                    });
                 } else {
                     // Si se quita del grupo, la pantalla vuelve a su configuración individual.
                     // Reseteamos los campos que heredaba del grupo.

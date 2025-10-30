@@ -386,15 +386,26 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                 const visualMedia = allUserMedia.filter(media => !media.type.startsWith('audio/'));
                 qrContentMediaLibrary.innerHTML = '';
                 visualMedia.forEach(media => {
+                    const isVideo = media.type.startsWith('video');
                     const isSelected = existingIds.includes(media.id);
                     const card = document.createElement('div');
-                    card.className = `qr-media-card ${isSelected ? 'selected' : ''}`;
+                    // Usamos la misma clase que en el otro modal de QR para reutilizar los estilos
+                    card.className = `qr-media-card-selectable relative rounded-lg overflow-hidden shadow-sm cursor-pointer border-2 border-transparent ${isSelected ? 'selected' : ''}`;
+
+                    // CORRECCIÓN 2: Usar <video> para miniaturas de video, <img> para imágenes.
+                    const thumbElement = isVideo
+                        ? `<video src="${media.url}#t=0.5" class="w-full h-32 object-cover pointer-events-none" muted playsinline></video>`
+                        : `<img src="${media.url}" class="w-full h-32 object-cover pointer-events-none">`;
+
                     card.innerHTML = `
-                        <img src="${media.url}" class="w-full h-32 object-cover">
-                        <div class="checkbox-overlay"></div>
+                        ${thumbElement}
+                        <div class="absolute inset-0 bg-black bg-opacity-0 transition-all duration-200 flex items-center justify-center check-overlay">
+                            <svg class="w-10 h-10 text-white opacity-0 scale-75 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
                         <input type="checkbox" data-media-id="${media.id}" class="hidden" ${isSelected ? 'checked' : ''}>
                     `;
-                    card.addEventListener('click', () => card.classList.toggle('selected'));
+                    // CORRECCIÓN 1: La lógica de selección ya existe en script.js, solo necesitamos la estructura correcta.
+                    // El listener principal en script.js se encargará del toggle.
                     qrContentMediaLibrary.appendChild(card);
                 });
                 qrContentModal.classList.add('active');

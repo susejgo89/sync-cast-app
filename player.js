@@ -807,7 +807,10 @@ function displayMedia(item) {
         setTimeout(() => { newContent.style.opacity = 1; }, 100);
 
         const screenId = localStorage.getItem('nexusplay_screen_id');
-        if (screenId) {
+        // CORRECCIÓN: La lógica para determinar la URL del QR estaba mal.
+        // Ahora se comprueba correctamente si el tipo es 'url' y tiene contenido,
+        // o si es 'menu' para construir la URL del visor de menús.
+        if (item) {
             const qrTargetUrl = (item.qrType === 'url' && item.qrUrl)
                 ? item.qrUrl
                 : `${window.location.origin}/viewer.html?qrMenuId=${item.qrMenuId}`;
