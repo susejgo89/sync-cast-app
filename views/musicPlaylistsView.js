@@ -32,7 +32,7 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
     let activePlaylistId = null;
     let userMusicPlaylists = [];
     let listenersAttached = false;
-    let currentUserId = userId;
+    let currentUserId = userId; // CORRECCIÓN: Asignar el userId recibido a la variable de estado del módulo.
     let draggedItem = null; 
 
     // --- Lógica de Renderizado y Manipulación de Items ---
@@ -164,7 +164,7 @@ async function renderPlaylistItems(itemIds) {
         if (!playlistName) return;
 
         await addDoc(collection(db, 'musicPlaylists'), {
-            userId: userId,
+            userId: currentUserId, // CORRECCIÓN: Usar la variable correcta que sí tiene el ID del usuario.
             name: playlistName,
             items: [],
             createdAt: serverTimestamp()

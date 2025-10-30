@@ -273,7 +273,8 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
             // Creamos el documento en qrContents por adelantado para evitar errores de permisos
             const qrContentRef = doc(db, 'qrMenus', qrItem.qrMenuId);
             await setDoc(qrContentRef, {
-                userId: currentUserId,
+                // CORRECCIÓN: Añadimos el userId para cumplir con las reglas de seguridad.
+                userId: currentUserId, 
                 items: []
             });
 

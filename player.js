@@ -41,7 +41,7 @@ function showAudioOverlay() {
 audioOverlay.addEventListener('click', () => {
     audioOverlay.style.display = 'none';
     if (currentMusicPlaylistItems.length > 0 && audioPlayer.paused) {
-        playNextMusicItem();
+        playNextMusicItem(); // Reanuda la música de fondo si estaba pausada
     }
 }, { once: true });
 
@@ -845,6 +845,9 @@ function displayMedia(item) {
             const createPlayer = () => {
                 let hasUnmuted = false; // Flag para asegurar que solo quitamos el silencio una vez.
 
+                // Limpiamos cualquier callback anterior al crear un nuevo reproductor
+                window.unmuteYoutubeCallback = null;
+
                 new YT.Player(playerContainer.id, {
                     videoId: videoId,
                     // IMPORTANTE: Forzamos el inicio en silencio (mute: 1) para garantizar el autoplay.
@@ -873,6 +876,12 @@ function displayMedia(item) {
                                 setTimeout(() => {
                                     if (event.target.isMuted()) {
                                         console.warn("El navegador bloqueó el sonido automático de YouTube. Mostrando overlay.");
+                                        // Guardamos la función para quitar el silencio en una variable global
+                                        // para que el overlay pueda llamarla.
+                                        window.unmuteYoutubeCallback = () => {
+                                            event.target.unMute();
+                                            event.target.setVolume(100);
+                                        };
                                         showAudioOverlay();
                                     }
                                 }, 500); // Damos un pequeño margen para que el navegador procese el unmute.
