@@ -10,7 +10,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         import { initScreensView } from './views/screensView.js'; 
         import { initMusicPlaylistsView } from './views/musicPlaylistsView.js';
         import { initGroupsView } from './views/groupsView.js';
-        import { initRouter, navigate } from './utils/router.js';
+        import { initRouter, showPage, showMandatoryPage } from './utils/router.js';
         import { initAdminView } from './views/adminView.js';
         import { createMediaCard } from './components/mediaCard.js';
         
@@ -39,6 +39,29 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         }
         
         document.addEventListener('DOMContentLoaded', async () => {
+            // --- EVENT LISTENER DELEGADO PARA FORMULARIOS DE PERFIL ---
+            // Este listener se añade al body y escucha los 'submit' que ocurran dentro.
+            // Así, aunque los formularios se creen dinámicamente, siempre funcionará.
+            document.body.addEventListener('submit', async (e) => {
+                // Comprobamos si el formulario que se envió es uno de los de perfil.
+                if (e.target.id === 'account-form' || e.target.id === 'complete-profile-form') {
+                    e.preventDefault(); // ¡LA LÍNEA MÁS IMPORTANTE! Previene la recarga.
+                    const form = e.target;
+                    const user = auth.currentUser;
+                    if (!user) return;
+
+                    const profileData = {
+                        fullName: form.querySelector('#profile-fullName').value,
+                        taxId: form.querySelector('#profile-taxId').value,
+                        phone: form.querySelector('#profile-phone').value,
+                        address: form.querySelector('#profile-address').value,
+                        country: form.querySelector('#profile-country').value,
+                        city: form.querySelector('#profile-city').value,
+                        profileComplete: true
+                    };
+                    await saveProfileData(user, profileData, form.id);
+                }
+            });
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -166,47 +189,42 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     document.getElementById('register-form-container').style.display = 'none';
     document.getElementById('verify-email-container').style.display = 'none';
 
-    if (user && user.emailVerified) {
-        // CASO 1: Usuario logueado Y VERIFICADO -> Muestra el dashboard
-        // (Tu código original para mostrar el dashboard va aquí)
+    if (user) { // Usuario ha iniciado sesión
         currentUserId = user.uid;
-        authContainer.style.display = 'none';
-
-        // --- LÓGICA DE ROLES ---
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const adminNavLink = document.getElementById('admin-nav-link');
-            
-            if (userData.role === 'reseller') {
-                adminNavLink.classList.remove('hidden');
-                // Solo aplicamos la marca blanca si el usuario es un reseller.
-                await applyWhiteLabeling();
-            } else {
-                adminNavLink.classList.add('hidden');
+        if (!user.emailVerified) {
+            // CASO 1: Usuario logueado PERO NO VERIFICADO -> Muestra el mensaje
+            authContainer.style.display = 'flex';
+            dashboardContainer.style.display = 'none';
+            document.getElementById('verify-email-container').style.display = 'block';
+            const logoutVerificationBtn = document.getElementById('logout-verification-button');
+            if (logoutVerificationBtn) {
+                logoutVerificationBtn.onclick = () => auth.signOut();
             }
-
-            dashboardContainer.style.display = 'flex';
-            userInfo.innerHTML = `<div class="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center font-bold text-white mr-3 flex-shrink-0">${user.email.charAt(0).toUpperCase()}</div><span class="text-sm font-medium text-white truncate" title="${user.email}">${user.email}</span>`;
-            loadInitialData(user.uid, userData.role);
+        } else {
+            // CASO 2 y 3: Usuario VERIFICADO (perfil completo o incompleto)
+            if (window.location.pathname.includes('landing')) {
+                window.location.href = '/app.html';
+            } else if (userDoc.exists() && userDoc.data().profileComplete) {
+                // CASO 2: Ya estamos en app.html y el perfil está COMPLETO -> Carga la app
+                console.log("Perfil completo. Cargando app...");
+                authContainer.style.display = 'none';
+                dashboardContainer.style.display = 'flex';
+                userInfo.innerHTML = `<div class="w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center font-bold text-white mr-3 flex-shrink-0 pointer-events-none">${user.email.charAt(0).toUpperCase()}</div><span class="text-sm font-medium text-white truncate pointer-events-none" title="${user.email}">${user.email}</span>`;
+                initializeAppForUser(user, userDoc.data());
+            } else if (!window.location.pathname.includes('landing')) {
+                // CASO 3: Ya estamos en app.html y el perfil está INCOMPLETO -> Muestra formulario obligatorio
+                console.log("Perfil incompleto. Mostrando formulario obligatorio.");
+                authContainer.style.display = 'none';
+                dashboardContainer.style.display = 'none';
+                showMandatoryPage('complete-profile-section');
+                setupProfileForms(user);
+            }
         }
-
-    } else if (user && !user.emailVerified) {
-        // CASO 2: Usuario logueado PERO NO VERIFICADO -> Muestra el mensaje
-        authContainer.style.display = 'flex';
-        dashboardContainer.style.display = 'none';
-        document.getElementById('verify-email-container').style.display = 'block';
-        
-        const logoutVerificationBtn = document.getElementById('logout-verification-button');
-        if (logoutVerificationBtn) {
-            logoutVerificationBtn.onclick = () => auth.signOut();
-        }
-
     } else {
-        // CASO 3: Usuario NO logueado -> Muestra el login
-        // (Tu código original para cuando no hay usuario va aquí)
+        // CASO 4: Usuario NO logueado -> Muestra el login
         document.body.classList.add('auth-bg');
         currentUserId = null;
         authContainer.style.display = 'flex';
@@ -226,7 +244,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     }
 
     // Inicializamos el router DESPUÉS de que la lógica de autenticación haya decidido qué mostrar.
-    initRouter();
+    if (dashboardContainer.style.display !== 'none') initRouter();
 });
         
         const showMessage = (message, isError = false) => {
@@ -261,7 +279,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 ownerId: null, // Es una cuenta principal, no pertenece a un reseller
                 status: 'active', // Estado inicial
                 screenLimit: 3, // Límite de pantallas por defecto
-                storageLimit: 1 * 1024 * 1024 * 1024 // 1 GB de almacenamiento por defecto en bytes
+                storageLimit: 1 * 1024 * 1024 * 1024, // 1 GB de almacenamiento por defecto en bytes
+                profileComplete: false // ¡CLAVE! Marcamos el perfil como incompleto.
             }).then(() => {
                 // Una vez creado el perfil, enviamos el email de verificación
                 sendEmailVerification(user)
@@ -397,6 +416,105 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
             }
         }
+
+        /**
+         * Configura los formularios de perfil (obligatorio y "Mi Cuenta").
+         * @param {object} user - El objeto de usuario de Firebase Auth.
+         */
+        async function setupProfileForms(user) {
+            const template = document.getElementById('account-form-template').content.cloneNode(true);
+            const accountForm = document.getElementById('account-form');
+            const completeProfileForm = document.getElementById('complete-profile-form');
+
+            // Cargar datos existentes
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userData = userDoc.exists() ? userDoc.data() : {};
+
+            // Función para configurar un formulario individualmente
+            const configureForm = (formElement) => {
+                if (!formElement) return;
+
+                // 1. Limpiamos el formulario y lo llenamos con la plantilla
+                formElement.innerHTML = '';
+                formElement.appendChild(template.cloneNode(true));
+
+                // 2. Rellenamos los datos del usuario
+                formElement.querySelector('#profile-email').value = user.email;
+                formElement.querySelector('#profile-fullName').value = userData.fullName || '';
+                formElement.querySelector('#profile-taxId').value = userData.taxId || '';
+                formElement.querySelector('#profile-phone').value = userData.phone || '';
+                formElement.querySelector('#profile-address').value = userData.address || '';
+                formElement.querySelector('#profile-country').value = userData.country || '';
+                formElement.querySelector('#profile-city').value = userData.city || '';
+
+                // 3. Rellenamos los placeholders con la traducción correcta
+                const lang = currentLang;
+                formElement.querySelector('#profile-fullName').placeholder = translations[lang].formFullName;
+                formElement.querySelector('#profile-taxId').placeholder = translations[lang].formTaxId;
+                formElement.querySelector('#profile-email').placeholder = translations[lang].emailPlaceholder;
+                formElement.querySelector('#profile-phone').placeholder = translations[lang].formPhone;
+                formElement.querySelector('#profile-address').placeholder = translations[lang].formAddress;
+                formElement.querySelector('#profile-country').placeholder = translations[lang].formCountry;
+                formElement.querySelector('#profile-city').placeholder = translations[lang].formCity;
+            };
+
+            configureForm(accountForm);
+            configureForm(completeProfileForm);
+        }
+
+        /**
+         * Guarda los datos del perfil en Firestore y maneja la UI.
+         * @param {object} user - El objeto de usuario de Firebase.
+         * @param {object} profileData - Los datos a guardar.
+         * @param {string} formId - El ID del formulario que se envió.
+         */
+        async function saveProfileData(user, profileData, formId) {
+            const form = document.getElementById(formId);
+            const saveBtn = form.querySelector('button[type="submit"]');
+            const saveBtnText = saveBtn.querySelector('span');
+            const saveBtnIcon = saveBtn.querySelector('#save-btn-icon');
+            
+            const originalBtnText = saveBtnText.textContent;
+            const originalBtnIconHTML = saveBtnIcon.innerHTML;
+
+            saveBtn.disabled = true;
+            saveBtnText.textContent = 'Guardando...';
+            // Opcional: Cambiar a un icono de "cargando"
+            saveBtnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9a9 9 0 0114.13-6.36M20 15a9 9 0 01-14.13 6.36"></path>`;
+            saveBtnIcon.classList.add('animate-spin');
+
+            try {
+                await updateDoc(doc(db, 'users', user.uid), profileData);
+
+                if (formId === 'complete-profile-form') {
+                    window.location.reload(); // Recarga para que la app se inicie
+                } else {
+                    // --- LÓGICA DE FEEDBACK VISUAL ---
+                    saveBtn.classList.remove('bg-violet-600', 'hover:bg-violet-700');
+                    saveBtn.classList.add('bg-emerald-500'); // Color verde de éxito
+                    saveBtnIcon.classList.remove('animate-spin');
+                    saveBtnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>`; // Icono de check
+                    saveBtnText.textContent = '¡Guardado!';
+
+                    // Después de 2 segundos, restauramos el botón a su estado original
+                    setTimeout(() => {
+                        saveBtn.disabled = false;
+                        saveBtnText.textContent = originalBtnText;
+                        saveBtnIcon.innerHTML = originalBtnIconHTML;
+                        saveBtn.classList.add('bg-violet-600', 'hover:bg-violet-700');
+                        saveBtn.classList.remove('bg-emerald-500');
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error("Error al guardar el perfil:", error);
+                showMessage('Hubo un error al guardar tu perfil.', true);
+                // Restauramos el botón inmediatamente si hay un error
+                saveBtn.disabled = false;
+                saveBtnText.textContent = originalBtnText;
+                saveBtnIcon.innerHTML = originalBtnIconHTML;
+                saveBtnIcon.classList.remove('animate-spin');
+            }
+        }
         
         function loadInitialData(userId, userRole) {
             unsubscribeMedia = initMediaView(userId, () => currentLang, (media) => {
@@ -429,6 +547,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             if (userRole === 'reseller') {
                 adminViewInstance = initAdminView(userId, () => currentLang);
             }
+        }
+
+        async function initializeAppForUser(user, userData) {
+            setupProfileForms(user); // Prepara el formulario de "Mi Cuenta" en segundo plano
+
+            const adminNavLink = document.getElementById('admin-nav-link');
+            
+            if (userData.role === 'reseller') {
+                adminNavLink.classList.remove('hidden');
+                // Solo aplicamos la marca blanca si el usuario es un reseller.
+                await applyWhiteLabeling();
+            } else {
+                adminNavLink.classList.add('hidden');
+            }
+
+            loadInitialData(user.uid, userData.role);
         }
 
         // Listener para abrir el modal de QR desde playlistsView

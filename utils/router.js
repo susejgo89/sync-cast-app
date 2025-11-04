@@ -7,9 +7,12 @@ const navLinks = document.querySelectorAll('.nav-link');
  * Muestra la sección de la página correspondiente a la ruta y actualiza el estado de los enlaces.
  * @param {string} path - La ruta de la URL (ej. '/dashboard').
  */
-function showPage(path) {
+export function showPage(path) {
+    // Limpiamos el prefijo /app/ para obtener el ID de la sección
+    const cleanPath = path.startsWith('/app') ? path.substring(4) : path;
+
     // La ruta por defecto será el dashboard
-    const targetId = path === '/' ? 'dashboard' : path.substring(1);
+    const targetId = cleanPath === '/' || cleanPath === '' ? 'dashboard' : cleanPath.substring(1);
     
     pageSections.forEach(s => s.classList.add('hidden'));
     navLinks.forEach(l => l.classList.remove('bg-neutral-700', 'text-white'));
@@ -38,11 +41,29 @@ function showPage(path) {
 }
 
 /**
+ * Muestra una página obligatoria, ocultando todo lo demás.
+ * Se usa para forzar al usuario a completar su perfil.
+ * @param {string} sectionId - El ID de la sección a mostrar (ej. 'complete-profile-section').
+ */
+export function showMandatoryPage(sectionId) {
+    // Oculta todas las secciones de la página
+    pageSections.forEach(s => s.classList.add('hidden'));
+
+    // Muestra solo la sección obligatoria
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    }
+}
+
+/**
  * Navega a una nueva ruta, actualizando la URL y la vista.
  * @param {string} path - La ruta a la que se quiere navegar.
  */
 export function navigate(path) {
-    history.pushState({}, '', path);
+    // Nos aseguramos de que la ruta en la URL siempre empiece con /app
+    const fullPath = path.startsWith('/app') ? path : `/app${path}`;
+    history.pushState({}, '', fullPath);
     showPage(path);
 }
 

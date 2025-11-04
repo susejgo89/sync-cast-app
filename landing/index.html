@@ -606,6 +606,43 @@
       background-color: #1DA851;
       transform: scale(1.1);
     }
+
+    /* Estilos para el banner de cookies flotante */
+    .cookie-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(33, 37, 41, 0.95); /* Color oscuro, como el footer */
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: white;
+      padding: 1.5rem 0;
+      z-index: 1050; /* Por encima de la mayoría de los elementos */
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+      /* Animación de entrada */
+      transform: translateY(100%);
+      transition: transform 0.5s ease-in-out;
+      visibility: hidden;
+    }
+
+    .cookie-banner.show {
+      transform: translateY(0);
+      visibility: visible;
+    }
+
+    .cookie-title {
+      font-weight: 600;
+    }
+
+    .cookie-text {
+      color: #adb5bd; /* Gris claro para el texto */
+    }
+
+    .cookie-link {
+      color: #ffffff;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -649,7 +686,7 @@
             <img src="https://flagcdn.com/br.svg" width="25" alt="Português" data-lang-id="pt" class="lang-flag">
         </div>
 
-        <a href="/app.html" class="btn btn-outline-light">
+        <a href="../app.html" class="btn btn-outline-light">
           <span data-lang="loginButton">Iniciar Sesión</span>
         </a>
       </div>
@@ -1197,7 +1234,7 @@
     <div class="container text-center text-white py-5">
       <h2 class="display-5 fw-bold" data-lang="ctaTitle">La pregunta no es si puedes invertir. Es si puedes permitirte no estar presente.</h2>
       <p class="lead my-4 mx-auto" style="max-width: 600px;" data-lang="ctaSubtitle">Pongamos tu marca donde las ventas suceden. Agenda una demo y diseñemos una estrategia que convierta la atención en el incremento constante que tus ventas necesitan.</p>
-      <a href="/app.html" class="btn btn-light btn-lg px-5 py-3 text-primary fw-bold text-uppercase mt-3" data-lang="ctaButton">
+      <a href="../app.html" class="btn btn-light btn-lg px-5 py-3 text-primary fw-bold text-uppercase mt-3" data-lang="ctaButton">
         Empezar ahora
       </a>
     </div>
@@ -1212,7 +1249,7 @@
         <!-- Columna 1: Logo y Descripción -->
         <div class="col-md-4 col-lg-5 mb-4">
           <img src="../assets/Sync (vert blan).png" alt="NexusRePlay Logo" height="60" class="mb-3">
-          <p class="text-muted pe-lg-5">La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.</p>
+          <p class="text-white-50 pe-lg-5" data-lang="footerDescription">La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.</p>
         </div>
         <!-- Columna 2: Enlaces de Navegación -->
         <div class="col-md-4 col-lg-3 mb-4">
@@ -1238,7 +1275,9 @@
         </div>
       </div>
       <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
-      <p class="text-muted text-center mb-0" data-lang="footerRights">© 2024 NexusRePlay. Todos los derechos reservados.</p>
+        <p class="text-white-50 mb-3 mb-sm-0" data-lang="footerRights">© 2024 NexusRePlay. Todos los derechos reservados.</p>
+        <a href="privacy-policy.html" class="footer-link" data-lang="footerPrivacy">Política de Privacidad</a>
+      </div>
     </div>
   </footer>
 
@@ -1256,6 +1295,25 @@
     <i class="bi bi-whatsapp fs-4"></i>
   </a>
   
+  <!-- =============================================== -->
+  <!-- =========== BANNER DE COOKIES ================= -->
+  <!-- =============================================== -->
+<div id="cookie-consent-banner" class="cookie-banner">
+  <div class="container">
+      <div class="row align-items-center">
+          <div class="col-lg-8">
+              <h5 class="cookie-title" data-lang="cookieTitle">Este sitio web utiliza cookies</h5>
+              <p class="cookie-text mb-3 mb-lg-0" data-lang="cookieText">
+                  Usamos cookies para personalizar el contenido, analizar nuestro tráfico y mejorar tu experiencia. Al hacer clic en "Aceptar", aceptas nuestro uso de cookies. Puedes obtener más información en nuestra <a href="privacy-policy.html" class="cookie-link" data-lang="cookiePolicyLink">Política de Privacidad</a>.
+              </p>
+          </div>
+          <div class="col-lg-4 d-flex justify-content-lg-end gap-2 mt-3 mt-lg-0">
+              <button id="reject-cookies-btn" class="btn btn-outline-light" data-lang="cookieReject">Rechazar</button>
+              <button id="accept-cookies-btn" class="btn btn-primary" data-lang="cookieAccept">Aceptar</button>
+          </div>
+      </div>
+  </div>
+</div>
 
 
   <!-- Bootstrap JS -->
@@ -1366,7 +1424,14 @@
         navDesign: "Diseñamos por Ti",
         navFaq: "FAQ",
         footerConnect: "Conecta con Nosotros",
-        footerRights: "© 2024 NexusRePlay. Todos los derechos reservados."
+        footerRights: "© 2024 NexusRePlay. Todos los derechos reservados.",
+        footerDescription: "La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.",
+        footerPrivacy: "Política de Privacidad",
+        cookieTitle: "Este sitio web utiliza cookies",
+        cookieText: "Usamos cookies para personalizar el contenido, analizar nuestro tráfico y mejorar tu experiencia. Al hacer clic en \"Aceptar\", aceptas nuestro uso de cookies. Puedes obtener más información en nuestra",
+        cookiePolicyLink: "Política de Privacidad",
+        cookieAccept: "Aceptar",
+        cookieReject: "Rechazar"
       },
       en: {
         loginButton: "Login",
@@ -1470,7 +1535,14 @@
         navDesign: "We Design For You",
         navFaq: "FAQ",
         footerConnect: "Connect with Us",
-        footerRights: "© 2024 NexusRePlay. All rights reserved."
+        footerRights: "© 2024 NexusRePlay. All rights reserved.",
+        footerDescription: "The ultimate platform to manage your visual content easily, remotely, and professionally.",
+        footerPrivacy: "Privacy Policy",
+        cookieTitle: "This website uses cookies",
+        cookieText: "We use cookies to personalize content, analyze our traffic, and improve your experience. By clicking \"Accept\", you agree to our use of cookies. You can learn more in our",
+        cookiePolicyLink: "Privacy Policy",
+        cookieAccept: "Accept",
+        cookieReject: "Reject"
       },
       pt: {
         loginButton: "Entrar",
@@ -1574,7 +1646,14 @@
         navDesign: "Nós Criamos para Você",
         navFaq: "FAQ",
         footerConnect: "Conecte-se Conosco",
-        footerRights: "© 2024 NexusRePlay. Todos os direitos reservados."
+        footerRights: "© 2024 NexusRePlay. Todos os direitos reservados.",
+        footerDescription: "A plataforma definitiva para gerenciar seu conteúdo visual de forma fácil, remota e profissional.",
+        footerPrivacy: "Política de Privacidade",
+        cookieTitle: "Este site usa cookies",
+        cookieText: "Usamos cookies para personalizar o conteúdo, analisar nosso tráfego e melhorar sua experiência. Ao clicar em \"Aceitar\", você concorda com o nosso uso de cookies. Você pode saber mais em nossa",
+        cookiePolicyLink: "Política de Privacidade",
+        cookieAccept: "Aceitar",
+        cookieReject: "Rejeitar"
       }
     };
 
@@ -1704,6 +1783,32 @@
     }, { rootMargin: "-50% 0px -50% 0px" }); // Activa el link cuando la sección está en el centro de la pantalla
 
     sections.forEach(section => spyObserver.observe(section));
+
+    // --- SCRIPT PARA EL BANNER DE COOKIES (EJECUTADO AL FINAL) ---
+    function initCookieBanner() {
+      const cookieBanner = document.getElementById('cookie-consent-banner');
+      const rejectCookiesBtn = document.getElementById('reject-cookies-btn');
+      const acceptCookiesBtn = document.getElementById('accept-cookies-btn');
+
+      if (!cookieBanner || !acceptCookiesBtn || !rejectCookiesBtn) return; // Salir si los elementos no existen
+
+      // Comprobar si el consentimiento ya fue dado
+      if (!localStorage.getItem('cookie_consent_given')) {
+        // Usamos un pequeño timeout para asegurar que la página ha renderizado
+        setTimeout(() => {
+          cookieBanner.classList.add('show');
+        }, 500); // Un pequeño retraso para la animación
+      }
+
+      const handleConsent = () => {
+        localStorage.setItem('cookie_consent_given', 'true');
+        cookieBanner.classList.remove('show');
+      };
+
+      acceptCookiesBtn.addEventListener('click', handleConsent);
+      rejectCookiesBtn.addEventListener('click', handleConsent);
+    }
+    initCookieBanner(); // Llamamos a la función
   </script>
   
 </body>
