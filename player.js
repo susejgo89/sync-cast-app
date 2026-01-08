@@ -6,6 +6,94 @@ import { WEATHER_API_KEY } from './weather-config.js';
 // --- DOM Elements ---
 const pairingScreen = document.getElementById('pairing-screen');
 const contentScreen = document.getElementById('content-screen');
+// --- Inject Responsive Styles for Widgets ---
+const widgetStyles = document.createElement('style');
+widgetStyles.textContent = `
+    .player-widget {
+        position: fixed;
+        left: 0;
+        right: 0;
+        width: 100%;
+        display: none;
+        align-items: center;
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+        transition: bottom 0.3s ease;
+    }
+    #news-widget {
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: #1f2937;
+        padding: 12px 25px;
+        z-index: 1000;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+        height: 60px;
+    }
+    #currency-widget {
+        bottom: 0;
+        background-color: rgba(17, 24, 39, 0.95);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: white;
+        padding: 8px 25px;
+        z-index: 999;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        height: 50px;
+    }
+    .widget-title {
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-right: 15px;
+        text-transform: uppercase;
+        flex-shrink: 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .widget-content {
+        font-weight: 500;
+        overflow: hidden;
+        white-space: nowrap;
+        flex-grow: 1;
+    }
+    #news-content { font-size: 1.2rem; }
+    #currency-content { font-size: 1.1rem; }
+
+    /* --- Portrait Mode (Vertical Screens) --- */
+    @media (orientation: portrait) {
+        #news-widget {
+            height: 90px;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 20px;
+            justify-content: center;
+        }
+        #currency-widget {
+            height: 80px;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 20px;
+            justify-content: center;
+        }
+        .widget-title {
+            margin-right: 0;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            align-self: flex-start;
+        }
+        .widget-content {
+            width: 100%;
+        }
+        #news-content { font-size: 1.1rem; }
+        #currency-content { font-size: 1rem; }
+    }
+`;
+document.head.appendChild(widgetStyles);
+
 const pairingCodeInputs = document.getElementById('pairing-code-inputs');
 const inputs = pairingCodeInputs.querySelectorAll('.pairing-input');
 const pairBtn = document.getElementById('pair-btn');
@@ -146,154 +234,222 @@ async function updateWeather(location, lang) {
     }
 }
 
-// --- News Widget (RSS) ---
+// --- News Widget ---
 const newsWidget = document.createElement('div');
 newsWidget.id = 'news-widget';
-newsWidget.style.cssText = `
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.85); /* Blanco semitransparente (más opaco) */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px); /* Para Safari */
-    color: #1f2937; /* Gris más oscuro para mejor contraste */
-    padding: 12px 25px;
-    font-family: 'Inter', sans-serif;
-    text-shadow: none;
-    transition: opacity 0.5s;
-    display: none; /* Initially hidden, will be flex */
-    align-items: center;
-    z-index: 1000;
-    border-top: 1px solid rgba(255, 255, 255, 0.2); /* Borde superior translúcido */
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1); /* Sombra superior para definir el borde */
-`;
+newsWidget.className = 'player-widget';
 newsWidget.innerHTML = `
-    <h4 id="news-widget-title" style="
-        background-color: #7c3aed;
-        color: white;
-        padding: 6px 16px;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        font-weight: 700;
-        margin-right: 15px;
-        text-transform: uppercase;
-        flex-shrink: 0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        border-bottom: 2px solid #6d28d9;
-    "></h4>
-    <div id="news-content" style="font-size: 1.2rem; font-weight: 500; overflow: hidden; white-space: nowrap; flex-grow: 1;">
-        <span id="news-ticker-item" style="transition: opacity 0.4s ease-in-out; opacity: 1;">Cargando noticias...</span>
+    <h4 id="news-widget-title" class="widget-title" style="background-color: #7c3aed; color: white;"></h4>
+    <div id="news-content" class="widget-content">
+        <span id="news-item" style="transition: opacity 0.4s ease-in-out; opacity: 1;"></span>
     </div>
 `;
 document.body.appendChild(newsWidget);
 
-let newsIntervals = { fetch: null, rotate: null };
+// --- Currency Widget ---
+const currencyWidget = document.createElement('div');
+currencyWidget.id = 'currency-widget';
+currencyWidget.className = 'player-widget';
+currencyWidget.innerHTML = `
+    <h4 id="currency-widget-title" class="widget-title" style="background-color: #059669; color: white;"></h4>
+    <div id="currency-content" class="widget-content">
+        <span id="currency-item" style="transition: opacity 0.4s ease-in-out; opacity: 1;"></span>
+    </div>
+`;
+document.body.appendChild(currencyWidget);
+
+let newsState = { interval: null, fetchInterval: null, items: [], index: 0 };
+let currencyState = { interval: null, fetchInterval: null, items: [], index: 0 };
+
+// Helper para posicionar el widget de monedas dinámicamente
+function updateCurrencyPosition() {
+    const isNewsVisible = newsWidget.style.display !== 'none';
+    const isCurrencyVisible = currencyWidget.style.display !== 'none';
+    
+    if (!isCurrencyVisible) return;
+
+    if (isNewsVisible) {
+        const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+        // Alturas deben coincidir con el CSS
+        const newsHeight = isPortrait ? '90px' : '60px'; 
+        currencyWidget.style.bottom = newsHeight;
+    } else {
+        currencyWidget.style.bottom = '0px';
+    }
+}
+
+window.addEventListener('resize', updateCurrencyPosition);
+
+async function fetchNewsData(url, limit) {
+    const lang = document.documentElement.lang || 'es';
+    const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${url}`
+    ];
+
+    try {
+        let response, data;
+        try {
+            response = await fetch(proxies[0]);
+            if (!response.ok) throw new Error('Proxy 1 failed');
+            data = await response.json();
+        } catch (e) {
+            response = await fetch(proxies[1]);
+            data = await response.json();
+        }
+        
+        const contents = data.contents || data;
+        if (!contents) throw new Error("No content");
+
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(contents, "application/xml");
+        if (xmlDoc.querySelector("parsererror")) throw new Error("InvalidXML");
+
+        let items = Array.from(xmlDoc.querySelectorAll("item"));
+        if (items.length === 0) items = Array.from(xmlDoc.querySelectorAll("entry"));
+        
+        const newNews = items.slice(0, limit).map(item => item.querySelector("title")?.textContent.trim()).filter(Boolean);
+        return newNews.length > 0 ? newNews : [translations[lang]?.rssNoNewsInFeed || "No news found."];
+    } catch (error) {
+        console.error("RSS Error:", error);
+        return [translations[lang]?.rssFetchError || "Error fetching feed."];
+    }
+}
+
+async function fetchCurrencyData(country) {
+    const lang = document.documentElement.lang || 'es';
+    const countryMap = {
+        'VE': 'VES', 'BR': 'BRL', 'CO': 'COP', 'US': 'USD', 
+        'AR': 'ARS', 'PY': 'PYG', 'UY': 'UYU', 'CL': 'CLP', 'MX': 'MXN', 'PE': 'PEN', 'BO': 'BOB'
+    };
+    const flagMap = { 'USD': '🇺🇸', 'EUR': '🇪🇺', 'PYG': '🇵🇾', 'JPY': '🇯🇵', 'ARS': '🇦🇷', 'BRL': '🇧🇷', 'VES': '🇻🇪', 'COP': '🇨🇴', 'UYU': '🇺🇾', 'CLP': '🇨🇱', 'MXN': '🇲🇽', 'PEN': '🇵🇪', 'BOB': '🇧🇴', 'GBP': '🇬🇧' };
+    
+    const localCurrency = countryMap[country || 'PY'] || 'USD';
+    // Monedas a mostrar. Si la local es USD, mostramos otras.
+    let targets = ['USD', 'EUR', 'ARS', 'BRL', 'JPY', 'PYG', 'CLP', 'UYU', 'COP'];
+    if (localCurrency === 'USD') targets = ['EUR', 'GBP', 'JPY', 'BRL', 'MXN', 'CAD', 'CNY'];
+    
+    try {
+        const response = await fetch('https://open.er-api.com/v6/latest/USD');
+        const data = await response.json();
+        if (data && data.rates) {
+            const rates = data.rates;
+            const formattedItems = targets
+                .filter(c => c !== localCurrency && rates[c])
+                .map(curr => {
+                    // Valor de 1 unidad extranjera en moneda local
+                    const val = rates[localCurrency] / rates[curr];
+                    const formattedVal = val > 50 ? Math.round(val).toLocaleString(lang) : val.toLocaleString(lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    return `${flagMap[curr] || '💰'} ${curr}: ${formattedVal}`;
+                });
+            
+            // Agrupar en bloques de 3 para mostrar varias a la vez
+            const chunkSize = 3;
+            const chunks = [];
+            for (let i = 0; i < formattedItems.length; i += chunkSize) {
+                chunks.push(formattedItems.slice(i, i + chunkSize).join('<span style="margin: 0 20px; opacity: 0.4;">|</span>'));
+            }
+            return chunks;
+        }
+    } catch (e) {
+        console.error("Currency Error:", e);
+    }
+    return [];
+}
 
 function handleNewsWidget(settings) {
-    const { show, url, limit = 5, speed = 7 } = settings;
-
-    // Limpiamos cualquier intervalo anterior
-    clearInterval(newsIntervals.fetch);
-    clearInterval(newsIntervals.rotate);
-    newsIntervals.rotate = null; // Resetea el tracker de rotación
-
+    const { show, url, limit, speed } = settings;
+    
+    // Limpieza
+    clearInterval(newsState.interval);
+    clearInterval(newsState.fetchInterval);
+    newsState.interval = null;
+    
     if (!show || !url) {
         newsWidget.style.display = 'none';
+        updateCurrencyPosition();
         return;
     }
     newsWidget.style.display = 'flex';
-
-    // Actualizamos el título del widget con la traducción correcta
-    const widgetTitleEl = document.getElementById('news-widget-title');
-    if (widgetTitleEl) {
-        const lang = document.documentElement.lang || 'es';
-        widgetTitleEl.textContent = translations[lang]?.newsWidgetDefaultTitle || 'Últimas Noticias';
-    }
-
-    // Resetea el texto a "Cargando..." cada vez que se activa
-    const tickerItem = document.getElementById('news-ticker-item');
-    if (tickerItem) {
-        tickerItem.textContent = "Cargando noticias...";
-    }
-
-    let newsItems = [];
-    let currentNewsIndex = -1;
-
-    const fetchAndParseRss = async () => {
-        const lang = document.documentElement.lang || 'es';
-        // Lista de proxies. Si uno falla, intentará con el siguiente.
-        const proxies = [
-            `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-            `https://thingproxy.freeboard.io/fetch/${url}`
-        ];
-
-        try {
-            let response;
-            let data;
-
-            // Intenta con el primer proxy, si falla, intenta con el segundo.
-            try {
-                response = await fetch(proxies[0]);
-                if (!response.ok) throw new Error('Primer proxy falló');
-                data = await response.json();
-            } catch (e) {
-                response = await fetch(proxies[1]);
-                data = await response.json(); // thingproxy no envuelve en 'contents'
-            }
-            
-            const contents = data.contents || data; // allorigins usa 'contents', thingproxy no.
-            if (!contents) throw new Error("El proxy no devolvió contenido.");
-
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(contents, "application/xml");
-
-            const parseError = xmlDoc.querySelector("parsererror");
-            if (parseError) {
-                console.error("Error al parsear el XML del RSS:", parseError.textContent);
-                throw new Error("InvalidXML"); // Custom error para capturarlo abajo
-            }
-
-            // Buscamos <item> (RSS) y si no, <entry> (Atom) para mayor compatibilidad
-            let items = Array.from(xmlDoc.querySelectorAll("item"));
-            if (items.length === 0) {
-                items = Array.from(xmlDoc.querySelectorAll("entry"));
-            }
-            
-            const newNews = items.slice(0, limit).map(item => item.querySelector("title")?.textContent.trim()).filter(Boolean);
-            
-            newsItems = newNews.length > 0 ? newNews : [translations[lang]?.rssNoNewsInFeed || "No se encontraron noticias en el feed."];
-        } catch (error) {
-            console.error("Error al obtener o procesar el feed RSS:", error);
-            if (error instanceof SyntaxError || error.message === "InvalidXML") {
-                newsItems = [translations[lang]?.rssInvalidFormat || "Error: Formato de RSS no válido o URL incorrecta."];
-            } else {
-                newsItems = [translations[lang]?.rssFetchError || "Error al cargar el feed."];
-            }
-        } finally {
-            // Este bloque se asegura de que la rotación comience, incluso si hubo un error, para mostrar el mensaje.
-            if (newsItems.length > 0 && newsIntervals.rotate === null) {
-                rotateNews(); // Primera rotación inmediata
-                newsIntervals.rotate = setInterval(rotateNews, speed * 1000);
-            }
-        }
+    updateCurrencyPosition();
+    
+    const lang = document.documentElement.lang || 'es';
+    const titleEl = document.getElementById('news-widget-title');
+    titleEl.textContent = translations[lang]?.newsWidgetDefaultTitle || 'Últimas Noticias';
+    
+    const refreshNews = async () => {
+        newsState.items = await fetchNewsData(url, limit);
+        if (!newsState.interval) startNewsRotation();
     };
+    
+    refreshNews();
+    newsState.fetchInterval = setInterval(refreshNews, 1800000);
+    
+    const startNewsRotation = () => {
+        newsState.index = 0;
+        const contentEl = document.getElementById('news-item');
+        
+        const rotate = () => {
+            if (newsState.items.length === 0) return;
+            
+            contentEl.style.opacity = 0;
+            setTimeout(() => {
+                contentEl.textContent = newsState.items[newsState.index];
+                contentEl.style.opacity = 1;
+                newsState.index = (newsState.index + 1) % newsState.items.length;
+            }, 400);
+        };
+        
+        rotate();
+        newsState.interval = setInterval(rotate, (speed || 7) * 1000);
+    };
+}
 
-    const rotateNews = () => {
-        const tickerItem = document.getElementById('news-ticker-item');
-        if (!tickerItem || newsItems.length === 0) return;
-
-        tickerItem.style.opacity = 0;
+function handleCurrencyWidget(settings, isNewsVisible) {
+    const { show, country } = settings;
+    
+    // Limpieza
+    clearInterval(currencyState.interval);
+    clearInterval(currencyState.fetchInterval);
+    currencyState.interval = null;
+    
+    if (!show) {
+        currencyWidget.style.display = 'none';
+        return;
+    }
+    currencyWidget.style.display = 'flex';
+    updateCurrencyPosition();
+    
+    const lang = document.documentElement.lang || 'es';
+    const titleEl = document.getElementById('currency-widget-title');
+    titleEl.textContent = translations[lang]?.currencyWidgetTitle || 'Cotizaciones';
+    
+    const refreshCurrency = async () => {
+        currencyState.items = await fetchCurrencyData(country);
+        if (!currencyState.interval) startCurrencyRotation();
+    };
+    
+    refreshCurrency();
+    currencyState.fetchInterval = setInterval(refreshCurrency, 3600000);
+    
+    const startCurrencyRotation = () => {
+        currencyState.index = 0;
+        const contentEl = document.getElementById('currency-item');
+        
+        const rotate = () => {
+            if (currencyState.items.length === 0) return;
+            
+            contentEl.style.opacity = 0;
         setTimeout(() => {
-            currentNewsIndex = (currentNewsIndex + 1) % newsItems.length;
-            tickerItem.textContent = newsItems[currentNewsIndex];
-            tickerItem.style.opacity = 1;
-        }, 400); // Coincide con la duración de la transición
+            contentEl.innerHTML = currencyState.items[currencyState.index];
+            contentEl.style.opacity = 1;
+            currencyState.index = (currencyState.index + 1) % currencyState.items.length;
+        }, 400);
     };
-
-    fetchAndParseRss(); // Primera llamada
-    newsIntervals.fetch = setInterval(fetchAndParseRss, 30 * 60 * 1000); // Refresca cada 30 mins
+        
+        rotate();
+        currencyState.interval = setInterval(rotate, 8000); // 8 segundos por bloque de monedas
+    };
 }
 
 // --- QR Code Widget ---
@@ -441,8 +597,18 @@ function startContentPlayback(screenId) {
         // --- Controlar Widget de QR ---
         handleQrCodeWidget(screenId, { show: screenData.showQrOnPlayer, enabled: screenData.qrEnabled, text: screenData.qrCodeText });
 
-        // --- Controlar Widget de Noticias ---
-        handleNewsWidget({ show: screenData.showNews, url: screenData.newsRssUrl, limit: screenData.newsLimit, speed: screenData.newsSpeed });
+        // --- Controlar Widgets Separados ---
+        handleNewsWidget({ 
+            show: screenData.showNews, 
+            url: screenData.newsRssUrl, 
+            limit: screenData.newsLimit, 
+            speed: screenData.newsSpeed 
+        });
+
+        handleCurrencyWidget({ 
+            show: screenData.showCurrency, 
+            country: screenData.currencyCountry 
+        }, screenData.showNews);
 
         // Controlar visibilidad del reloj
         if (clockWidget) {

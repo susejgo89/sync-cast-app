@@ -185,6 +185,31 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="flex items-center justify-between mb-2">
+                    <label for="currency-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showCurrency}</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="currency-toggle-${screen.id}" data-screen-id="${screen.id}" class="currency-toggle-checkbox" ${screen.showCurrency ? 'checked' : ''}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="${screen.showCurrency ? '' : 'hidden'}">
+                    <label for="currency-country-${screen.id}" class="block text-sm font-medium text-gray-700 mb-1">${translations[currentLang].currencyCountry}</label>
+                    <select id="currency-country-${screen.id}" data-screen-id="${screen.id}" class="currency-country-select custom-select">
+                        <option value="PY" ${screen.currencyCountry === 'PY' ? 'selected' : ''}>Paraguay (PYG)</option>
+                        <option value="AR" ${screen.currencyCountry === 'AR' ? 'selected' : ''}>Argentina (ARS)</option>
+                        <option value="BR" ${screen.currencyCountry === 'BR' ? 'selected' : ''}>Brasil (BRL)</option>
+                        <option value="US" ${screen.currencyCountry === 'US' ? 'selected' : ''}>Estados Unidos (USD)</option>
+                        <option value="UY" ${screen.currencyCountry === 'UY' ? 'selected' : ''}>Uruguay (UYU)</option>
+                        <option value="CL" ${screen.currencyCountry === 'CL' ? 'selected' : ''}>Chile (CLP)</option>
+                        <option value="CO" ${screen.currencyCountry === 'CO' ? 'selected' : ''}>Colombia (COP)</option>
+                        <option value="VE" ${screen.currencyCountry === 'VE' ? 'selected' : ''}>Venezuela (VES)</option>
+                        <option value="MX" ${screen.currencyCountry === 'MX' ? 'selected' : ''}>México (MXN)</option>
+                        <option value="PE" ${screen.currencyCountry === 'PE' ? 'selected' : ''}>Perú (PEN)</option>
+                        <option value="BO" ${screen.currencyCountry === 'BO' ? 'selected' : ''}>Bolivia (BOB)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
                 <div class="flex items-center justify-between">
                     <label for="show-qr-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showQrOnScreen}</label>
                     <label class="toggle-switch">
@@ -480,6 +505,16 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
             // Si se cambió la velocidad de las noticias
             if (e.target.classList.contains('news-speed-input')) {
                 updateDoc(screenRef, { newsSpeed: Number(e.target.value) });
+            }
+
+            // Si se cambió el toggle de cotizaciones
+            if (e.target.classList.contains('currency-toggle-checkbox')) {
+                updateDoc(screenRef, { showCurrency: e.target.checked });
+            }
+
+            // Si se cambió el país de referencia
+            if (e.target.classList.contains('currency-country-select')) {
+                updateDoc(screenRef, { currencyCountry: e.target.value });
             }
         });
 
