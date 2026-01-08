@@ -4,7 +4,7 @@ import { db } from '../firebase-config.js';
 import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
-import { createMediaCard } from '../components/mediaCard.js';
+import { createMediaCard } from '../components/MediaCard.js';
 
 export function initMusicPlaylistsView(userId, getLang, onUpdateCallback, getMediaData) {
     const viewSection = document.getElementById('music-playlists-section');

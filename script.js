@@ -12,7 +12,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         import { initGroupsView } from './views/groupsView.js';
         import { initRouter, showPage, showMandatoryPage } from './utils/router.js';
         import { initAdminView } from './views/adminView.js';
-        import { createMediaCard } from './components/mediaCard.js';
+        import { createMediaCard } from './components/MediaCard.js';
         
         /**
          * Lógica de White-Labeling (Marca Personalizada).

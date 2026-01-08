@@ -5,7 +5,7 @@ import { collection, query, where, onSnapshot, doc, deleteDoc, addDoc, serverTim
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
-import { createMediaCard } from '../components/mediaCard.js';
+import { createMediaCard } from '../components/MediaCard.js';
 
 let unsubscribeMedia = null;
 
