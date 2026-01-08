@@ -4,7 +4,7 @@ import { db } from '../firebase-config.js';
 import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
-import { createMediaCard } from '../components/MediaCard.js';
+import { createMediaCard } from '../components/mediaCard.js';
 
 export function initMusicPlaylistsView(userId, getLang, onUpdateCallback, getMediaData) {
     const viewSection = document.getElementById('music-playlists-section');
@@ -40,17 +40,22 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
     // Crea un elemento de lista compacto para un audio, con drag-and-drop y botón de eliminar.
     function createCompactAudioItem(mediaData, index, onDeleteCallback) {
         const el = document.createElement('div');
-        el.className = 'flex items-center justify-between bg-gray-200 p-2 rounded-lg cursor-grab';
+        el.className = 'flex items-center justify-between bg-white/60 border border-white/50 shadow-sm p-3 rounded-xl cursor-grab mb-3 transition-all hover:bg-white/90 hover:shadow-md hover:scale-[1.01] group';
         el.dataset.index = index;
         el.draggable = true;
 
         el.innerHTML = `
-            <div class="flex items-center min-w-0">
-                <svg class="w-6 h-6 text-gray-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path></svg>
-                <p class="text-sm truncate text-gray-700" title="${mediaData.name}">${mediaData.name}</p>
+            <div class="flex items-center min-w-0 w-full">
+                <div class="w-10 h-10 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0 text-violet-600 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path></svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <p class="text-sm font-bold text-gray-800 truncate tracking-tight group-hover:text-violet-700 transition-colors" title="${mediaData.name}">${mediaData.name}</p>
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">Audio</p>
+                </div>
             </div>
-            <button class="remove-item-btn text-red-400 hover:text-red-600 p-1">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <button class="remove-item-btn text-gray-300 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-all ml-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
         `;
         
@@ -74,7 +79,7 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
         playlistsList.innerHTML = '';
         userMusicPlaylists.forEach(p => {
             const item = document.createElement('div');
-            item.className = `p-3 rounded-lg cursor-pointer transition-colors ${p.id === activePlaylistId ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`;
+            item.className = `list-button-item ${p.id === activePlaylistId ? 'active' : ''}`;
             item.textContent = p.name;
             item.dataset.playlistId = p.id;
             item.addEventListener('click', () => selectMusicPlaylist(p.id));
@@ -235,7 +240,7 @@ async function renderPlaylistItems(itemIds) {
             if (mediaInfoStr) {
                 const mediaInfo = JSON.parse(mediaInfoStr);
                 if (!mediaInfo.type.startsWith('audio')) {
-                    alert("Solo puedes añadir archivos de audio a esta playlist.");
+                    alert(translations[getLang()].onlyAudioFiles);
                     return;
                 }
                 await updateDoc(playlistRef, { items: arrayUnion(mediaInfo.id) });

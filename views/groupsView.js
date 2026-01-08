@@ -40,7 +40,7 @@ function renderGroupsList(groups) {
     groupsListEl.innerHTML = '';
     groups.forEach(group => {
         const item = document.createElement('div');
-        item.className = `p-3 rounded-lg cursor-pointer transition-colors ${group.id === activeGroupId ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`;
+        item.className = `list-button-item ${group.id === activeGroupId ? 'active' : ''}`;
         item.textContent = group.name;
         item.dataset.groupId = group.id;
         item.addEventListener('click', () => selectGroup(group.id, groups));
@@ -265,7 +265,7 @@ export function initGroupsView(userId, langGetter, screensGetter, playlistsGette
             const days = Array.from(document.querySelectorAll('#rule-days-checkboxes input:checked')).map(cb => parseInt(cb.value));
 
             if ((!playlistId && !musicPlaylistId) || days.length === 0 || !startTime || !endTime) {
-                alert('Por favor, completa los días, horas y al menos una playlist.');
+                alert(translations[getLang()].scheduleCompleteFields);
                 return;
             }
 

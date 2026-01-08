@@ -12,7 +12,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         import { initGroupsView } from './views/groupsView.js';
         import { initRouter, showPage, showMandatoryPage } from './utils/router.js';
         import { initAdminView } from './views/adminView.js';
-        import { createMediaCard } from './components/MediaCard.js';
+        import { createMediaCard } from './components/mediaCard.js';
         
         /**
          * Lógica de White-Labeling (Marca Personalizada).
@@ -395,7 +395,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (allActivities.length > 0) {
                     allActivities.forEach(activity => {
                         const activityEl = document.createElement('div');
-                        activityEl.className = 'flex items-center text-sm p-2 bg-gray-50 rounded-md border';
+                        activityEl.className = 'flex items-center text-sm p-3 bg-white/60 border border-white/50 rounded-xl shadow-sm hover:bg-white/80 transition-colors';
                         const icon = activity.type === 'screen' 
                             ? `<svg class="w-5 h-5 mr-3 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>`
                             : `<svg class="w-5 h-5 mr-3 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a3.002 3.002 0 013.292-2.296M12 10a4 4 0 110-8 4 4 0 010 8zm0 0a2 2 0 100-4 2 2 0 000 4z"></path></svg>`;

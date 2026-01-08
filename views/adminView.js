@@ -126,11 +126,11 @@ async function handleSaveClient(e) {
     const currentUsedStorage = clientsData.reduce((sum, c) => sum + (c.id !== clientId ? (c.storageLimit || 0) : 0), 0);
 
     if (currentUsedScreens + screenLimit > resellerData.totalScreenLimit) {
-        alert('El límite de pantallas asignado excede el total disponible en tu pool.');
+        alert(translations[getLang()].adminScreenLimitExceeded);
         return;
     }
     if (currentUsedStorage + storageLimitBytes > resellerData.totalStorageLimit) {
-        alert('El límite de almacenamiento asignado excede el total disponible en tu pool.');
+        alert(translations[getLang()].adminStorageLimitExceeded);
         return;
     }
 

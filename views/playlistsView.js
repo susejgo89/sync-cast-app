@@ -4,7 +4,7 @@ import { db } from '../firebase-config.js';
 import { collection, query, where, onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, serverTimestamp, arrayUnion, setDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
-import { createMediaCard } from '../components/MediaCard.js';
+import { createMediaCard } from '../components/mediaCard.js';
 
 // DOM Elements specific to this view
 const addPlaylistBtn = document.getElementById('add-playlist-btn');
@@ -45,38 +45,51 @@ function renderVisualMediaLibrary() {
 
 function createPlaylistItemElement(item, index, currentLang) {
     const el = document.createElement('div');
-    el.className = 'flex items-center bg-gray-200 p-2 rounded-lg cursor-grab';
+    // Añadimos la clase 'group' para efectos hover coordinados y mejoramos sombras/bordes
+    el.className = 'flex items-center bg-white/60 border border-white/50 shadow-sm p-3 rounded-xl cursor-grab mb-3 transition-all hover:bg-white/90 hover:shadow-md hover:scale-[1.01] group';
     el.draggable = true;
     el.dataset.index = index;
     const isEditable = item.type.startsWith('image') || item.type === 'iframe' || item.type === 'youtube' || item.type === 'clock' || item.type === 'weather' || item.type === 'qrcode';
 
+    // Etiqueta legible para el tipo de contenido
+    const typeLabel = item.type.startsWith('image') ? 'Imagen' : 
+                      item.type.startsWith('video') ? 'Video' :
+                      item.type === 'youtube' ? 'YouTube' :
+                      item.type === 'iframe' ? 'Web' :
+                      item.type === 'clock' ? 'Reloj' :
+                      item.type === 'weather' ? 'Clima' :
+                      item.type === 'qrcode' ? 'QR' : item.type.toUpperCase();
+
     // El cambio se hace dentro de esta plantilla de HTML
     el.innerHTML = `
-        <div class="w-16 h-10 bg-gray-800 rounded-md mr-3 flex-shrink-0 flex items-center justify-center text-white">
-            ${item.type.startsWith('image') ? `<img src="${item.url}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/160x100/EEE/31343C?text=Error';">` : ''}
-            ${item.type.startsWith('video') ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5z"></path></svg>` : ''}
-            ${item.type === 'youtube' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>` : ''}
-            ${item.type === 'iframe' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.5-1.5a.5.5 0 01.707-.707l1.5 1.5a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path><path fill-rule="evenodd" d="M4.086 15.414a2 2 0 010-2.828l3-3a2 2 0 012.828 0l1.5 1.5a.5.5 0 01-.707.707l-1.5-1.5a1 1 0 00-1.414 0l-3 3a1 1 0 000 1.414 1 1 0 001.414 0l.5-.5a.5.5 0 11.707.707l-.5.5a2 2 0 01-2.828 0z" clip-rule="evenodd"></path></svg>` : ''}
-            ${item.type === 'clock' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>` : ''}
-            ${item.type === 'weather' ? `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.312 11.218a.5.5 0 01.688.718A6.979 6.979 0 0110 16a6.979 6.979 0 01-6-4.064.5.5 0 01.688-.718A5.979 5.979 0 0010 15a5.979 5.979 0 005.312-3.782zM10 4a.5.5 0 01.5.5v5a.5.5 0 01-1 0v-5A.5.5 0 0110 4z" clip-rule="evenodd"></path></svg>` : ''}
-            ${item.type === 'qrcode' ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M3 10v4M21 10v4M10 3h4M10 21h4"></path></svg>` : ''}
+        <div class="w-14 h-14 bg-gray-50 rounded-lg mr-4 flex-shrink-0 flex items-center justify-center text-gray-400 overflow-hidden border border-gray-200 shadow-inner group-hover:border-violet-200 transition-colors">
+            ${item.type.startsWith('image') ? `<img src="${item.url}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.onerror=null;this.src='https://placehold.co/160x100/EEE/31343C?text=Error';">` : ''}
+            ${item.type.startsWith('video') ? `<svg class="w-6 h-6 text-violet-500" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5z"></path></svg>` : ''}
+            ${item.type === 'youtube' ? `<svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'iframe' ? `<svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.5-1.5a.5.5 0 01.707-.707l1.5 1.5a1 1 0 001.414 0l3-3z" clip-rule="evenodd"></path><path fill-rule="evenodd" d="M4.086 15.414a2 2 0 010-2.828l3-3a2 2 0 012.828 0l1.5 1.5a.5.5 0 01-.707.707l-1.5-1.5a1 1 0 00-1.414 0l-3 3a1 1 0 000 1.414 1 1 0 001.414 0l.5-.5a.5.5 0 11.707.707l-.5.5a2 2 0 01-2.828 0z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'clock' ? `<svg class="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'weather' ? `<svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.312 11.218a.5.5 0 01.688.718A6.979 6.979 0 0110 16a6.979 6.979 0 01-6-4.064.5.5 0 01.688-.718A5.979 5.979 0 0010 15a5.979 5.979 0 005.312-3.782zM10 4a.5.5 0 01.5.5v5a.5.5 0 01-1 0v-5A.5.5 0 0110 4z" clip-rule="evenodd"></path></svg>` : ''}
+            ${item.type === 'qrcode' ? `<svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M3 10v4M21 10v4M10 3h4M10 21h4"></path></svg>` : ''}
         </div>
 
-        <div class="flex-grow min-w-0">
-            <p class="text-sm truncate text-gray-700" title="${item.name}">${item.name}</p>
+        <div class="flex-grow min-w-0 flex flex-col justify-center">
+            <p class="text-sm font-bold text-gray-800 truncate tracking-tight group-hover:text-violet-700 transition-colors" title="${item.name}">${item.name}</p>
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mt-0.5">${typeLabel}</p>
         </div>
         
-        <div class="flex items-center gap-x-3 mx-3">
+        <div class="flex items-center gap-x-3 mx-2">
             ${isEditable ? `
-                <span class="text-sm text-gray-500">${item.duration || 10}s</span>
-                <button class="edit-item-btn text-gray-500 hover:text-violet-600 p-1" data-index="${index}" title="Editar">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21H3v-3.5L14.732 5.232z"></path></svg>
+                <div class="flex flex-col items-end">
+                    <span class="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${item.duration || 10}s</span>
+                </div>
+                <button class="edit-item-btn text-gray-400 hover:text-violet-600 p-2 rounded-full hover:bg-violet-50 transition-all" data-index="${index}" title="Editar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21H3v-3.5L14.732 5.232z"></path></svg>
                 </button>
             ` : ''}
         </div>
         
-        <button class="remove-item-btn text-red-400 hover:text-red-600 p-1" data-index="${index}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <button class="remove-item-btn text-gray-300 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-all" data-index="${index}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
     `;
 
@@ -111,10 +124,7 @@ async function selectPlaylist(playlistId) {
     renderPlaylistItems(playlist.items || [], currentLang);
     renderVisualMediaLibrary();
     Array.from(playlistsList.children).forEach(child => {
-        child.classList.toggle('bg-violet-600', child.dataset.playlistId === playlistId);
-        child.classList.toggle('text-white', child.dataset.playlistId === playlistId);
-        child.classList.toggle('bg-gray-100', child.dataset.playlistId !== playlistId);
-        child.classList.toggle('text-gray-800', child.dataset.playlistId !== playlistId);
+        child.classList.toggle('active', child.dataset.playlistId === playlistId);
     });
 
     // --- LÓGICA PARA AÑADIR URL (MOVIDA AQUÍ) ---
@@ -172,7 +182,7 @@ function loadPlaylists(userId) {
         playlistsList.innerHTML = '';
         userPlaylistsData.forEach(p => {
             const item = document.createElement('div');
-            item.className = `p-3 rounded-lg cursor-pointer transition-colors ${p.id === activePlaylistId ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`;
+            item.className = `list-button-item ${p.id === activePlaylistId ? 'active' : ''}`;
             item.textContent = p.name;
             item.dataset.playlistId = p.id;
             item.addEventListener('click', () => selectPlaylist(p.id));

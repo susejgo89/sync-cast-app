@@ -227,76 +227,101 @@
 
             <main class="flex-1 p-6 lg:p-10 overflow-y-auto">
                 <div id="dashboard-section" class="page-section">
-                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-6" data-lang="dashboardTitle">Dashboard</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-8" data-lang="dashboardTitle">Dashboard</h2>
+                    
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <!-- Card: Estado de Pantallas -->
-                        <div class="card card-glass p-6 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardScreenStatus">Estado de Pantallas</h3>
-                                <div class="flex items-baseline gap-6 mt-4">
-                                    <div class="text-center">
-                                        <p id="online-count" class="text-4xl font-bold text-green-600">0</p>
-                                        <p class="text-sm text-gray-500 flex items-center gap-2"><span class="status-dot status-dot-online"></span> <span data-lang="online">Online</span></p>
-                                    </div>
-                                    <div class="text-center">
-                                        <p id="offline-count" class="text-4xl font-bold text-red-600">0</p>
-                                        <p class="text-sm text-gray-500 flex items-center gap-2"><span class="status-dot status-dot-offline"></span> <span data-lang="offline">Offline</span></p>
-                                    </div>
+                        <div class="card card-glass p-6 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                                <svg class="w-24 h-24 text-violet-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-gray-600 text-sm uppercase tracking-wider" data-lang="dashboardScreenStatus">Estado de Pantallas</h3>
+                            <div class="flex items-end gap-6 mt-4 relative z-10">
+                                <div>
+                                    <span id="online-count" class="text-5xl font-extrabold text-emerald-500 tracking-tighter">0</span>
+                                    <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full ml-1 align-top" data-lang="online">Online</span>
+                                </div>
+                                <div>
+                                    <span id="offline-count" class="text-5xl font-extrabold text-red-500 tracking-tighter">0</span>
+                                    <span class="text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full ml-1 align-top" data-lang="offline">Offline</span>
                                 </div>
                             </div>
-                            <a href="/screens" data-route="/screens" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardManageScreens">Gestionar Pantallas &rarr;</a>
+                            <a href="/screens" data-route="/screens" class="absolute bottom-4 right-4 text-violet-600 hover:text-violet-800 transition-colors z-10 p-2 hover:bg-violet-50 rounded-full">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </a>
                         </div>
+
                         <!-- Card: Playlists -->
-                        <div class="card card-glass p-6 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardPlaylists">Playlists</h3>
-                                <div class="mt-4 space-y-2">
-                                    <p class="text-gray-600"><strong id="visual-playlist-count" class="text-2xl font-bold text-gray-800">0</strong> <span data-lang="dashboardVisualPlaylists">Playlists Visuales</span></p>
-                                    <p class="text-gray-600"><strong id="music-playlist-count" class="text-2xl font-bold text-gray-800">0</strong> <span data-lang="dashboardMusicPlaylists">Playlists de Música</span></p>
+                        <div class="card card-glass p-6 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                                <svg class="w-24 h-24 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-gray-600 text-sm uppercase tracking-wider" data-lang="dashboardPlaylists">Playlists</h3>
+                            <div class="mt-4 space-y-3 relative z-10">
+                                <div class="flex justify-between items-center border-b border-gray-200/50 pb-2">
+                                    <span class="text-gray-600 font-medium text-sm" data-lang="dashboardVisualPlaylists">Visuales</span>
+                                    <span id="visual-playlist-count" class="text-2xl font-bold text-gray-800">0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 font-medium text-sm" data-lang="dashboardMusicPlaylists">Música</span>
+                                    <span id="music-playlist-count" class="text-2xl font-bold text-gray-800">0</span>
                                 </div>
                             </div>
-                            <a href="/playlists" data-route="/playlists" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardCreatePlaylist">Crear Nueva Playlist &rarr;</a>
+                             <a href="/playlists" data-route="/playlists" class="absolute bottom-4 right-4 text-blue-600 hover:text-blue-800 transition-colors z-10 p-2 hover:bg-blue-50 rounded-full">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </a>
                         </div>
+
                         <!-- Card: Medios -->
-                        <div class="card card-glass p-6 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardMediaLibrary">Biblioteca de Medios</h3>
-                                <div class="mt-4">
-                                    <p class="text-gray-600"><strong id="media-count" class="text-4xl font-bold text-gray-800">0</strong> <span data-lang="dashboardTotalFiles">Archivos Totales</span></p>
-                                    <!-- Futuro: <p class="text-sm text-gray-500 mt-2">1.2 GB / 5 GB usados</p> -->
-                                </div>
+                        <div class="card card-glass p-6 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                                <svg class="w-24 h-24 text-pink-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg>
                             </div>
-                            <a href="/media" data-route="/media" class="dashboard-link mt-6 font-semibold text-violet-600 hover:text-violet-800" data-lang="dashboardUploadFile">Subir Nuevo Archivo &rarr;</a>
+                            <h3 class="font-bold text-gray-600 text-sm uppercase tracking-wider" data-lang="dashboardMediaLibrary">Biblioteca</h3>
+                            <div class="mt-4 relative z-10">
+                                <span id="media-count" class="text-5xl font-extrabold text-gray-800 tracking-tighter">0</span>
+                                <span class="text-sm font-medium text-gray-500 ml-2" data-lang="dashboardTotalFiles">Archivos</span>
+                            </div>
+                             <a href="/media" data-route="/media" class="absolute bottom-4 right-4 text-pink-600 hover:text-pink-800 transition-colors z-10 p-2 hover:bg-pink-50 rounded-full">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </a>
                         </div>
+
                         <!-- Card: Accesos Rápidos -->
-                        <div class="card card-glass p-6">
-                            <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardQuickActions">Accesos Rápidos</h3>
-                            <div class="mt-4 space-y-3">
-                                <button id="quick-add-screen" class="btn-dashboard-action">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                    <span data-lang="addScreen">Añadir Pantalla</span>
-                                </button>
-                                <button id="quick-add-playlist" class="btn-dashboard-action">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                    <span data-lang="createPlaylist">Crear Playlist</span>
-                                </button>
-                                <label for="file-upload" class="btn-dashboard-action cursor-pointer">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                    <span data-lang="uploadFile">Subir Archivo</span>
-                                </label>
-                            </div>
+                        <div class="card card-glass p-6 flex flex-col justify-center space-y-3">
+                            <h3 class="font-bold text-gray-600 text-sm uppercase tracking-wider mb-2" data-lang="dashboardQuickActions">Accesos Rápidos</h3>
+                            <button id="quick-add-screen" class="w-full flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-xl shadow hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-medium">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                <span data-lang="addScreen">Añadir Pantalla</span>
+                            </button>
+                            <button id="quick-add-playlist" class="w-full flex items-center justify-center px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl shadow-sm hover:bg-gray-50 hover:text-violet-600 hover:border-violet-200 transition-all font-medium">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span data-lang="createPlaylist">Crear Playlist</span>
+                            </button>
+                             <label for="file-upload" class="w-full flex items-center justify-center px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl shadow-sm hover:bg-gray-50 hover:text-violet-600 hover:border-violet-200 transition-all cursor-pointer font-medium">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span data-lang="uploadFile">Subir Archivo</span>
+                            </label>
                         </div>
-                        <!-- Card: Archivos Recientes -->
-                        <div class="card card-glass p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
-                            <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentUploads">Archivos Recientes</h3>
-                            <div id="recent-uploads-container" class="mt-4 grid grid-cols-3 gap-3">
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Recent Uploads -->
+                        <div class="card card-glass p-6 lg:col-span-2">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentUploads">Archivos Recientes</h3>
+                                <a href="/media" data-route="/media" class="text-sm text-violet-600 hover:text-violet-800 font-medium hover:underline">Ver todos</a>
+                            </div>
+                            <div id="recent-uploads-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                 <!-- Thumbnails will be injected here -->
                             </div>
                         </div>
-                        <!-- Card: Actividad Reciente -->
-                        <div class="card card-glass p-6 col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1">
-                            <h3 class="font-bold text-lg text-gray-800" data-lang="dashboardRecentActivity">Actividad Reciente</h3>
-                            <div id="recent-activity-container" class="mt-4 space-y-3">
+
+                        <!-- Recent Activity -->
+                        <div class="card card-glass p-6">
+                            <h3 class="font-bold text-lg text-gray-800 mb-6" data-lang="dashboardRecentActivity">Actividad Reciente</h3>
+                            <div id="recent-activity-container" class="space-y-3">
                                 <!-- La actividad reciente se insertará aquí -->
                             </div>
                         </div>
@@ -367,12 +392,12 @@
                         </button>
                     </div>
                 
-                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden">
+                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden p-4">
                 
-                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col card card-glass p-6">
                             <h3 class="text-xl font-semibold text-gray-800 mb-4" data-lang="myPlaylists">Mis Playlists</h3>
                             <div id="playlists-list"
-                                class="space-y-2 pr-2 bg-gray-50 rounded-md p-2 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                                class="space-y-2 pr-2 bg-white/60 rounded-md p-2 pb-12 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
                             </div>
                         </div>
                 
@@ -389,8 +414,8 @@
                                         </svg></button>
                                 </div>
                 
-                                <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden">
-                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden p-4">
+                                    <div class="w-full md:w-1/2 flex flex-col card card-glass p-6">
                                         <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="mediaLibrary">Biblioteca de
                                             Medios y URLs
                                         </h4>
@@ -449,22 +474,22 @@
                                             <input type="hidden" id="edit-item-index">
                                         </form>
                                         <!-- Sección de la Biblioteca (ahora con más espacio) -->
-                                        <div class="bg-gray-50 rounded-md p-2 flex-1 overflow-y-auto">
+                                        <div class="bg-white/60 rounded-md p-2 pb-12 flex-1 overflow-y-auto">
                                             <div id="playlist-media-library" class="grid grid-cols-2 gap-3"></div>
                                         </div>
                                     </div>
-                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                    <div class="w-full md:w-1/2 flex flex-col card card-glass p-6">
                                         <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="playlistContent">Contenido de la
                                             Playlist</h4>
                                         <div id="playlist-content-area"
-                                            class="space-y-2 bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
+                                            class="space-y-2 bg-white/60 rounded-md p-2 pb-12 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                 
                             <div id="playlist-placeholder"
-                                class="flex-1 flex items-center justify-center bg-white rounded-lg shadow-md">
+                                class="flex-1 flex items-center justify-center card card-glass">
                                 <p class="text-gray-500 text-center p-4" data-lang="playlistPlaceholder">Selecciona una playlist para
                                     editar o crea una nueva.</p>
                             </div>
@@ -486,12 +511,12 @@
                         </button>
                     </div>
                 
-                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden">
-                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden p-4">
+                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col card card-glass p-6">
                             <h3 class="text-xl font-semibold text-gray-800 mb-4" data-lang="myMusicPlaylists">Mis Playlists de Música
                             </h3>
                             <div id="music-playlists-list"
-                                class="space-y-2 pr-2 bg-gray-50 rounded-md p-2 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                                class="space-y-2 pr-2 bg-white/60 rounded-md p-2 pb-12 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
                             </div>
                         </div>
                 
@@ -508,26 +533,26 @@
                                         </svg></button>
                                 </div>
                 
-                                <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden">
-                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                <div class="flex-1 flex flex-col md:flex-row gap-6 min-h-0 md:h-full md:overflow-hidden p-4">
+                                    <div class="w-full md:w-1/2 flex flex-col card card-glass p-6">
                                         <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="audioLibrary">Biblioteca de
                                             Audio</h4>
-                                        <div class="bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
+                                        <div class="bg-white/60 rounded-md p-2 pb-12 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
                                             <div id="music-playlist-media-library" class="grid grid-cols-2 gap-3"></div>
                                         </div>
                                     </div>
-                                    <div class="w-full md:w-1/2 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                                    <div class="w-full md:w-1/2 flex flex-col card card-glass p-6">
                                         <h4 class="text-lg font-semibold text-gray-800 mb-3" data-lang="musicPlaylistContent">Contenido
                                             de la Playlist</h4>
                                         <div id="music-playlist-content-area"
-                                            class="space-y-2 bg-gray-50 rounded-md p-2 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
+                                            class="space-y-2 bg-white/60 rounded-md p-2 pb-12 min-h-[300px] md:min-h-0 md:flex-1 md:overflow-y-auto">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                 
                             <div id="music-playlist-placeholder"
-                                class="flex-1 flex items-center justify-center bg-white rounded-lg shadow-md">
+                                class="flex-1 flex items-center justify-center card card-glass">
                                 <p class="text-gray-500 text-center p-4" data-lang="musicPlaylistPlaceholder">Selecciona una playlist de
                                     música para editar o crea una nueva.</p>
                             </div>
@@ -545,7 +570,6 @@
                     </div>
                     <div id="screens-list" class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
-
                 <div id="groups-section" class="page-section hidden h-full flex flex-col">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                         <h2 class="text-3xl lg:text-4xl font-bold text-gray-800" data-lang="groupsTitle">Grupos de Pantallas</h2>
@@ -555,16 +579,16 @@
                         </button>
                     </div>
                 
-                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden">
-                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-[#EDE8E8] rounded-lg p-4 shadow-md">
+                    <div class="flex-1 mt-8 flex flex-col lg:flex-row gap-6 lg:h-full lg:overflow-hidden p-4">
+                        <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col card card-glass p-6">
                             <h3 class="text-xl font-semibold text-gray-800 mb-4" data-lang="myGroups">Mis Grupos</h3>
-                            <div id="groups-list" class="space-y-2 pr-2 bg-gray-50 rounded-md p-2 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+                            <div id="groups-list" class="space-y-2 pr-2 bg-white/60 rounded-md p-2 pb-12 min-h-[200px] lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
                                 <!-- La lista de grupos se insertará aquí -->
                             </div>
                         </div>
                 
                         <div class="w-full lg:w-2/3 xl:w-3/4 flex flex-col">
-                            <div id="group-editor" class="flex-1 flex-col hidden h-full bg-white rounded-lg shadow-md p-6">
+                            <div id="group-editor" class="flex-1 flex-col hidden h-full card card-glass p-6">
                                 <div class="flex justify-between items-center mb-6">
                                     <h3 id="group-editor-title" class="text-2xl font-bold text-gray-800"></h3>
                                     <button id="delete-group-btn" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-transform transform hover:scale-110" title="Eliminar Grupo">
@@ -602,11 +626,11 @@
                                     </div>
                                     <div>
                                         <h4 class="text-lg font-semibold text-gray-700 mb-3" data-lang="groupScreens">Pantallas en este Grupo</h4>
-                                        <div id="group-screens-list" class="space-y-2 max-h-64 overflow-y-auto bg-gray-50 p-3 rounded-md border"></div>
+                                        <div id="group-screens-list" class="space-y-2 max-h-64 overflow-y-auto bg-white/60 p-3 pb-12 rounded-md border"></div>
                                     </div>
                                 </div>
                             </div>
-                            <div id="group-placeholder" class="flex-1 flex items-center justify-center bg-white rounded-lg shadow-md">
+                            <div id="group-placeholder" class="flex-1 flex items-center justify-center card card-glass">
                                 <p class="text-gray-500 text-center p-4" data-lang="groupPlaceholder">Selecciona un grupo para editar o crea uno nuevo.</p>
                             </div>
                         </div>

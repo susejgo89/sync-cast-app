@@ -78,154 +78,205 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
         const isMusicAdvanced = screen.musicSchedulingMode === 'advanced';
 
         const card = document.createElement('div');
-        card.className = 'card card-glass p-5 flex flex-col';
+        card.className = 'card card-glass p-0 flex flex-col overflow-hidden group transition-all duration-300 hover:shadow-xl';
         
-        card.innerHTML = `
-            <div class="flex justify-between items-start">
-                <div>
-                    <h4 class="text-xl font-bold text-gray-800">${screen.name}</h4>
-                    <p class="text-sm text-gray-500 mt-1"><span data-lang="code">${translations[currentLang].code}</span>: <span class="font-mono bg-gray-200 px-2 py-1 rounded">${screen.isPaired ? `✅ ${translations[currentLang].paired || 'Enlazada'}` : screen.pairingCode}</span></p>
-                </div>
-                <button data-screen-id="${screen.id}" class="delete-screen-btn text-gray-400 hover:text-red-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-            </div>
-            <div class="mt-3 flex items-center space-x-2">
-                <div class="status-dot ${isOnline ? 'status-dot-online animate-pulse' : 'status-dot-offline'}"></div>
-                <span class="text-sm font-medium ${isOnline ? 'text-green-600' : 'text-red-600'}">
-                    ${isOnline ? (translations[currentLang].online || 'Online') : (translations[currentLang].offline || 'Offline')}
-                </span>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-200 space-y-4">
-                <!-- SECCIÓN PLAYLIST VISUAL -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">${translations[currentLang].visualPlaylist}</label>
-                    <div class="flex items-center gap-4 mb-2">
-                        <label class="flex items-center text-xs"><input type="radio" name="visual-scheduling-mode-${screen.id}" value="simple" class="scheduling-mode-radio" data-screen-id="${screen.id}" data-type="visual" ${!isVisualAdvanced ? 'checked' : ''}> <span class="ml-1">${translations[currentLang].simpleMode}</span></label>
-                        <label class="flex items-center text-xs"><input type="radio" name="visual-scheduling-mode-${screen.id}" value="advanced" class="scheduling-mode-radio" data-screen-id="${screen.id}" data-type="visual" ${isVisualAdvanced ? 'checked' : ''}> <span class="ml-1">${translations[currentLang].advancedMode}</span></label>
+        // --- HEADER SECTION ---
+        const headerHtml = `
+            <div class="p-5 border-b border-white/20 bg-white/30 relative">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white shadow-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-red-500'}" title="${isOnline ? 'Online' : 'Offline'}"></div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-800 leading-tight">${screen.name}</h4>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">${translations[currentLang].code}:</span>
+                                <span class="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">${screen.isPaired ? `✅ ${translations[currentLang].paired || 'Enlazada'}` : screen.pairingCode}</span>
+                            </div>
+                        </div>
                     </div>
+                    <button data-screen-id="${screen.id}" class="delete-screen-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // --- CONTENT SECTION (PLAYLISTS) ---
+        const contentHtml = `
+            <div class="p-5 space-y-5 bg-white/40">
+                <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Contenido
+                </h5>
+                
+                <!-- Visual Playlist -->
+                <div class="bg-white/60 rounded-lg p-3 border border-white/50 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-400"></span> ${translations[currentLang].visualPlaylist}
+                        </label>
+                        <div class="flex bg-gray-100 rounded p-0.5">
+                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${!isVisualAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="simple" data-type="visual" data-screen-id="${screen.id}">${translations[currentLang].simpleMode}</button>
+                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${isVisualAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="advanced" data-type="visual" data-screen-id="${screen.id}">${translations[currentLang].advancedMode}</button>
+                        </div>
+                    </div>
+                    
                     <div class="simple-schedule-container ${isVisualAdvanced ? 'hidden' : ''}" data-type="visual">
-                        <select data-screen-id="${screen.id}" class="playlist-select custom-select">
+                        <select data-screen-id="${screen.id}" class="playlist-select custom-select text-sm w-full bg-transparent border-gray-200 focus:bg-white transition-colors">
                             <option value="">${translations[currentLang].none}</option>
                             ${visualOptions}
                         </select>
                     </div>
                     <div class="advanced-schedule-container ${!isVisualAdvanced ? 'hidden' : ''}" data-type="visual">
-                        <div class="schedule-summary-list space-y-2 mb-2 max-h-24 overflow-y-auto pr-1">
+                        <div class="schedule-summary-list space-y-1 mb-2 max-h-20 overflow-y-auto text-xs">
                             ${generateScheduleSummary(screen.visualScheduleRules, 'visual', visualPlaylists, currentLang)}
                         </div>
-                        <button data-screen-id="${screen.id}" data-type="visual" class="manage-schedule-btn w-full btn-secondary text-sm">${translations[currentLang].manageSchedule}</button>
+                        <button data-screen-id="${screen.id}" data-type="visual" class="manage-schedule-btn w-full py-1.5 text-xs font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded transition-colors">${translations[currentLang].manageSchedule}</button>
                     </div>
                 </div>
 
-                <!-- SECCIÓN PLAYLIST DE MÚSICA -->
-                <div class="pt-4 border-t border-gray-100">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">${translations[currentLang].musicPlaylist}</label>
-                     <div class="flex items-center gap-4 mb-2">
-                        <label class="flex items-center text-xs"><input type="radio" name="music-scheduling-mode-${screen.id}" value="simple" class="scheduling-mode-radio" data-screen-id="${screen.id}" data-type="music" ${!isMusicAdvanced ? 'checked' : ''}> <span class="ml-1">${translations[currentLang].simpleMode}</span></label>
-                        <label class="flex items-center text-xs"><input type="radio" name="music-scheduling-mode-${screen.id}" value="advanced" class="scheduling-mode-radio" data-screen-id="${screen.id}" data-type="music" ${isMusicAdvanced ? 'checked' : ''}> <span class="ml-1">${translations[currentLang].advancedMode}</span></label>
+                <!-- Music Playlist -->
+                <div class="bg-white/60 rounded-lg p-3 border border-white/50 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-pink-400"></span> ${translations[currentLang].musicPlaylist}
+                        </label>
+                        <div class="flex bg-gray-100 rounded p-0.5">
+                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${!isMusicAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="simple" data-type="music" data-screen-id="${screen.id}">${translations[currentLang].simpleMode}</button>
+                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${isMusicAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="advanced" data-type="music" data-screen-id="${screen.id}">${translations[currentLang].advancedMode}</button>
+                        </div>
                     </div>
+
                     <div class="simple-schedule-container ${isMusicAdvanced ? 'hidden' : ''}" data-type="music">
-                    <select data-screen-id="${screen.id}" class="music-playlist-select custom-select mt-1">
-                        <option value="">${translations[currentLang].none}</option>
-                        ${musicOptions}
-                    </select>
+                        <select data-screen-id="${screen.id}" class="music-playlist-select custom-select text-sm w-full bg-transparent border-gray-200 focus:bg-white transition-colors">
+                            <option value="">${translations[currentLang].none}</option>
+                            ${musicOptions}
+                        </select>
                     </div>
                     <div class="advanced-schedule-container ${!isMusicAdvanced ? 'hidden' : ''}" data-type="music">
-                        <div class="schedule-summary-list space-y-2 mb-2 max-h-24 overflow-y-auto pr-1">
+                        <div class="schedule-summary-list space-y-1 mb-2 max-h-20 overflow-y-auto text-xs">
                              ${generateScheduleSummary(screen.musicScheduleRules, 'music', musicPlaylists, currentLang)}
                         </div>
-                        <button data-screen-id="${screen.id}" data-type="music" class="manage-schedule-btn w-full btn-secondary text-sm">${translations[currentLang].manageSchedule}</button>
+                        <button data-screen-id="${screen.id}" data-type="music" class="manage-schedule-btn w-full py-1.5 text-xs font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded transition-colors">${translations[currentLang].manageSchedule}</button>
                     </div>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <div class="flex items-center justify-between">
-                    <label for="clock-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showClock}</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="clock-toggle-${screen.id}" data-screen-id="${screen.id}" class="clock-toggle-checkbox" ${screen.showClock ? 'checked' : ''}>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <div class="flex items-center justify-between mb-2">
-                    <label for="weather-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showWeather}</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="weather-toggle-${screen.id}" data-screen-id="${screen.id}" class="weather-toggle-checkbox" ${screen.showWeather ? 'checked' : ''}>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="${screen.showWeather ? '' : 'hidden'}">
-                    <label for="weather-location-${screen.id}" class="block text-sm font-medium text-gray-700 sr-only">${translations[currentLang].weatherLocation}</label>
-                    <input type="text" id="weather-location-${screen.id}" data-screen-id="${screen.id}" class="weather-location-input custom-select" value="${screen.weatherLocation || ''}" placeholder="${translations[currentLang].weatherLocationPlaceholder}">
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <div class="flex items-center justify-between mb-2">
-                    <label for="news-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showNews}</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="news-toggle-${screen.id}" data-screen-id="${screen.id}" class="news-toggle-checkbox" ${screen.showNews ? 'checked' : ''}>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="space-y-2 ${screen.showNews ? '' : 'hidden'}">
-                    <div>
-                        <label for="news-rss-url-${screen.id}" class="block text-sm font-medium text-gray-700 sr-only">${translations[currentLang].rssFeedUrl}</label>
-                        <input type="url" id="news-rss-url-${screen.id}" data-screen-id="${screen.id}" class="news-rss-url-input custom-select" value="${screen.newsRssUrl || ''}" placeholder="${translations[currentLang].rssFeedUrlPlaceholder}">
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex-1">
-                            <label for="news-limit-${screen.id}" class="block text-xs font-medium text-gray-500">${translations[currentLang].newsLimit}</label>
-                            <input type="number" id="news-limit-${screen.id}" data-screen-id="${screen.id}" class="news-limit-input custom-select mt-1" value="${screen.newsLimit || 5}" min="1" max="20">
-                        </div>
-                        <div class="flex-1">
-                            <label for="news-speed-${screen.id}" class="block text-xs font-medium text-gray-500">${translations[currentLang].newsSpeed}</label>
-                            <input type="number" id="news-speed-${screen.id}" data-screen-id="${screen.id}" class="news-speed-input custom-select mt-1" value="${screen.newsSpeed || 7}" min="3" max="60">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <div class="flex items-center justify-between mb-2">
-                    <label for="currency-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showCurrency}</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="currency-toggle-${screen.id}" data-screen-id="${screen.id}" class="currency-toggle-checkbox" ${screen.showCurrency ? 'checked' : ''}>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="${screen.showCurrency ? '' : 'hidden'}">
-                    <label for="currency-country-${screen.id}" class="block text-sm font-medium text-gray-700 mb-1">${translations[currentLang].currencyCountry}</label>
-                    <select id="currency-country-${screen.id}" data-screen-id="${screen.id}" class="currency-country-select custom-select">
-                        <option value="PY" ${screen.currencyCountry === 'PY' ? 'selected' : ''}>Paraguay (PYG)</option>
-                        <option value="AR" ${screen.currencyCountry === 'AR' ? 'selected' : ''}>Argentina (ARS)</option>
-                        <option value="BR" ${screen.currencyCountry === 'BR' ? 'selected' : ''}>Brasil (BRL)</option>
-                        <option value="US" ${screen.currencyCountry === 'US' ? 'selected' : ''}>Estados Unidos (USD)</option>
-                        <option value="UY" ${screen.currencyCountry === 'UY' ? 'selected' : ''}>Uruguay (UYU)</option>
-                        <option value="CL" ${screen.currencyCountry === 'CL' ? 'selected' : ''}>Chile (CLP)</option>
-                        <option value="CO" ${screen.currencyCountry === 'CO' ? 'selected' : ''}>Colombia (COP)</option>
-                        <option value="VE" ${screen.currencyCountry === 'VE' ? 'selected' : ''}>Venezuela (VES)</option>
-                        <option value="MX" ${screen.currencyCountry === 'MX' ? 'selected' : ''}>México (MXN)</option>
-                        <option value="PE" ${screen.currencyCountry === 'PE' ? 'selected' : ''}>Perú (PEN)</option>
-                        <option value="BO" ${screen.currencyCountry === 'BO' ? 'selected' : ''}>Bolivia (BOB)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-gray-200">
-                <div class="flex items-center justify-between">
-                    <label for="show-qr-toggle-${screen.id}" class="block text-sm font-medium text-gray-700 cursor-pointer">${translations[currentLang].showQrOnScreen}</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="show-qr-toggle-${screen.id}" data-screen-id="${screen.id}" class="show-qr-toggle-checkbox" ${screen.showQrOnPlayer ? 'checked' : ''}>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="space-y-3 ${screen.showQrOnPlayer ? '' : 'hidden'}">
-                    <div>
-                        <label for="qr-text-${screen.id}" class="block text-sm font-medium text-gray-700 sr-only">${translations[currentLang].qrCodeText}</label>
-                        <input type="text" id="qr-text-${screen.id}" data-screen-id="${screen.id}" class="qr-text-input custom-select mt-2" value="${screen.qrCodeText || ''}" placeholder="${translations[currentLang].qrTextPlaceholder}">
-                    </div>
-                    <button data-screen-id="${screen.id}" class="select-qr-content-btn w-full btn-secondary mt-3">${translations[currentLang].selectQrContent}</button>
                 </div>
             </div>
         `;
+
+        // --- WIDGETS SECTION ---
+        const widgetsHtml = `
+            <div class="p-5 bg-white/20 border-t border-white/20 flex-grow">
+                <h5 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    Widgets
+                </h5>
+                <div class="space-y-3">
+                    <!-- Clock -->
+                    <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/40 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="p-1.5 bg-indigo-100 text-indigo-600 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                            <span class="text-sm font-medium text-gray-700">${translations[currentLang].showClock}</span>
+                        </div>
+                        <label class="toggle-switch scale-75 origin-right">
+                            <input type="checkbox" id="clock-toggle-${screen.id}" data-screen-id="${screen.id}" class="clock-toggle-checkbox" ${screen.showClock ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Weather -->
+                    <div class="group">
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/40 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-sky-100 text-sky-600 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></div>
+                                <span class="text-sm font-medium text-gray-700">${translations[currentLang].showWeather}</span>
+                            </div>
+                            <label class="toggle-switch scale-75 origin-right">
+                                <input type="checkbox" id="weather-toggle-${screen.id}" data-screen-id="${screen.id}" class="weather-toggle-checkbox" ${screen.showWeather ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="${screen.showWeather ? 'block' : 'hidden'} px-2 pb-2 pt-1 animate-fadeIn">
+                            <input type="text" id="weather-location-${screen.id}" data-screen-id="${screen.id}" class="weather-location-input w-full text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-sky-500 outline-none transition-all" value="${screen.weatherLocation || ''}" placeholder="${translations[currentLang].weatherLocationPlaceholder}">
+                        </div>
+                    </div>
+
+                    <!-- News -->
+                    <div class="group">
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/40 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-orange-100 text-orange-600 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg></div>
+                                <span class="text-sm font-medium text-gray-700">${translations[currentLang].showNews}</span>
+                            </div>
+                            <label class="toggle-switch scale-75 origin-right">
+                                <input type="checkbox" id="news-toggle-${screen.id}" data-screen-id="${screen.id}" class="news-toggle-checkbox" ${screen.showNews ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="${screen.showNews ? 'block' : 'hidden'} px-2 pb-2 pt-1 space-y-2 animate-fadeIn">
+                            <input type="url" id="news-rss-url-${screen.id}" data-screen-id="${screen.id}" class="news-rss-url-input w-full text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none transition-all" value="${screen.newsRssUrl || ''}" placeholder="${translations[currentLang].rssFeedUrlPlaceholder}">
+                            <div class="flex gap-2">
+                                <input type="number" id="news-limit-${screen.id}" data-screen-id="${screen.id}" class="news-limit-input w-1/2 text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none" value="${screen.newsLimit || 5}" min="1" max="20" placeholder="Limit">
+                                <input type="number" id="news-speed-${screen.id}" data-screen-id="${screen.id}" class="news-speed-input w-1/2 text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none" value="${screen.newsSpeed || 7}" min="3" max="60" placeholder="Speed (s)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Currency -->
+                    <div class="group">
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/40 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                                <span class="text-sm font-medium text-gray-700">${translations[currentLang].showCurrency}</span>
+                            </div>
+                            <label class="toggle-switch scale-75 origin-right">
+                                <input type="checkbox" id="currency-toggle-${screen.id}" data-screen-id="${screen.id}" class="currency-toggle-checkbox" ${screen.showCurrency ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="${screen.showCurrency ? 'block' : 'hidden'} px-2 pb-2 pt-1 animate-fadeIn">
+                            <select id="currency-country-${screen.id}" data-screen-id="${screen.id}" class="currency-country-select w-full text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-emerald-500 outline-none transition-all">
+                                <option value="PY" ${screen.currencyCountry === 'PY' ? 'selected' : ''}>Paraguay (PYG)</option>
+                                <option value="AR" ${screen.currencyCountry === 'AR' ? 'selected' : ''}>Argentina (ARS)</option>
+                                <option value="BR" ${screen.currencyCountry === 'BR' ? 'selected' : ''}>Brasil (BRL)</option>
+                                <option value="US" ${screen.currencyCountry === 'US' ? 'selected' : ''}>Estados Unidos (USD)</option>
+                                <option value="UY" ${screen.currencyCountry === 'UY' ? 'selected' : ''}>Uruguay (UYU)</option>
+                                <option value="CL" ${screen.currencyCountry === 'CL' ? 'selected' : ''}>Chile (CLP)</option>
+                                <option value="CO" ${screen.currencyCountry === 'CO' ? 'selected' : ''}>Colombia (COP)</option>
+                                <option value="VE" ${screen.currencyCountry === 'VE' ? 'selected' : ''}>Venezuela (VES)</option>
+                                <option value="MX" ${screen.currencyCountry === 'MX' ? 'selected' : ''}>México (MXN)</option>
+                                <option value="PE" ${screen.currencyCountry === 'PE' ? 'selected' : ''}>Perú (PEN)</option>
+                                <option value="BO" ${screen.currencyCountry === 'BO' ? 'selected' : ''}>Bolivia (BOB)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- QR Code -->
+                    <div class="group">
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-white/40 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="p-1.5 bg-gray-100 text-gray-600 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></div>
+                                <span class="text-sm font-medium text-gray-700">${translations[currentLang].showQrOnScreen}</span>
+                            </div>
+                            <label class="toggle-switch scale-75 origin-right">
+                                <input type="checkbox" id="show-qr-toggle-${screen.id}" data-screen-id="${screen.id}" class="show-qr-toggle-checkbox" ${screen.showQrOnPlayer ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="${screen.showQrOnPlayer ? 'block' : 'hidden'} px-2 pb-2 pt-1 space-y-2 animate-fadeIn">
+                            <input type="text" id="qr-text-${screen.id}" data-screen-id="${screen.id}" class="qr-text-input w-full text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-gray-500 outline-none transition-all" value="${screen.qrCodeText || ''}" placeholder="${translations[currentLang].qrTextPlaceholder}">
+                            <button data-screen-id="${screen.id}" class="select-qr-content-btn w-full py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors">${translations[currentLang].selectQrContent}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        card.innerHTML = headerHtml + contentHtml + widgetsHtml;
         screensListContainer.appendChild(card);
 
     });
@@ -310,7 +361,7 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
         
             } catch (error) {
                 console.error("Error al añadir pantalla:", error);
-                alert("Hubo un error al intentar añadir la pantalla.");
+                alert(translations[getLang()].errorAddingScreen);
             }
         });
 
@@ -444,6 +495,15 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                 showConfirmModal('Eliminar Pantalla', '¿Seguro que quieres eliminar esta pantalla?', () => {
                     deleteDoc(doc(db, 'screens', screenId));
                 });
+            }
+
+            // Listener para los botones de modo de programación (Simple/Avanzado)
+            const modeBtn = e.target.closest('.scheduling-mode-btn');
+            if (modeBtn) {
+                const screenId = modeBtn.dataset.screenId;
+                const type = modeBtn.dataset.type;
+                const mode = modeBtn.dataset.mode;
+                updateDoc(doc(db, 'screens', screenId), { [`${type}SchedulingMode`]: mode, lastScheduledAt: serverTimestamp() });
             }
         });
 
