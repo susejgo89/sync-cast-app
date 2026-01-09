@@ -34,6 +34,20 @@ let allMusicPlaylists = [];
 let setCurrentQrId = () => {};
 let currentScreenForSchedule = null;
 
+// --- PRESETS DE NOTICIAS (Estilo ScreenCorp) ---
+const RSS_PRESETS = [
+    { name: '--- Personalizado / Custom ---', url: '' },
+    { name: '🌎 BBC Mundo (Español)', url: 'https://www.bbc.com/mundo/ultimas_noticias/index.xml' },
+    { name: '🇪🇸 El País - Portada (Español)', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada' },
+    { name: '🇺🇸 CNN Top Stories (English)', url: 'http://rss.cnn.com/rss/edition.rss' },
+    { name: '🇬🇧 BBC World (English)', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' },
+    { name: '🇧🇷 G1 - Todas as notícias (Português)', url: 'https://g1.globo.com/rss/g1/' },
+    { name: '🇧🇷 UOL Notícias (Português)', url: 'http://rss.uol.com.br/feed/noticias.xml' },
+    { name: '⚽ ESPN Sports (Global)', url: 'https://www.espn.com/espn/rss/news' },
+    { name: '💻 TechCrunch (Tecnología)', url: 'https://techcrunch.com/feed/' },
+    { name: '💼 Forbes (Business)', url: 'https://www.forbes.com/business/feed/' }
+];
+
 function generateScheduleSummary(rules, type, allPlaylists, lang) {
     if (!rules || rules.length === 0) {
         return `<p class="text-xs text-center text-gray-400 p-2">${translations[lang].scheduleNoRules || 'No hay reglas de horario.'}</p>`;
@@ -66,6 +80,13 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
     screens.forEach(screen => {
         const visualOptions = visualPlaylists.map(p => `<option value="${p.id}" ${screen.playlistId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
         const musicOptions = musicPlaylists.map(p => `<option value="${p.id}" ${screen.musicPlaylistId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+
+        // Generar opciones para el selector de noticias
+        const newsOptions = RSS_PRESETS.map(preset => {
+            // Intentamos detectar si la URL actual coincide con un preset
+            const isSelected = screen.newsRssUrl === preset.url;
+            return `<option value="${preset.url}" ${isSelected ? 'selected' : ''}>${preset.name}</option>`;
+        }).join('');
 
         // --- LÓGICA DE ESTADO ONLINE/OFFLINE ---
         const lastSeen = screen.lastSeen?.toDate();
@@ -218,6 +239,10 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
                             </label>
                         </div>
                         <div class="${screen.showNews ? 'block' : 'hidden'} px-2 pb-2 pt-1 space-y-2 animate-fadeIn">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">${translations[currentLang].selectNewsSource}</label>
+                                <select data-screen-id="${screen.id}" class="news-preset-select w-full text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none transition-all mb-2">${newsOptions}</select>
+                            </div>
                             <input type="url" id="news-rss-url-${screen.id}" data-screen-id="${screen.id}" class="news-rss-url-input w-full text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none transition-all" value="${screen.newsRssUrl || ''}" placeholder="${translations[currentLang].rssFeedUrlPlaceholder}">
                             <div class="flex gap-2">
                                 <input type="number" id="news-limit-${screen.id}" data-screen-id="${screen.id}" class="news-limit-input w-1/2 text-xs px-2 py-1.5 rounded border border-gray-200 bg-white/80 focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none" value="${screen.newsLimit || 5}" min="1" max="20" placeholder="Limit">
@@ -549,6 +574,16 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
             // Si se cambió la URL del RSS (al perder el foco)
             if (e.target.classList.contains('news-rss-url-input')) {
                 updateDoc(screenRef, { newsRssUrl: e.target.value.trim() });
+            }
+
+            // --- NUEVO: Si se selecciona un preset de noticias ---
+            if (e.target.classList.contains('news-preset-select')) {
+                const selectedUrl = e.target.value;
+                // Actualizamos el input de texto visualmente
+                const urlInput = document.getElementById(`news-rss-url-${screenId}`);
+                if (urlInput) urlInput.value = selectedUrl;
+                // Actualizamos en Firebase
+                updateDoc(screenRef, { newsRssUrl: selectedUrl });
             }
 
             // Si se cambió el toggle de "Mostrar QR en Pantalla"

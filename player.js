@@ -282,38 +282,46 @@ window.addEventListener('resize', updateCurrencyPosition);
 
 async function fetchNewsData(url, limit) {
     const lang = document.documentElement.lang || 'es';
-    const proxies = [
-        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-        `https://thingproxy.freeboard.io/fetch/${url}`
-    ];
-
+    
+    // ESTRATEGIA 1: RSS2JSON (Servicio especializado, muy estable y rápido)
     try {
-        let response, data;
-        try {
-            response = await fetch(proxies[0]);
-            if (!response.ok) throw new Error('Proxy 1 failed');
-            data = await response.json();
-        } catch (e) {
-            response = await fetch(proxies[1]);
-            data = await response.json();
+        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'ok' && data.items && data.items.length > 0) {
+                // RSS2JSON ya nos da el JSON limpio, no hay que parsear XML
+                const newsItems = data.items.map(item => item.title.trim()).filter(Boolean);
+                return newsItems.slice(0, limit);
+            }
         }
-        
-        const contents = data.contents || data;
-        if (!contents) throw new Error("No content");
-
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(contents, "application/xml");
-        if (xmlDoc.querySelector("parsererror")) throw new Error("InvalidXML");
-
-        let items = Array.from(xmlDoc.querySelectorAll("item"));
-        if (items.length === 0) items = Array.from(xmlDoc.querySelectorAll("entry"));
-        
-        const newNews = items.slice(0, limit).map(item => item.querySelector("title")?.textContent.trim()).filter(Boolean);
-        return newNews.length > 0 ? newNews : [translations[lang]?.rssNoNewsInFeed || "No news found."];
-    } catch (error) {
-        console.error("RSS Error:", error);
-        return [translations[lang]?.rssFetchError || "Error fetching feed."];
+    } catch (e) {
+        console.warn("RSS2JSON failed, trying fallback...", e);
     }
+
+    // ESTRATEGIA 2: AllOrigins (Fallback) con caché desactivado
+    try {
+        // Añadimos disableCache=true para evitar que guarde errores durante tus pruebas
+        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&disableCache=true`);
+        if (response.ok) {
+            const data = await response.json();
+            const contents = data.contents;
+            if (contents) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(contents, "application/xml");
+                if (!xmlDoc.querySelector("parsererror")) {
+                    let items = Array.from(xmlDoc.querySelectorAll("item"));
+                    if (items.length === 0) items = Array.from(xmlDoc.querySelectorAll("entry"));
+                    
+                    const newsItems = items.map(item => item.querySelector("title")?.textContent.trim()).filter(Boolean);
+                    if (newsItems.length > 0) return newsItems.slice(0, limit);
+                }
+            }
+        }
+    } catch (e) {
+        console.error("AllOrigins failed:", e);
+    }
+
+    return [translations[lang]?.rssFetchError || "Error fetching feed."];
 }
 
 async function fetchCurrencyData(country) {
