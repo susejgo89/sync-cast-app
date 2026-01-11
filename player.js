@@ -98,6 +98,7 @@ const pairingCodeInputs = document.getElementById('pairing-code-inputs');
 const inputs = pairingCodeInputs.querySelectorAll('.pairing-input');
 const pairBtn = document.getElementById('pair-btn');
 const messageBox = document.getElementById('player-message-box');
+const loader = document.getElementById('loader');
 
 // --- Audio Autoplay Overlay ---
 const audioOverlay = document.createElement('div');
@@ -859,7 +860,7 @@ function displayMedia(item) {
 
             // Si el item no tiene ubicación, usamos la de la pantalla como alternativa.
             if (!location) {
-                const screenDocRef = doc(db, 'screens', localStorage.getItem('nexusplay_screen_id'));
+                const screenDocRef = doc(db, 'screens', localStorage.getItem('nexusreplay_screen_id'));
                 const screenSnap = await getDoc(screenDocRef);
                 if (screenSnap.exists()) {
                     location = screenSnap.data().weatherLocation;
@@ -980,7 +981,7 @@ function displayMedia(item) {
         contentScreen.appendChild(newContent);
         setTimeout(() => { newContent.style.opacity = 1; }, 100);
 
-        const screenId = localStorage.getItem('nexusplay_screen_id');
+        const screenId = localStorage.getItem('nexusreplay_screen_id');
         // CORRECCIÓN: La lógica para determinar la URL del QR estaba mal.
         // Ahora se comprueba correctamente si el tipo es 'url' y tiene contenido,
         // o si es 'menu' para construir la URL del visor de menús.
@@ -1268,6 +1269,12 @@ function init() {
         // Si no, mostramos la pantalla de emparejamiento
         pairingScreen.classList.remove('hidden');
         if(inputs[0]) inputs[0].focus();
+    }
+
+    // Ocultar el loader con una transición suave
+    if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.style.display = 'none', 500);
     }
 }
 
