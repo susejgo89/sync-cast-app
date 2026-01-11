@@ -30,6 +30,25 @@ let listenersAttached = false;
 let setCurrentQrId = () => {};
 let getLang = () => 'es'; // Guardaremos la función aquí
 
+async function addItemToPlaylist(mediaInfo) {
+    if (!activePlaylistId) {
+        alert(translations[getLang()].selectPlaylistFirst || 'Por favor, selecciona una playlist primero.');
+        return;
+    }
+    const playlistRef = doc(db, 'playlists', activePlaylistId);
+    const playlistDoc = await getDoc(playlistRef);
+    if (!playlistDoc.exists()) return;
+    
+    let items = playlistDoc.data().items || [];
+    items.push({ 
+        name: mediaInfo.name, 
+        url: mediaInfo.url, 
+        type: mediaInfo.type, 
+        duration: 10 
+    });
+    
+    await updateDoc(playlistRef, { items });
+}
 
 function renderVisualMediaLibrary() {
     if (!playlistMediaLibrary) return;
@@ -38,7 +57,10 @@ function renderVisualMediaLibrary() {
     
     playlistMediaLibrary.innerHTML = '';
     visualMedia.forEach(media => {
-        const card = createMediaCard(media, { isDraggable: true });
+        const card = createMediaCard(media, { 
+            isDraggable: true,
+            onAdd: () => addItemToPlaylist(media)
+        });
         playlistMediaLibrary.appendChild(card);
     });
 }
@@ -117,8 +139,6 @@ async function selectPlaylist(playlistId) {
     playlistPlaceholder.classList.add('hidden');
     playlistEditorTitle.textContent = `${translations[currentLang].editing}: ${playlist.name}`;
 
-    // Ocultamos el editor de duración al cambiar de playlist
-    document.getElementById('edit-item-form').classList.add('hidden');
     document.getElementById('add-url-form').classList.remove('hidden');
 
     renderPlaylistItems(playlist.items || [], currentLang);
@@ -358,8 +378,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
         });
 
         document.getElementById('edit-item-cancel').addEventListener('click', () => {
-            document.getElementById('edit-item-form').classList.add('hidden');
-            document.getElementById('add-url-form').classList.remove('hidden');
+            document.getElementById('edit-item-modal').classList.remove('active');
         });
 
         playlistContentArea.addEventListener('click', async (e) => {
@@ -373,9 +392,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
                 const item = items[index];
 
                 if (item) {
-                    document.getElementById('add-url-form').classList.add('hidden');
-                    const editForm = document.getElementById('edit-item-form');
-                    editForm.classList.remove('hidden');
+                    document.getElementById('edit-item-modal').classList.add('active');
                     document.getElementById('edit-item-name').textContent = item.name;
                     document.getElementById('edit-item-duration').value = item.duration || 10;
                     document.getElementById('edit-item-index').value = index;
@@ -458,9 +475,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
                 }
                 await updateDoc(playlistRef, { items });
             }
-            // En lugar de simular un click, llamamos directamente a la lógica de cierre para más control
-            document.getElementById('edit-item-form').classList.add('hidden');
-            document.getElementById('add-url-form').classList.remove('hidden');
+            document.getElementById('edit-item-modal').classList.remove('active');
         });
 
         listenersAttached = true;

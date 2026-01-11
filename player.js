@@ -62,6 +62,12 @@ widgetStyles.textContent = `
     #news-content { font-size: 1.2rem; }
     #currency-content { font-size: 1.1rem; }
 
+    /* Aseguramos que los items sean bloques para poder medir su ancho y animarlos */
+    #news-item, #currency-item {
+        display: inline-block;
+        white-space: nowrap;
+    }
+
     /* --- Portrait Mode (Vertical Screens) --- */
     @media (orientation: portrait) {
         #news-widget {
@@ -95,6 +101,7 @@ widgetStyles.textContent = `
     /* --- Animación de Desplazamiento (Marquee) --- */
     .scrolling-content {
         display: inline-block;
+        will-change: transform; /* Optimización de rendimiento */
         animation-name: marquee;
         animation-timing-function: linear;
         animation-iteration-count: 1;
@@ -429,7 +436,7 @@ function handleNewsWidget(settings) {
 
                 // --- LÓGICA INTELIGENTE DE SCROLL ---
                 let duration = (speed || 7) * 1000;
-                const contentWidth = contentEl.scrollWidth;
+                const contentWidth = contentEl.offsetWidth; // Usamos offsetWidth para mayor precisión
                 const containerWidth = containerEl.clientWidth;
 
                 // Si el texto es más largo que el contenedor, activamos el scroll
@@ -442,6 +449,7 @@ function handleNewsWidget(settings) {
                     // Si la animación dura más que el tiempo configurado, extendemos el tiempo
                     if (totalTime > duration) duration = totalTime;
 
+                    contentEl.style.removeProperty('transform'); // Limpiamos transform inline para que la animación mande
                     contentEl.style.setProperty('--scroll-offset', `-${scrollDistance}px`);
                     contentEl.style.animationDuration = `${totalTime}ms`;
                     contentEl.classList.add('scrolling-content');
@@ -504,7 +512,7 @@ function handleCurrencyWidget(settings, isNewsVisible) {
             contentEl.style.opacity = 1;
 
             let duration = 8000;
-            const contentWidth = contentEl.scrollWidth;
+            const contentWidth = contentEl.offsetWidth;
             const containerWidth = containerEl.clientWidth;
 
             if (contentWidth > containerWidth) {
@@ -513,6 +521,7 @@ function handleCurrencyWidget(settings, isNewsVisible) {
                 const totalTime = scrollTime + 3000;
                 if (totalTime > duration) duration = totalTime;
 
+                contentEl.style.removeProperty('transform');
                 contentEl.style.setProperty('--scroll-offset', `-${scrollDistance}px`);
                 contentEl.style.animationDuration = `${totalTime}ms`;
                 contentEl.classList.add('scrolling-content');

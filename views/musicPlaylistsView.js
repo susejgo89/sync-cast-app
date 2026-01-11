@@ -101,6 +101,12 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
         renderPlaylistItems(playlist.items || []);
         renderAudioLibrary();
     }
+
+    async function addAudioToPlaylist(mediaInfo) {
+        if (!activePlaylistId) return;
+        const playlistRef = doc(db, 'musicPlaylists', activePlaylistId);
+        await updateDoc(playlistRef, { items: arrayUnion(mediaInfo.id) });
+    }
     
     function renderAudioLibrary() {
         // LA MAGIA: Filtramos para mostrar SOLO archivos de audio
@@ -108,7 +114,10 @@ const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-ca
         
         playlistMediaLibrary.innerHTML = audioFiles.length === 0 ? `<p class="text-gray-500 col-span-full text-center">${translations[getLang()].emptyAudioLibrary}</p>` : '';
         audioFiles.forEach(media => {
-            const card = createMediaCard(media, { isDraggable: true });
+            const card = createMediaCard(media, { 
+                isDraggable: true,
+                onAdd: () => addAudioToPlaylist(media)
+            });
             playlistMediaLibrary.appendChild(card);
         });
     }

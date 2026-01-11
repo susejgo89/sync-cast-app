@@ -8,10 +8,11 @@
  * @param {function} options.onDelete - La función que se ejecutará al hacer clic en el botón de eliminar.
  * @param {boolean} options.isSelectable - Define si la tarjeta se puede seleccionar (para modales).
  * @param {boolean} options.isSelected - Define si la tarjeta está seleccionada inicialmente.
+ * @param {function} options.onAdd - La función que se ejecutará al hacer clic en el botón de añadir (para playlists).
  * @returns {HTMLElement} El elemento HTML de la tarjeta.
  */
 export function createMediaCard(media, options = {}) {
-    const { isDraggable = false, onDelete = null, isSelectable = false, isSelected = false } = options;
+    const { isDraggable = false, onDelete = null, isSelectable = false, isSelected = false, onAdd = null } = options;
 
     const card = document.createElement('div');
     card.className = 'card card-glass overflow-hidden relative group';
@@ -42,6 +43,11 @@ export function createMediaCard(media, options = {}) {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
         </div>` : ''}
+        ${onAdd ? `<div class="absolute top-2 right-2 z-10 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <button class="add-media-btn bg-violet-600 hover:bg-violet-700 text-white p-2 rounded-full shadow-md transition-transform transform hover:scale-110 flex items-center justify-center" title="Añadir a Playlist">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </button>
+        </div>` : ''}
         ${isSelectable ? `
             <div class="selection-overlay absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 transition-opacity">
                 <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
@@ -62,6 +68,15 @@ export function createMediaCard(media, options = {}) {
     if (onDelete) {
         const deleteBtn = card.querySelector('.delete-media-btn');
         if (deleteBtn) deleteBtn.addEventListener('click', () => onDelete());
+    }
+
+    if (onAdd) {
+        const addBtn = card.querySelector('.add-media-btn');
+        if (addBtn) addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onAdd();
+        });
     }
 
     return card;
