@@ -91,6 +91,19 @@ widgetStyles.textContent = `
         #news-content { font-size: 1.1rem; }
         #currency-content { font-size: 1rem; }
     }
+
+    /* --- Animación de Desplazamiento (Marquee) --- */
+    .scrolling-content {
+        display: inline-block;
+        animation-name: marquee;
+        animation-timing-function: linear;
+        animation-iteration-count: 1;
+    }
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        20% { transform: translateX(0); } /* Pausa inicial para leer el principio */
+        100% { transform: translateX(var(--scroll-offset)); } /* Se mueve hasta el final */
+    }
 `;
 document.head.appendChild(widgetStyles);
 
@@ -259,8 +272,8 @@ currencyWidget.innerHTML = `
 `;
 document.body.appendChild(currencyWidget);
 
-let newsState = { interval: null, fetchInterval: null, items: [], index: 0 };
-let currencyState = { interval: null, fetchInterval: null, items: [], index: 0 };
+let newsState = { timeout: null, fetchInterval: null, items: [], index: 0 };
+let currencyState = { timeout: null, fetchInterval: null, items: [], index: 0 };
 
 // Helper para posicionar el widget de monedas dinámicamente
 function updateCurrencyPosition() {
@@ -370,9 +383,9 @@ function handleNewsWidget(settings) {
     const { show, url, limit, speed } = settings;
     
     // Limpieza
-    clearInterval(newsState.interval);
+    clearTimeout(newsState.timeout);
     clearInterval(newsState.fetchInterval);
-    newsState.interval = null;
+    newsState.timeout = null;
     
     if (!show || !url) {
         newsWidget.style.display = 'none';
@@ -388,7 +401,7 @@ function handleNewsWidget(settings) {
     
     const refreshNews = async () => {
         newsState.items = await fetchNewsData(url, limit);
-        if (!newsState.interval) startNewsRotation();
+        if (!newsState.timeout) startNewsRotation();
     };
     
     refreshNews();
@@ -397,20 +410,49 @@ function handleNewsWidget(settings) {
     const startNewsRotation = () => {
         newsState.index = 0;
         const contentEl = document.getElementById('news-item');
+        const containerEl = document.getElementById('news-content');
         
         const rotate = () => {
-            if (newsState.items.length === 0) return;
+            if (newsState.items.length === 0) {
+                newsState.timeout = setTimeout(rotate, 2000); // Reintentar si no hay noticias
+                return;
+            }
             
             contentEl.style.opacity = 0;
+            contentEl.style.animation = 'none'; // Resetear animación
+            contentEl.classList.remove('scrolling-content');
+            contentEl.style.transform = 'translateX(0)';
+
             setTimeout(() => {
                 contentEl.textContent = newsState.items[newsState.index];
                 contentEl.style.opacity = 1;
+
+                // --- LÓGICA INTELIGENTE DE SCROLL ---
+                let duration = (speed || 7) * 1000;
+                const contentWidth = contentEl.scrollWidth;
+                const containerWidth = containerEl.clientWidth;
+
+                // Si el texto es más largo que el contenedor, activamos el scroll
+                if (contentWidth > containerWidth) {
+                    const scrollDistance = contentWidth - containerWidth + 20; // +20px de margen
+                    const scrollSpeed = 50; // Píxeles por segundo (velocidad de lectura cómoda)
+                    const scrollTime = (scrollDistance / scrollSpeed) * 1000;
+                    const totalTime = scrollTime + 3000; // +3s para pausas inicial/final
+                    
+                    // Si la animación dura más que el tiempo configurado, extendemos el tiempo
+                    if (totalTime > duration) duration = totalTime;
+
+                    contentEl.style.setProperty('--scroll-offset', `-${scrollDistance}px`);
+                    contentEl.style.animationDuration = `${totalTime}ms`;
+                    contentEl.classList.add('scrolling-content');
+                }
+
                 newsState.index = (newsState.index + 1) % newsState.items.length;
+                newsState.timeout = setTimeout(rotate, duration);
             }, 400);
         };
         
         rotate();
-        newsState.interval = setInterval(rotate, (speed || 7) * 1000);
     };
 }
 
@@ -418,9 +460,9 @@ function handleCurrencyWidget(settings, isNewsVisible) {
     const { show, country } = settings;
     
     // Limpieza
-    clearInterval(currencyState.interval);
+    clearTimeout(currencyState.timeout);
     clearInterval(currencyState.fetchInterval);
-    currencyState.interval = null;
+    currencyState.timeout = null;
     
     if (!show) {
         currencyWidget.style.display = 'none';
@@ -435,7 +477,7 @@ function handleCurrencyWidget(settings, isNewsVisible) {
     
     const refreshCurrency = async () => {
         currencyState.items = await fetchCurrencyData(country);
-        if (!currencyState.interval) startCurrencyRotation();
+        if (!currencyState.timeout) startCurrencyRotation();
     };
     
     refreshCurrency();
@@ -444,20 +486,44 @@ function handleCurrencyWidget(settings, isNewsVisible) {
     const startCurrencyRotation = () => {
         currencyState.index = 0;
         const contentEl = document.getElementById('currency-item');
+        const containerEl = document.getElementById('currency-content');
         
         const rotate = () => {
-            if (currencyState.items.length === 0) return;
+            if (currencyState.items.length === 0) {
+                currencyState.timeout = setTimeout(rotate, 2000);
+                return;
+            }
             
             contentEl.style.opacity = 0;
+            contentEl.style.animation = 'none';
+            contentEl.classList.remove('scrolling-content');
+            contentEl.style.transform = 'translateX(0)';
+
         setTimeout(() => {
             contentEl.innerHTML = currencyState.items[currencyState.index];
             contentEl.style.opacity = 1;
+
+            let duration = 8000;
+            const contentWidth = contentEl.scrollWidth;
+            const containerWidth = containerEl.clientWidth;
+
+            if (contentWidth > containerWidth) {
+                const scrollDistance = contentWidth - containerWidth + 20;
+                const scrollTime = (scrollDistance / 50) * 1000;
+                const totalTime = scrollTime + 3000;
+                if (totalTime > duration) duration = totalTime;
+
+                contentEl.style.setProperty('--scroll-offset', `-${scrollDistance}px`);
+                contentEl.style.animationDuration = `${totalTime}ms`;
+                contentEl.classList.add('scrolling-content');
+            }
+
             currencyState.index = (currencyState.index + 1) % currencyState.items.length;
+            currencyState.timeout = setTimeout(rotate, duration);
         }, 400);
     };
         
         rotate();
-        currencyState.interval = setInterval(rotate, 8000); // 8 segundos por bloque de monedas
     };
 }
 
