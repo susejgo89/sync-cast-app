@@ -111,6 +111,36 @@ widgetStyles.textContent = `
         20% { transform: translateX(0); } /* Pausa inicial para leer el principio */
         100% { transform: translateX(var(--scroll-offset)); } /* Se mueve hasta el final */
     }
+
+    /* --- NUEVAS TRANSICIONES DE MEDIOS --- */
+    .media-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        will-change: transform, opacity;
+        background-color: black; /* Evita fondos blancos en transiciones */
+    }
+
+    /* Tipo 1: Fade (Desvanecimiento) */
+    .anim-fade-enter { opacity: 0; z-index: 20; }
+    .anim-fade-enter-active { opacity: 1; transition: opacity 1.2s ease-in-out; }
+    .anim-fade-exit { opacity: 1; z-index: 10; }
+    .anim-fade-exit-active { opacity: 0; transition: opacity 1.2s ease-in-out; }
+
+    /* Tipo 2: Slide (Deslizamiento) */
+    .anim-slide-enter { transform: translateX(100%); z-index: 20; }
+    .anim-slide-enter-active { transform: translateX(0); transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    .anim-slide-exit { transform: translateX(0); z-index: 10; }
+    .anim-slide-exit-active { transform: translateX(-30%); opacity: 0.5; transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s; }
+
+    /* Tipo 3: Zoom (Escala) */
+    .anim-zoom-enter { transform: scale(1.1); opacity: 0; z-index: 20; }
+    .anim-zoom-enter-active { transform: scale(1); opacity: 1; transition: transform 1.5s ease-out, opacity 1.5s ease-out; }
+    .anim-zoom-exit { transform: scale(1); opacity: 1; z-index: 10; }
+    .anim-zoom-exit-active { transform: scale(1.05); opacity: 0; transition: transform 1.5s ease-in, opacity 1.5s ease-in; }
 `;
 document.head.appendChild(widgetStyles);
 
@@ -843,11 +873,40 @@ function playNextItem() { // Ya no necesita ser 'async'
 
 // Muestra un archivo (imagen o video) en la pantalla
 function displayMedia(item) {
-    // Prepara el nuevo contenido con opacidad 0
-    const newContent = document.createElement('div');
-    newContent.className = 'w-full h-full absolute top-0 left-0 transition-opacity duration-500 ease-in-out opacity-0';
+    // Identificar contenido anterior para la transición de salida
+    const oldContent = contentScreen.lastElementChild;
+    
+    // Seleccionar transición aleatoria
+    const transitions = ['fade', 'slide', 'zoom'];
+    const transitionType = transitions[Math.floor(Math.random() * transitions.length)];
 
-    contentScreen.innerHTML = ''; 
+    // Prepara el nuevo contenido
+    const newContent = document.createElement('div');
+    newContent.className = `media-container anim-${transitionType}-enter`;
+
+    // Función para ejecutar la transición
+    const runTransition = () => {
+        // Forzar reflow
+        void newContent.offsetWidth;
+        
+        newContent.classList.add(`anim-${transitionType}-enter-active`);
+        newContent.classList.remove(`anim-${transitionType}-enter`);
+
+        if (oldContent) {
+            oldContent.classList.add(`anim-${transitionType}-exit`);
+            requestAnimationFrame(() => {
+                oldContent.classList.add(`anim-${transitionType}-exit-active`);
+                oldContent.classList.remove(`anim-${transitionType}-exit`);
+            });
+            
+            // Limpieza del contenido viejo
+            setTimeout(() => {
+                if (oldContent.parentNode === contentScreen) {
+                    contentScreen.removeChild(oldContent);
+                }
+            }, 1600); // Un poco más que la transición más larga
+        }
+    };
 
     if (item.type.startsWith('image')) {
         // Si la música estaba en pausa (ej. por un video anterior) y hay una playlist, la reanudamos.
@@ -874,7 +933,7 @@ function displayMedia(item) {
 
         // Una vez que la imagen carga, la hacemos visible
         img.onload = () => {
-            setTimeout(() => { newContent.style.opacity = 1; }, 100); // Pequeño delay para asegurar la transición
+            runTransition();
         };
         img.onerror = () => playNextItem(); // Si la imagen no carga, pasa a la siguiente
 
@@ -898,7 +957,7 @@ function displayMedia(item) {
 
         // Hacemos el video visible solo cuando realmente empieza a reproducirse
         video.addEventListener('playing', () => {
-            newContent.style.opacity = 1;
+            runTransition();
         }, { once: true });
 
         // Usamos la función unificada para reanudar la música y pasar al siguiente item.
@@ -928,7 +987,7 @@ function displayMedia(item) {
         weatherContainer.innerHTML = `<div class="text-3xl font-light">Cargando pronóstico...</div>`;
         newContent.appendChild(weatherContainer);
         contentScreen.appendChild(newContent);
-        setTimeout(() => { newContent.style.opacity = 1; }, 100);
+        requestAnimationFrame(runTransition);
 
         const fetchAndDisplayWeather = async () => {
             let location = item.location; // Prioridad 1: la ubicación del propio item.
@@ -1016,7 +1075,7 @@ function displayMedia(item) {
         `;
         newContent.appendChild(clockContainer);
         contentScreen.appendChild(newContent);
-        setTimeout(() => { newContent.style.opacity = 1; }, 100);
+        requestAnimationFrame(runTransition);
 
         const updateFullscreenClock = () => {
             const timeEl = document.getElementById('fullscreen-clock-time');
@@ -1054,7 +1113,7 @@ function displayMedia(item) {
         qrContainer.append(qrCodeEl, qrTextEl);
         newContent.appendChild(qrContainer);
         contentScreen.appendChild(newContent);
-        setTimeout(() => { newContent.style.opacity = 1; }, 100);
+        requestAnimationFrame(runTransition);
 
         const screenId = localStorage.getItem('nexusreplay_screen_id');
         // CORRECCIÓN: La lógica para determinar la URL del QR estaba mal.
@@ -1110,7 +1169,7 @@ function displayMedia(item) {
                         'onReady': (event) => {
                             // En 'onReady', solo nos aseguramos de que el video se reproduzca y se muestre.
                             event.target.playVideo();
-                            setTimeout(() => { newContent.style.opacity = 1; }, 100);
+                            runTransition();
                         },
                         'onStateChange': (event) => {
                             // --- ESTA ES LA LÓGICA CLAVE ---
@@ -1173,7 +1232,7 @@ function displayMedia(item) {
 
         newContent.appendChild(iframe);
         contentScreen.appendChild(newContent);
-        setTimeout(() => { newContent.style.opacity = 1; }, 100);
+        requestAnimationFrame(runTransition);
 
         const durationInSeconds = item.duration || 15;
         setTimeout(playNextItem, durationInSeconds * 1000);
