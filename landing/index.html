@@ -14,6 +14,14 @@
   <!-- Bootstrap Icons (para los iconos de características) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+  <!-- Tailwind CSS (Configurado para no interferir con Bootstrap) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      corePlugins: { preflight: false } // Evita que Tailwind resetee los estilos de Bootstrap
+    }
+  </script>
+
   <style>
     /* =============================================== */
     /* ========= CUSTOM BOOTSTRAP OVERRIDES ========== */
@@ -1315,6 +1323,55 @@
   </div>
 </div>
 
+  <!-- =============================================== -->
+  <!-- ======== CHATBOT FLOTANTE (NEXUS) ============= -->
+  <!-- =============================================== -->
+  
+  <!-- Botón Flotante (A la IZQUIERDA para no tapar WhatsApp) -->
+  <button id="chatbot-toggle-btn" class="fixed bottom-6 left-6 z-[9999] bg-violet-600 hover:bg-violet-700 text-white p-4 rounded-full shadow-lg transition-transform transform hover:scale-110 flex items-center justify-center group border-0">
+      <!-- Icono de Chat -->
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+      <span class="absolute left-full ml-3 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-lang="chatbotLabel">Ayuda IA</span>
+  </button>
+
+  <!-- Ventana del Chat -->
+  <div id="chatbot-container" class="fixed bottom-24 left-6 z-[9999] w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex-col hidden border border-gray-200 overflow-hidden font-sans text-left">
+      <!-- Header -->
+      <div class="bg-violet-600 p-4 flex justify-between items-center text-white">
+          <div class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <h3 class="font-bold m-0" data-lang="chatbotTitle">Nexus</h3>
+          </div>
+          <button id="chatbot-close-btn" class="hover:bg-violet-700 p-1 rounded bg-transparent border-0 text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+      </div>
+
+      <!-- Área de Mensajes -->
+      <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50">
+          <div class="flex w-full justify-start mb-4">
+              <div class="max-w-[80%] p-3 rounded-lg text-sm bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200" data-lang="chatbotGreeting">
+                  Hola, soy Nexus, y estoy aquí para ayudarte.
+              </div>
+          </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="p-3 border-t border-gray-200 bg-white flex gap-2">
+          <input type="text" id="chatbot-input" data-lang-placeholder="chatbotInputPlaceholder" placeholder="Escribe tu pregunta..." class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm text-gray-800">
+          <button id="chatbot-send-btn" class="bg-violet-600 hover:bg-violet-700 text-white p-2 rounded-full transition-colors border-0 flex items-center justify-center">
+              <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+          </button>
+      </div>
+  </div>
+
+  <!-- Inicialización del Chatbot -->
+  <script type="module">
+    import { initChatbot } from '../utils/chatbot.js';
+    document.addEventListener('DOMContentLoaded', () => {
+        initChatbot();
+    });
+  </script>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -1431,7 +1488,11 @@
         cookieText: "Usamos cookies para personalizar el contenido, analizar nuestro tráfico y mejorar tu experiencia. Al hacer clic en \"Aceptar\", aceptas nuestro uso de cookies. Puedes obtener más información en nuestra",
         cookiePolicyLink: "Política de Privacidad",
         cookieAccept: "Aceptar",
-        cookieReject: "Rechazar"
+        cookieReject: "Rechazar",
+        chatbotLabel: "Ayuda IA",
+        chatbotTitle: "Nexus",
+        chatbotGreeting: "Hola, soy Nexus, y estoy aquí para ayudarte.",
+        chatbotInputPlaceholder: "Escribe tu pregunta..."
       },
       en: {
         loginButton: "Login",
@@ -1542,7 +1603,11 @@
         cookieText: "We use cookies to personalize content, analyze our traffic, and improve your experience. By clicking \"Accept\", you agree to our use of cookies. You can learn more in our",
         cookiePolicyLink: "Privacy Policy",
         cookieAccept: "Accept",
-        cookieReject: "Reject"
+        cookieReject: "Reject",
+        chatbotLabel: "AI Help",
+        chatbotTitle: "Nexus",
+        chatbotGreeting: "Hi, I'm Nexus, and I'm here to help you.",
+        chatbotInputPlaceholder: "Type your question..."
       },
       pt: {
         loginButton: "Entrar",
@@ -1653,7 +1718,11 @@
         cookieText: "Usamos cookies para personalizar o conteúdo, analisar nosso tráfego e melhorar sua experiência. Ao clicar em \"Aceitar\", você concorda com o nosso uso de cookies. Você pode saber mais em nossa",
         cookiePolicyLink: "Política de Privacidade",
         cookieAccept: "Aceitar",
-        cookieReject: "Rejeitar"
+        cookieReject: "Rejeitar",
+        chatbotLabel: "Ajuda IA",
+        chatbotTitle: "Nexus",
+        chatbotGreeting: "Olá, sou o Nexus e estou aqui para ajudar.",
+        chatbotInputPlaceholder: "Digite sua pergunta..."
       }
     };
 

@@ -180,6 +180,10 @@ export const translations = {
                 formSectionPersonal: "Información Personal",
                 formSectionContact: "Contacto",
                 formSectionAddress: "Dirección",
+                chatbotLabel: "Ayuda IA",
+                chatbotTitle: "Nexus",
+                chatbotGreeting: "Hola, soy Nexus, y estoy aquí para ayudarte.",
+                chatbotInputPlaceholder: "Escribe tu pregunta...",
             },
             en: {
                 loginTitle: "Login",
@@ -362,6 +366,10 @@ export const translations = {
                 formSectionPersonal: "Personal Information",
                 formSectionContact: "Contact",
                 formSectionAddress: "Address",
+                chatbotLabel: "AI Help",
+                chatbotTitle: "Nexus",
+                chatbotGreeting: "Hi, I'm Nexus, and I'm here to help you.",
+                chatbotInputPlaceholder: "Type your question...",
             },
             pt: {
                 loginTitle: "Entrar",
@@ -544,5 +552,9 @@ export const translations = {
                 formSectionPersonal: "Informações Pessoais",
                 formSectionContact: "Contato",
                 formSectionAddress: "Endereço",
+                chatbotLabel: "Ajuda IA",
+                chatbotTitle: "Nexus",
+                chatbotGreeting: "Olá, sou o Nexus e estou aqui para ajudar.",
+                chatbotInputPlaceholder: "Digite sua pergunta...",
             }
         };

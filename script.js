@@ -13,6 +13,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         import { initRouter, showPage, showMandatoryPage } from './utils/router.js';
         import { initAdminView } from './views/adminView.js';
         import { createMediaCard } from './components/mediaCard.js';
+        import { initChatbot } from './utils/chatbot.js';
         
         /**
          * Lógica de White-Labeling (Marca Personalizada).
@@ -39,6 +40,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         }
         
         document.addEventListener('DOMContentLoaded', async () => {
+            // Inicializar el Chatbot de IA
+            initChatbot();
+
             // --- EVENT LISTENER DELEGADO PARA FORMULARIOS DE PERFIL ---
             // Este listener se añade al body y escucha los 'submit' que ocurran dentro.
             // Así, aunque los formularios se creen dinámicamente, siempre funcionará.

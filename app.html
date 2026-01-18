@@ -682,7 +682,6 @@
                 </div>
             </main>
         </div>
-    </div>
 
     <div id="confirm-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm">
@@ -894,6 +893,48 @@
         </div>
     </div>
 
+    <!-- =============================================== -->
+    <!-- ======== CHATBOT FLOTANTE (GEMINI) ============ -->
+    <!-- =============================================== -->
+    
+    <!-- Botón Flotante (Global) -->
+    <button id="chatbot-toggle-btn" class="fixed bottom-6 right-6 z-[9999] bg-violet-600 hover:bg-violet-700 text-white p-4 rounded-full shadow-lg transition-transform transform hover:scale-110 flex items-center justify-center group">
+        <!-- Icono de Chat -->
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        <span class="absolute right-full mr-3 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-lang="chatbotLabel">Ayuda IA</span>
+    </button>
+
+    <!-- Ventana del Chat (Oculta por defecto) -->
+    <div id="chatbot-container" class="fixed bottom-24 right-6 z-[9999] w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex-col hidden border border-gray-200 overflow-hidden font-sans">
+        <!-- Header -->
+        <div class="bg-violet-600 p-4 flex justify-between items-center text-white">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <h3 class="font-bold" data-lang="chatbotTitle">Nexus</h3>
+            </div>
+            <button id="chatbot-close-btn" class="hover:bg-violet-700 p-1 rounded">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <!-- Área de Mensajes -->
+        <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50">
+            <!-- Mensaje de bienvenida -->
+            <div class="flex w-full justify-start mb-4">
+                <div class="max-w-[80%] p-3 rounded-lg text-sm bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200" data-lang="chatbotGreeting">
+                    Hola, soy Nexus, y estoy aquí para ayudarte.
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-3 border-t border-gray-200 bg-white flex gap-2">
+            <input type="text" id="chatbot-input" data-lang-placeholder="chatbotInputPlaceholder" placeholder="Escribe tu pregunta..." class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm">
+            <button id="chatbot-send-btn" class="bg-violet-600 hover:bg-violet-700 text-white p-2 rounded-full transition-colors">
+                <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+        </div>
+    </div>
 
     <script type="module" src="script.js" defer></script>
 
