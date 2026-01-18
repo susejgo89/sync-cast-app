@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+import { GEMINI_API_KEY } from "./secrets.js";
 
 /**
  * CONFIGURACIÓN DEL CHATBOT
@@ -6,7 +7,7 @@ import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
  */
 
 // 1. TU API KEY (Reemplaza esto con tu clave real de Google AI Studio)
-const API_KEY = "AIzaSyCwQjaMRfOG0vS5IU-zowD8u7a_gtK7u1M"; // <--- ¡PEGA TU CLAVE AQUÍ!
+const API_KEY = GEMINI_API_KEY; 
 
 // 2. MODELO A USAR
 const MODEL_NAME = "models/gemini-2.5-flash";

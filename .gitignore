@@ -4,3 +4,4 @@ weather-config.js
 .firebase/
 # Ignorar dependencias de Node.js (buena práctica para el futuro)
 node_modules/
+utils/secrets.js
