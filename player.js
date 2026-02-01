@@ -66,6 +66,7 @@ widgetStyles.textContent = `
     #news-item, #currency-item {
         display: inline-block;
         white-space: nowrap;
+        padding-right: 50px; /* Margen extra para asegurar el scroll */
     }
 
     /* --- Portrait Mode (Vertical Screens) --- */
@@ -105,6 +106,9 @@ widgetStyles.textContent = `
         animation-name: marquee;
         animation-timing-function: linear;
         animation-iteration-count: 1;
+        animation-fill-mode: forwards; /* Mantiene la posición final al terminar */
+        transform: translateZ(0); /* Fuerza aceleración por GPU */
+        backface-visibility: hidden;
     }
     @keyframes marquee {
         0% { transform: translateX(0); }
@@ -402,13 +406,8 @@ async function fetchCurrencyData(country) {
                     return `${flagMap[curr] || '💰'} ${curr}: ${formattedVal}`;
                 });
             
-            // Agrupar en bloques de 3 para mostrar varias a la vez
-            const chunkSize = 3;
-            const chunks = [];
-            for (let i = 0; i < formattedItems.length; i += chunkSize) {
-                chunks.push(formattedItems.slice(i, i + chunkSize).join('<span style="margin: 0 20px; opacity: 0.4;">|</span>'));
-            }
-            return chunks;
+            // Devolvemos todas las cotizaciones en una sola cadena para que se muestren juntas
+            return formattedItems.length > 0 ? [formattedItems.join('<span style="margin: 0 20px; opacity: 0.4;">|</span>')] : [];
         }
     } catch (e) {
         console.error("Currency Error:", e);
@@ -464,29 +463,40 @@ function handleNewsWidget(settings) {
                 contentEl.textContent = newsState.items[newsState.index];
                 contentEl.style.opacity = 1;
 
-                // --- LÓGICA INTELIGENTE DE SCROLL ---
-                let duration = (speed || 7) * 1000;
-                const contentWidth = contentEl.offsetWidth; // Usamos offsetWidth para mayor precisión
+                // --- LÓGICA DE ANIMACIÓN POR JAVASCRIPT (WAAPI) ---
+                // Esto garantiza que el scroll funcione siempre, sin depender de clases CSS
+                const contentWidth = contentEl.scrollWidth;
                 const containerWidth = containerEl.clientWidth;
 
                 // Si el texto es más largo que el contenedor, activamos el scroll
                 if (contentWidth > containerWidth) {
-                    const scrollDistance = contentWidth - containerWidth + 20; // +20px de margen
-                    const scrollSpeed = 50; // Píxeles por segundo (velocidad de lectura cómoda)
-                    const scrollTime = (scrollDistance / scrollSpeed) * 1000;
-                    const totalTime = scrollTime + 3000; // +3s para pausas inicial/final
+                    const distance = contentWidth - containerWidth + 20; // Distancia a recorrer + margen
+                    const scrollSpeed = 50; // px por segundo
+                    const duration = (distance / scrollSpeed) * 1000;
                     
-                    // Si la animación dura más que el tiempo configurado, extendemos el tiempo
-                    if (totalTime > duration) duration = totalTime;
+                    // Creamos la animación manualmente
+                    const animation = contentEl.animate([
+                        { transform: 'translateX(0)' }, 
+                        { transform: `translateX(-${distance}px)` }
+                    ], {
+                        duration: duration,
+                        delay: 2000,     // Pausa inicial de 2s para leer el principio
+                        endDelay: 2000,  // Pausa final de 2s
+                        easing: 'linear',
+                        fill: 'forwards'
+                    });
 
-                    contentEl.style.removeProperty('transform'); // Limpiamos transform inline para que la animación mande
-                    contentEl.style.setProperty('--scroll-offset', `-${scrollDistance}px`);
-                    contentEl.style.animationDuration = `${totalTime}ms`;
-                    contentEl.classList.add('scrolling-content');
+                    animation.onfinish = () => {
+                        newsState.index = (newsState.index + 1) % newsState.items.length;
+                        rotate(); // Llamada recursiva al terminar
+                    };
+                } else {
+                    // Si cabe en pantalla, solo esperamos el tiempo configurado
+                    newsState.timeout = setTimeout(() => {
+                        newsState.index = (newsState.index + 1) % newsState.items.length;
+                        rotate();
+                    }, (speed || 7) * 1000);
                 }
-
-                newsState.index = (newsState.index + 1) % newsState.items.length;
-                newsState.timeout = setTimeout(rotate, duration);
             }, 400);
         };
         
@@ -541,24 +551,34 @@ function handleCurrencyWidget(settings, isNewsVisible) {
             contentEl.innerHTML = currencyState.items[currencyState.index];
             contentEl.style.opacity = 1;
 
-            let duration = 8000;
-            const contentWidth = contentEl.offsetWidth;
+            const contentWidth = contentEl.scrollWidth;
             const containerWidth = containerEl.clientWidth;
 
             if (contentWidth > containerWidth) {
-                const scrollDistance = contentWidth - containerWidth + 20;
-                const scrollTime = (scrollDistance / 50) * 1000;
-                const totalTime = scrollTime + 3000;
-                if (totalTime > duration) duration = totalTime;
+                const distance = contentWidth - containerWidth + 20;
+                const duration = (distance / 50) * 1000; // 50px/s
 
-                contentEl.style.removeProperty('transform');
-                contentEl.style.setProperty('--scroll-offset', `-${scrollDistance}px`);
-                contentEl.style.animationDuration = `${totalTime}ms`;
-                contentEl.classList.add('scrolling-content');
+                const animation = contentEl.animate([
+                    { transform: 'translateX(0)' },
+                    { transform: `translateX(-${distance}px)` }
+                ], {
+                    duration: duration,
+                    delay: 2000,
+                    endDelay: 2000,
+                    easing: 'linear',
+                    fill: 'forwards'
+                });
+
+                animation.onfinish = () => {
+                    currencyState.index = (currencyState.index + 1) % currencyState.items.length;
+                    rotate();
+                };
+            } else {
+                currencyState.timeout = setTimeout(() => {
+                    currencyState.index = (currencyState.index + 1) % currencyState.items.length;
+                    rotate();
+                }, 8000);
             }
-
-            currencyState.index = (currencyState.index + 1) % currencyState.items.length;
-            currencyState.timeout = setTimeout(rotate, duration);
         }, 400);
     };
         
