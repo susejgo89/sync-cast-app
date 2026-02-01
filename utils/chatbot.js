@@ -136,13 +136,12 @@ export function initChatbot() {
 
 function toggleChat(show) {
     if (show) {
-        chatContainer.classList.remove('tw-hidden');
-        chatContainer.classList.add('tw-flex');
-        // Foco en el input
+        chatContainer.classList.remove('tw-hidden', 'hidden');
+        chatContainer.classList.add('tw-flex', 'flex');
         setTimeout(() => document.getElementById('chatbot-input').focus(), 100);
     } else {
-        chatContainer.classList.add('tw-hidden');
-        chatContainer.classList.remove('tw-flex');
+        chatContainer.classList.add('tw-hidden', 'hidden');
+        chatContainer.classList.remove('tw-flex', 'flex');
     }
 }
 
