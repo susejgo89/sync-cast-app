@@ -18,7 +18,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      corePlugins: { preflight: false } // Evita que Tailwind resetee los estilos de Bootstrap
+      prefix: 'tw-', // Prefijo para aislar Tailwind
+      corePlugins: { preflight: false } // Evita resetear Bootstrap
     }
   </script>
 
@@ -51,6 +52,20 @@
       background-color: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px); /* Para Safari */
+    }
+
+    /* Eliminar bordes y recuadros del logo y botón móvil */
+    .navbar-brand, .navbar-brand:focus, .navbar-brand:active {
+      outline: none;
+      box-shadow: none;
+    }
+    .navbar-brand img {
+      border-style: none;
+    }
+    .navbar-toggler {
+      border: none;
+      outline: none;
+      box-shadow: none !important;
     }
 
     /* Fondo para el menú desplegable en móvil */
@@ -1328,39 +1343,39 @@
   <!-- =============================================== -->
   
   <!-- Botón Flotante (A la IZQUIERDA para no tapar WhatsApp) -->
-  <button id="chatbot-toggle-btn" class="fixed bottom-6 left-6 z-[9999] bg-violet-600 hover:bg-violet-700 text-white p-4 rounded-full shadow-lg transition-transform transform hover:scale-110 flex items-center justify-center group border-0">
+  <button id="chatbot-toggle-btn" class="tw-fixed tw-bottom-6 tw-left-6 tw-z-[9999] tw-bg-violet-600 hover:tw-bg-violet-700 tw-text-white tw-p-4 tw-rounded-full tw-shadow-lg tw-transition-transform tw-transform hover:tw-scale-110 tw-flex tw-items-center tw-justify-center tw-group tw-border-0">
       <!-- Icono de Chat -->
-      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-      <span class="absolute left-full ml-3 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-lang="chatbotLabel">Ayuda IA</span>
+      <svg class="tw-w-8 tw-h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+      <span class="tw-absolute tw-left-full tw-ml-3 tw-bg-gray-900 tw-text-white tw-text-xs tw-px-2 tw-py-1 tw-rounded tw-opacity-0 group-hover:tw-opacity-100 tw-transition-opacity tw-whitespace-nowrap" data-lang="chatbotLabel">Ayuda IA</span>
   </button>
 
   <!-- Ventana del Chat -->
-  <div id="chatbot-container" class="fixed bottom-24 left-6 z-[9999] w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex-col hidden border border-gray-200 overflow-hidden font-sans text-left">
+  <div id="chatbot-container" class="tw-fixed tw-bottom-24 tw-left-6 tw-z-[9999] tw-w-96 tw-h-[500px] tw-bg-white tw-rounded-2xl tw-shadow-2xl tw-flex-col tw-hidden tw-border tw-border-gray-200 tw-overflow-hidden tw-font-sans tw-text-left">
       <!-- Header -->
-      <div class="bg-violet-600 p-4 flex justify-between items-center text-white">
-          <div class="flex items-center gap-2">
-              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <h3 class="font-bold m-0" data-lang="chatbotTitle">Nexus</h3>
+      <div class="tw-bg-violet-600 tw-p-4 tw-flex tw-justify-between tw-items-center tw-text-white">
+          <div class="tw-flex tw-items-center tw-gap-2">
+              <div class="tw-w-2 tw-h-2 tw-bg-green-400 tw-rounded-full tw-animate-pulse"></div>
+              <h3 class="tw-font-bold tw-m-0" data-lang="chatbotTitle">Nexus</h3>
           </div>
-          <button id="chatbot-close-btn" class="hover:bg-violet-700 p-1 rounded bg-transparent border-0 text-white">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <button id="chatbot-close-btn" class="hover:tw-bg-violet-700 tw-p-1 tw-rounded tw-bg-transparent tw-border-0 tw-text-white">
+              <svg class="tw-w-5 tw-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
       </div>
 
       <!-- Área de Mensajes -->
-      <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50">
-          <div class="flex w-full justify-start mb-4">
-              <div class="max-w-[80%] p-3 rounded-lg text-sm bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200" data-lang="chatbotGreeting">
+      <div id="chatbot-messages" class="tw-flex-1 tw-p-4 tw-overflow-y-auto tw-bg-gray-50">
+          <div class="tw-flex tw-w-full tw-justify-start tw-mb-4">
+              <div class="tw-max-w-[80%] tw-p-3 tw-rounded-lg tw-text-sm tw-bg-gray-100 tw-text-gray-800 tw-rounded-bl-none tw-border tw-border-gray-200" data-lang="chatbotGreeting">
                   Hola, soy Nexus, y estoy aquí para ayudarte.
               </div>
           </div>
       </div>
 
       <!-- Input Area -->
-      <div class="p-3 border-t border-gray-200 bg-white flex gap-2">
-          <input type="text" id="chatbot-input" data-lang-placeholder="chatbotInputPlaceholder" placeholder="Escribe tu pregunta..." class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm text-gray-800">
-          <button id="chatbot-send-btn" class="bg-violet-600 hover:bg-violet-700 text-white p-2 rounded-full transition-colors border-0 flex items-center justify-center">
-              <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+      <div class="tw-p-3 tw-border-t tw-border-gray-200 tw-bg-white tw-flex tw-gap-2">
+          <input type="text" id="chatbot-input" data-lang-placeholder="chatbotInputPlaceholder" placeholder="Escribe tu pregunta..." class="tw-flex-1 tw-px-4 tw-py-2 tw-border tw-border-gray-300 tw-rounded-full focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-violet-500 tw-text-sm tw-text-gray-800">
+          <button id="chatbot-send-btn" class="tw-bg-violet-600 hover:tw-bg-violet-700 tw-text-white tw-p-2 tw-rounded-full tw-transition-colors tw-border-0 tw-flex tw-items-center tw-justify-center">
+              <svg class="tw-w-5 tw-h-5 tw-transform tw-rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
           </button>
       </div>
   </div>
