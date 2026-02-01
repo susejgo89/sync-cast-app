@@ -262,7 +262,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
             }
             const clockItem = { 
                 type: 'clock', 
-                name: 'Reloj Digital (Local)', 
+                name: translations[getLang()].clockItemName, 
                 duration: 10,
                 timezone: 'local' // 'local' para la hora del dispositivo
             };
@@ -277,7 +277,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
             }
             const weatherItem = { 
                 type: 'weather', 
-                name: 'Resumen del Clima', 
+                name: translations[getLang()].weatherItemName, 
                 duration: 15,
                 location: '' // Añadimos la propiedad de ubicación
             };
@@ -292,7 +292,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
             }
             const qrItem = { 
                 type: 'qrcode', 
-                name: 'Código QR Pantalla Completa', 
+                name: translations[getLang()].qrItemName, 
                 duration: 15,
                 text: translations[getLang()].scanForMenu || 'Escanea para más info',
                 qrType: 'url',
@@ -314,7 +314,7 @@ export function initPlaylistsView(userId, langGetter, onUpdateCallback, mediaDat
 
         deletePlaylistBtn.addEventListener('click', () => { 
             if (activePlaylistId) {
-                showConfirmModal("Eliminar Playlist", "¿Seguro que quieres eliminar esta playlist?", () => {
+                showConfirmModal(translations[getLang()].deletePlaylistTitle, translations[getLang()].deletePlaylistMsg, () => {
                     deleteDoc(doc(db, 'playlists', activePlaylistId)).then(() => { 
                         activePlaylistId = null; 
                         playlistEditor.classList.add('hidden'); 

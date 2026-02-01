@@ -258,14 +258,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             setTimeout(() => messageBox.classList.add('hidden'), 5000);
         };
 
-        loginForm.addEventListener('submit', (e) => { e.preventDefault(); signInWithEmailAndPassword(auth, loginForm['login-email'].value, loginForm['login-password'].value).catch(() => showMessage("Correo o contraseña incorrectos.", true)); });
+        loginForm.addEventListener('submit', (e) => { e.preventDefault(); signInWithEmailAndPassword(auth, loginForm['login-email'].value, loginForm['login-password'].value).catch(() => showMessage(translations[currentLang].loginError, true)); });
         registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const pass = registerForm['register-password'].value;
     const email = registerForm['register-email'].value;
 
     if (pass.length < 6) {
-        showMessage("La contraseña debe tener al menos 6 caracteres.", true);
+        showMessage(translations[currentLang].passwordTooShort, true);
         return;
     }
 
@@ -289,7 +289,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 // Una vez creado el perfil, enviamos el email de verificación
                 sendEmailVerification(user)
                     .then(() => {
-                        showMessage("¡Cuenta creada! Revisa tu correo para verificarla.", false);
+                        showMessage(translations[currentLang].accountCreated, false);
                         auth.signOut();
                     });
             });
@@ -298,7 +298,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         .catch((error) => {
             // Manejo de errores (ej. el correo ya existe)
             console.error("Error en registro:", error);
-            showMessage("Este correo ya está en uso o hubo un error.", true);
+            showMessage(translations[currentLang].registerError, true);
         });
 });
         showRegisterLink.addEventListener('click', (e) => {
@@ -482,7 +482,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const originalBtnIconHTML = saveBtnIcon.innerHTML;
 
             saveBtn.disabled = true;
-            saveBtnText.textContent = 'Guardando...';
+            saveBtnText.textContent = translations[currentLang].saving;
             // Opcional: Cambiar a un icono de "cargando"
             saveBtnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 9a9 9 0 0114.13-6.36M20 15a9 9 0 01-14.13 6.36"></path>`;
             saveBtnIcon.classList.add('animate-spin');
@@ -498,7 +498,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     saveBtn.classList.add('bg-emerald-500'); // Color verde de éxito
                     saveBtnIcon.classList.remove('animate-spin');
                     saveBtnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>`; // Icono de check
-                    saveBtnText.textContent = '¡Guardado!';
+                    saveBtnText.textContent = translations[currentLang].saved;
 
                     // Después de 2 segundos, restauramos el botón a su estado original
                     setTimeout(() => {
@@ -511,7 +511,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
             } catch (error) {
                 console.error("Error al guardar el perfil:", error);
-                showMessage('Hubo un error al guardar tu perfil.', true);
+                showMessage(translations[currentLang].saveProfileError, true);
                 // Restauramos el botón inmediatamente si hay un error
                 saveBtn.disabled = false;
                 saveBtnText.textContent = originalBtnText;

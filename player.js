@@ -834,7 +834,7 @@ function loadVisualPlaylist(playlistId) {
                 currentItemIndex = 0;
                 playNextItem();
             } else {
-                displayMessage("Error: La playlist visual no fue encontrada.");
+                displayMessage(translations[document.documentElement.lang || 'es'].visualPlaylistNotFound);
             }
         });
     } else {
@@ -869,7 +869,7 @@ function loadMusicPlaylist(playlistId) {
 function playNextItem() { // Ya no necesita ser 'async'
     if (currentPlaylistItems.length === 0) {
         // Si la lista está vacía, muestra un mensaje y termina.
-        displayMessage("No hay ninguna playlist visual asignada.");
+        displayMessage(translations[document.documentElement.lang || 'es'].noVisualPlaylistAssigned);
         return;
     }
 
