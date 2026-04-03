@@ -21,8 +21,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
          */
         async function applyWhiteLabeling() {
             const currentHostname = window.location.hostname;
-            // Reemplaza 'your-default-domain.web.app' con tu dominio real de Firebase Hosting
-            const defaultDomains = ['localhost', '127.0.0.1', 'sync-cast-app.web.app']; 
+            // Añade tu nuevo dominio personalizado a esta lista para que se reconozca como el dominio principal
+            const defaultDomains = ['localhost', '127.0.0.1', 'sync-cast-app.web.app', 'sutechtvcorporativa.web.app', 'nexusreplay.com', 'www.nexusreplay.com']; 
         
             if (!defaultDomains.includes(currentHostname)) {
                 const usersRef = collection(db, "users");
