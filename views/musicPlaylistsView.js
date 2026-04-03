@@ -6,6 +6,13 @@ import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
 import { createMediaCard } from '../components/mediaCard.js';
 
+// --- Estado del módulo (fuera de la función para evitar eventos duplicados) ---
+let listenersAttached = false;
+let currentUserId = null;
+let activePlaylistId = null;
+let userMusicPlaylists = [];
+let draggedItem = null; 
+
 export function initMusicPlaylistsView(userId, getLang, onUpdateCallback, getMediaData) {
     const viewSection = document.getElementById('music-playlists-section');
 if (!viewSection) {
@@ -28,12 +35,8 @@ const addMusicPlaylistForm = document.getElementById('add-music-playlist-form');
 const newMusicPlaylistNameInput = document.getElementById('new-music-playlist-name');
 const addMusicPlaylistCancelBtn = document.getElementById('add-music-playlist-cancel');
 
-
-    let activePlaylistId = null;
-    let userMusicPlaylists = [];
-    let listenersAttached = false;
-    let currentUserId = userId; // CORRECCIÓN: Asignar el userId recibido a la variable de estado del módulo.
-    let draggedItem = null; 
+    // Actualizamos el ID del usuario cada vez que se inicializa la vista
+    currentUserId = userId;
 
     // --- Lógica de Renderizado y Manipulación de Items ---
 

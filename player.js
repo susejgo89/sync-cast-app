@@ -471,7 +471,11 @@ function handleNewsWidget(settings) {
                 // Si el texto es más largo que el contenedor, activamos el scroll
                 if (contentWidth > containerWidth) {
                     const distance = contentWidth - containerWidth + 20; // Distancia a recorrer + margen
-                    const scrollSpeed = 50; // px por segundo
+                    
+                    // Vinculamos la velocidad de scroll al parámetro 'speed' del usuario.
+                    // Si 'speed' es 7 (por defecto), scrollSpeed es 50 px/s. 
+                    // Si el usuario pone 14 segundos, scrollSpeed baja a 25 px/s (más lento y legible).
+                    const scrollSpeed = 350 / (speed || 7); 
                     const duration = (distance / scrollSpeed) * 1000;
                     
                     // Creamos la animación manualmente
@@ -480,8 +484,8 @@ function handleNewsWidget(settings) {
                         { transform: `translateX(-${distance}px)` }
                     ], {
                         duration: duration,
-                        delay: 2000,     // Pausa inicial de 2s para leer el principio
-                        endDelay: 2000,  // Pausa final de 2s
+                        delay: 3000,     // 3s de pausa inicial para poder leer el principio
+                        endDelay: 3000,  // 3s de pausa final antes de cambiar a la siguiente
                         easing: 'linear',
                         fill: 'forwards'
                     });
@@ -556,15 +560,15 @@ function handleCurrencyWidget(settings, isNewsVisible) {
 
             if (contentWidth > containerWidth) {
                 const distance = contentWidth - containerWidth + 20;
-                const duration = (distance / 50) * 1000; // 50px/s
+                const duration = (distance / 35) * 1000; // 35px/s (Más lento y legible por defecto)
 
                 const animation = contentEl.animate([
                     { transform: 'translateX(0)' },
                     { transform: `translateX(-${distance}px)` }
                 ], {
                     duration: duration,
-                    delay: 2000,
-                    endDelay: 2000,
+                    delay: 3000,
+                    endDelay: 3000,
                     easing: 'linear',
                     fill: 'forwards'
                 });
