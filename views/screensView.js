@@ -135,32 +135,6 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
                     Contenido
                 </h5>
                 
-                <!-- Visual Playlist -->
-                <div class="bg-white/60 rounded-lg p-3 border border-white/50 shadow-sm">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-blue-400"></span> ${translations[currentLang].visualPlaylist}
-                        </label>
-                        <div class="flex bg-gray-100 rounded p-0.5">
-                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${!isVisualAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="simple" data-type="visual" data-screen-id="${screen.id}">${translations[currentLang].simpleMode}</button>
-                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${isVisualAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="advanced" data-type="visual" data-screen-id="${screen.id}">${translations[currentLang].advancedMode}</button>
-                        </div>
-                    </div>
-                    
-                    <div class="simple-schedule-container ${isVisualAdvanced ? 'hidden' : ''}" data-type="visual">
-                        <select data-screen-id="${screen.id}" class="playlist-select custom-select text-sm w-full bg-transparent border-gray-200 focus:bg-white transition-colors">
-                            <option value="">${translations[currentLang].none}</option>
-                            ${visualOptions}
-                        </select>
-                    </div>
-                    <div class="advanced-schedule-container ${!isVisualAdvanced ? 'hidden' : ''}" data-type="visual">
-                        <div class="schedule-summary-list space-y-1 mb-2 max-h-20 overflow-y-auto text-xs">
-                            ${generateScheduleSummary(screen.visualScheduleRules, 'visual', visualPlaylists, currentLang)}
-                        </div>
-                        <button data-screen-id="${screen.id}" data-type="visual" class="manage-schedule-btn w-full py-1.5 text-xs font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded transition-colors">${translations[currentLang].manageSchedule}</button>
-                    </div>
-                </div>
-
                 <!-- Music Playlist -->
                 <div class="bg-white/60 rounded-lg p-3 border border-white/50 shadow-sm">
                     <div class="flex justify-between items-center mb-2">
@@ -184,6 +158,32 @@ function renderScreens(screens, visualPlaylists, musicPlaylists, currentLang, us
                              ${generateScheduleSummary(screen.musicScheduleRules, 'music', musicPlaylists, currentLang)}
                         </div>
                         <button data-screen-id="${screen.id}" data-type="music" class="manage-schedule-btn w-full py-1.5 text-xs font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded transition-colors">${translations[currentLang].manageSchedule}</button>
+                    </div>
+                </div>
+
+                <!-- Visual Playlist -->
+                <div class="bg-white/60 rounded-lg p-3 border border-white/50 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-400"></span> ${translations[currentLang].visualPlaylist}
+                        </label>
+                        <div class="flex bg-gray-100 rounded p-0.5">
+                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${!isVisualAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="simple" data-type="visual" data-screen-id="${screen.id}">${translations[currentLang].simpleMode}</button>
+                            <button class="px-2 py-0.5 text-[10px] font-medium rounded ${isVisualAdvanced ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'} scheduling-mode-btn" data-mode="advanced" data-type="visual" data-screen-id="${screen.id}">${translations[currentLang].advancedMode}</button>
+                        </div>
+                    </div>
+                    
+                    <div class="simple-schedule-container ${isVisualAdvanced ? 'hidden' : ''}" data-type="visual">
+                        <select data-screen-id="${screen.id}" class="playlist-select custom-select text-sm w-full bg-transparent border-gray-200 focus:bg-white transition-colors">
+                            <option value="">${translations[currentLang].none}</option>
+                            ${visualOptions}
+                        </select>
+                    </div>
+                    <div class="advanced-schedule-container ${!isVisualAdvanced ? 'hidden' : ''}" data-type="visual">
+                        <div class="schedule-summary-list space-y-1 mb-2 max-h-20 overflow-y-auto text-xs">
+                            ${generateScheduleSummary(screen.visualScheduleRules, 'visual', visualPlaylists, currentLang)}
+                        </div>
+                        <button data-screen-id="${screen.id}" data-type="visual" class="manage-schedule-btn w-full py-1.5 text-xs font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded transition-colors">${translations[currentLang].manageSchedule}</button>
                     </div>
                 </div>
             </div>
@@ -414,6 +414,12 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
             await updateDoc(screenRef, { [fieldToUpdate]: arrayUnion(newRule), lastScheduledAt: serverTimestamp() });
 
             addScheduleRuleForm.reset();
+            
+            // NUEVO: Volver a renderizar la lista en el modal al instante tras añadir
+            const updatedSnap = await getDoc(screenRef);
+            if (updatedSnap.exists()) {
+                renderScheduleRules(updatedSnap.data()[fieldToUpdate] || [], scheduleType);
+            }
         });
 
         scheduleRulesListEl.addEventListener('click', async (e) => {
@@ -429,6 +435,10 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                     const ruleToDelete = rules[ruleIndex];
                     if (ruleToDelete) {
                         await updateDoc(screenRef, { [fieldName]: arrayRemove(ruleToDelete), lastScheduledAt: serverTimestamp() });
+                        
+                        // NUEVO: Volver a renderizar la lista en el modal al instante tras borrar
+                        rules.splice(ruleIndex, 1);
+                        renderScheduleRules(rules, scheduleType);
                     }
                 }
             }

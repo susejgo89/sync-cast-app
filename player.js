@@ -634,6 +634,7 @@ function handleQrCodeWidget(screenId, settings) {
 // --- State ---
 let currentPlaylistItems = [];
 let currentItemIndex = 0;
+let currentVisualPlaybackId = 0; // NUEVO: Identificador de sesión visual
 let unsubscribeScreenListener = null; 
 let unsubscribePlaylistListener = null;
 let unsubscribeMusicPlaylistListener = null; // Listener para la playlist de música
@@ -643,8 +644,33 @@ let currentMusicPlaylistId = null;
 
 let currentMusicPlaylistItems = [];
 let currentMusicItemIndex = 0;
+let currentMusicPlaybackId = 0; // NUEVO: Identificador de sesión musical
 const audioPlayer = new Audio(); // Nuestro reproductor de música dedicado
 audioPlayer.loop = false; // El bucle lo manejaremos con código
+let isVisualAudioActive = false; // "Semáforo" para evitar que la música pise a los videos
+let startupAudioBlock = false; // Evita que la música arranque antes del primer video con sonido
+let startupBlockInProgress = false; // Indica que estamos esperando al primer contenido visual
+
+const visualContentHasAudio = (item) => {
+    if (!item || !item.type) return false;
+    const type = item.type;
+    return type.startsWith('video') || type === 'youtube' || type === 'iframe';
+};
+
+const releaseStartupBlock = () => {
+    if (startupBlockInProgress) {
+        startupAudioBlock = false;
+        startupBlockInProgress = false;
+    }
+};
+
+// Candado de seguridad absoluto: Si la música intenta reproducirse estando el semáforo en rojo, la pausamos al instante.
+audioPlayer.addEventListener('play', () => {
+    if (isVisualAudioActive) {
+        console.warn("Bloqueo de seguridad: El audio intentó sonar durante un video. Forzando pausa.");
+        audioPlayer.pause();
+    }
+});
 
 // --- Language Function ---
 function setLanguage(lang) {
@@ -675,6 +701,9 @@ function resetPlayer() {
 }
 
 async function playNextMusicItem() {
+    currentMusicPlaybackId++;
+    const myId = currentMusicPlaybackId;
+
     if (currentMusicPlaylistItems.length === 0) {
         audioPlayer.pause();
         return;
@@ -687,33 +716,42 @@ async function playNextMusicItem() {
     currentMusicItemIndex++; // Incrementa para la siguiente llamada
 
     if (!itemId) {
-        // Si el item es inválido, salta al siguiente
-        playNextMusicItem();
+        if (currentMusicPlaybackId === myId) playNextMusicItem();
         return;
     }
 
     try {
         const mediaDoc = await getDoc(doc(db, 'media', itemId));
+        if (currentMusicPlaybackId !== myId) return; // Si la sesión cambió, abortamos la carga
+
         if (mediaDoc.exists()) {
+            audioPlayer.pause(); // Pausamos por seguridad antes de inyectar el nuevo audio
             audioPlayer.src = mediaDoc.data().url;
             // El evento 'onended' se encargará de llamar a la siguiente canción
-            await audioPlayer.play();
+            const shouldAutoplayMusic = !isVisualAudioActive && !startupAudioBlock;
+            if (shouldAutoplayMusic) {
+                await audioPlayer.play();
+            } else {
+                audioPlayer.pause(); // Doble seguro si el semáforo está en rojo o hay bloqueo por inicio
+            }
         } else {
             console.warn(`Audio con ID ${itemId} no encontrado. Saltando.`);
-            // Si el audio no existe, intenta reproducir el siguiente inmediatamente
-            playNextMusicItem();
+            if (currentMusicPlaybackId === myId) playNextMusicItem();
         }
     } catch (error) {
+        if (currentMusicPlaybackId !== myId) return;
         if (error.name === 'NotAllowedError') {
             console.warn("La reproducción automática de audio fue bloqueada. Esperando interacción del usuario.");
             showAudioOverlay();
         } else {
             console.error("Error al intentar reproducir audio:", error);
-            setTimeout(playNextMusicItem, 1000);
+            setTimeout(() => {
+                if (currentMusicPlaybackId === myId) playNextMusicItem();
+            }, 1000);
         }
     }
 }
-audioPlayer.onended = playNextMusicItem;
+audioPlayer.onended = () => playNextMusicItem();
 
 // --- Playback Logic ---
 
@@ -813,11 +851,23 @@ function startContentPlayback(screenId) {
             }
 
             // Cargar las playlists si han cambiado
-            if (finalVisualPlaylistId !== currentVisualPlaylistId) {
-                loadVisualPlaylist(finalVisualPlaylistId);
-            }
-            if (finalMusicPlaylistId !== currentMusicPlaylistId) {
+            let musicChanged = (finalMusicPlaylistId !== currentMusicPlaylistId);
+            let visualChanged = (finalVisualPlaylistId !== currentVisualPlaylistId);
+
+            // 1. Cargamos primero la música siempre
+            if (musicChanged) {
                 loadMusicPlaylist(finalMusicPlaylistId);
+            }
+
+            // 2. Cargamos lo visual
+            if (visualChanged) {
+                if (musicChanged) {
+                    // Si ambas cambian al mismo tiempo por un horario, le damos una leve 
+                    // ventaja a la música para evitar que choquen los audios.
+                    setTimeout(() => loadVisualPlaylist(finalVisualPlaylistId), 300);
+                } else {
+                    loadVisualPlaylist(finalVisualPlaylistId);
+                }
             }
         };
 
@@ -836,13 +886,17 @@ function loadVisualPlaylist(playlistId) {
             if (playlistSnap.exists()) {
                 currentPlaylistItems = playlistSnap.data().items || [];
                 currentItemIndex = 0;
+                startupAudioBlock = true;
+                startupBlockInProgress = true;
                 playNextItem();
             } else {
                 displayMessage(translations[document.documentElement.lang || 'es'].visualPlaylistNotFound);
+                releaseStartupBlock();
             }
         });
     } else {
         currentPlaylistItems = [];
+        releaseStartupBlock();
         playNextItem(); // Esto mostrará el mensaje de "No hay playlist asignada"
     }
 }
@@ -889,14 +943,25 @@ function playNextItem() { // Ya no necesita ser 'async'
     // Así, si displayMedia falla y llama a playNextItem, el índice ya habrá avanzado.
     currentItemIndex++;
 
+    currentVisualPlaybackId++;
+    const myPlaybackId = currentVisualPlaybackId;
+
     // Verificamos que el objeto exista y lo mostramos
     if (itemData) {
-        displayMedia(itemData);
+        displayMedia(itemData, myPlaybackId);
     }
 }
 
 // Muestra un archivo (imagen o video) en la pantalla
-function displayMedia(item) {
+function displayMedia(item, playbackId) {
+    // Función segura que solo avanza si el temporizador pertenece a la sesión actual
+    const safePlayNext = () => {
+        if (currentVisualPlaybackId === playbackId) {
+            playNextItem();
+        }
+    };
+    releaseStartupBlock();
+
     // Identificar contenido anterior para la transición de salida
     const oldContent = contentScreen.lastElementChild;
     
@@ -925,7 +990,16 @@ function displayMedia(item) {
             
             // Limpieza del contenido viejo
             setTimeout(() => {
-                if (oldContent.parentNode === contentScreen) {
+                // FORZAR PAUSA en cualquier video viejo para evitar "audio fantasma" en segundo plano
+                if (oldContent) {
+                    const oldVideos = oldContent.querySelectorAll('video');
+                    oldVideos.forEach(v => {
+                        v.pause();
+                        v.removeAttribute('src'); // Libera la memoria
+                        v.load();
+                    });
+                }
+                if (oldContent && oldContent.parentNode === contentScreen) {
                     contentScreen.removeChild(oldContent);
                 }
             }, 1600); // Un poco más que la transición más larga
@@ -933,6 +1007,7 @@ function displayMedia(item) {
     };
 
     if (item.type.startsWith('image')) {
+        isVisualAudioActive = false; // Semáforo verde
         // Si la música estaba en pausa (ej. por un video anterior) y hay una playlist, la reanudamos.
         if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
             audioPlayer.volume = 1; // Nos aseguramos que el volumen esté al máximo.
@@ -959,15 +1034,14 @@ function displayMedia(item) {
         img.onload = () => {
             runTransition();
         };
-        img.onerror = () => playNextItem(); // Si la imagen no carga, pasa a la siguiente
+        img.onerror = () => safePlayNext(); // Si la imagen no carga, pasa a la siguiente
 
-        setTimeout(playNextItem, durationInSeconds * 1000);
+        setTimeout(safePlayNext, durationInSeconds * 1000);
 
     } else if (item.type.startsWith('video')) {
-        // Pausamos la música de fondo para dar prioridad al audio del video.
-        if (!audioPlayer.paused) {
-            audioPlayer.pause();
-        }
+        isVisualAudioActive = true; // Semáforo rojo
+        // Forzamos la pausa de la música de fondo (quitamos el if por seguridad)
+        audioPlayer.pause();
 
         const video = document.createElement('video');
         // Añadimos un parámetro único para evitar errores de caché del navegador (net::ERR_CACHE_OPERATION_NOT_SUPPORTED)
@@ -990,17 +1064,18 @@ function displayMedia(item) {
             // porque el onended del video ya se encarga de llamar a playNextItem()
             // y la lógica de reanudación está en el tipo 'image' o similar.
             // La lógica actual ya pausa la música para el video y la reanuda para la imagen.
-            playNextItem();
+            safePlayNext();
         };
         // ¡CORRECCIÓN CLAVE! Rompemos el bucle infinito.
         // Si un video falla, en lugar de llamar a playNextItem() inmediatamente,
         // lo hacemos después de un breve instante. Esto evita el "Maximum call stack size exceeded".
         video.onerror = () => { 
             console.error("Error al cargar o reproducir el video, saltando al siguiente:", item.url); 
-            setTimeout(playNextItem, 100); 
+            setTimeout(safePlayNext, 100); 
         };
 
     } else if (item.type === 'weather') {
+        isVisualAudioActive = false; // Semáforo verde
         // Si hay música de fondo, la reanudamos si estaba pausada.
         if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
             audioPlayer.play().catch(e => console.error("Error al reanudar audio para clima:", e));
@@ -1082,9 +1157,10 @@ function displayMedia(item) {
 
         fetchAndDisplayWeather();
         const durationInSeconds = item.duration || 15;
-        setTimeout(playNextItem, durationInSeconds * 1000);
+        setTimeout(safePlayNext, durationInSeconds * 1000);
 
     } else if (item.type === 'clock') {
+        isVisualAudioActive = false; // Semáforo verde
         // Si hay música de fondo, la reanudamos si estaba pausada.
         if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
             audioPlayer.play().catch(e => console.error("Error al reanudar audio para reloj:", e));
@@ -1119,9 +1195,10 @@ function displayMedia(item) {
         updateFullscreenClock(); // Primera llamada
         const durationInSeconds = item.duration || 10;
         // Limpiamos el intervalo cuando el item termina para no dejar procesos corriendo
-        setTimeout(() => { clearInterval(clockInterval); playNextItem(); }, durationInSeconds * 1000);
+        setTimeout(() => { clearInterval(clockInterval); safePlayNext(); }, durationInSeconds * 1000);
 
     } else if (item.type === 'qrcode') {
+        isVisualAudioActive = false; // Semáforo verde
         // Si hay música de fondo, la reanudamos si estaba pausada.
         if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
             audioPlayer.play().catch(e => console.error("Error al reanudar audio para QR:", e));
@@ -1160,18 +1237,19 @@ function displayMedia(item) {
         }
 
         const durationInSeconds = item.duration || 15;
-        setTimeout(playNextItem, durationInSeconds * 1000);
+        setTimeout(safePlayNext, durationInSeconds * 1000);
 
     } else if (item.type === 'youtube') {
-        // Si hay música de fondo, la pausamos.
-        if (!audioPlayer.paused) audioPlayer.pause();
+        isVisualAudioActive = true; // Semáforo rojo
+        // Forzamos la pausa de la música de fondo
+        audioPlayer.pause();
 
         // ¡CORRECCIÓN CLAVE 2! Expresión regular para extraer el ID de cualquier formato de URL de YouTube
         const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
         const match = item.url.match(youtubeRegex);
         const videoId = match ? match[1] : null;
 
-        if (videoId) { // Ahora esto funcionará con URLs de tipo "embed"
+        if (!videoId) { safePlayNext(); return; } // Protección contra URLs mal formadas
             const playerContainer = document.createElement('div');
             playerContainer.id = 'youtube-player-' + new Date().getTime(); // ID único
             playerContainer.className = 'w-full h-full';
@@ -1199,8 +1277,9 @@ function displayMedia(item) {
                             // --- ESTA ES LA LÓGICA CLAVE ---
                             // Cuando el video realmente empieza a reproducirse (estado PLAYING)...
                             if (event.data === YT.PlayerState.PLAYING) {
+                            isVisualAudioActive = true; // Semáforo rojo
                                 // ¡CORRECCIÓN CLAVE! Pausamos la música de fondo aquí, justo cuando el video empieza.
-                                if (!audioPlayer.paused) audioPlayer.pause();
+                            audioPlayer.pause();
 
                                 // ...intentamos quitar el silencio y subir el volumen.
                                 if (!hasUnmuted) {
@@ -1224,11 +1303,12 @@ function displayMedia(item) {
                             }
                             // Cuando el video termina, pasamos al siguiente.
                             else if (event.data === YT.PlayerState.ENDED) {
+                            isVisualAudioActive = false; // Semáforo verde
                                 // ¡CORRECCIÓN! Reanudamos la música de fondo antes de pasar al siguiente item.
                                 if (audioPlayer.paused && currentMusicPlaylistItems.length > 0) {
                                     audioPlayer.play().catch(e => console.error("Error al reanudar audio tras YouTube:", e));
                                 }
-                                playNextItem(); // Ahora sí, pasamos al siguiente.
+                                safePlayNext(); // Ahora sí, pasamos al siguiente.
                             }
                         }
                     }
@@ -1241,12 +1321,9 @@ function displayMedia(item) {
             } else {
                 window.youtubePlayerQueue.push(createPlayer);
             }
-        } else {
-            // Si la URL de YouTube no es válida, simplemente pasamos al siguiente.
-            playNextItem();
-        }
     } else if (item.type === 'iframe') {
-        if (!audioPlayer.paused) audioPlayer.pause();
+        isVisualAudioActive = true; // Semáforo rojo (Los iframes pueden tener sonido)
+        audioPlayer.pause();
         const iframe = document.createElement('iframe');
         iframe.src = item.url;
         iframe.setAttribute('frameborder', '0');
@@ -1259,7 +1336,7 @@ function displayMedia(item) {
         requestAnimationFrame(runTransition);
 
         const durationInSeconds = item.duration || 15;
-        setTimeout(playNextItem, durationInSeconds * 1000);
+        setTimeout(safePlayNext, durationInSeconds * 1000);
     }
 }
 
