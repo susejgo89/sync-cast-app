@@ -340,7 +340,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             // --- NUEVO: Calcular el espacio de almacenamiento usado ---
             if (currentUserData) {
                 const usedBytes = userMediaData.reduce((sum, m) => sum + (m.size || 0), 0);
-                const limitBytes = currentUserData.storageLimit || (100 * 1024 * 1024); // 100MB default
+                const limitBytes = currentUserData.role === 'reseller' 
+                    ? (currentUserData.totalStorageLimit || currentUserData.storageLimit || (100 * 1024 * 1024))
+                    : (currentUserData.storageLimit || (100 * 1024 * 1024)); // 100MB default
                 
                 const usedMB = (usedBytes / (1024 * 1024)).toFixed(1);
                 const limitMB = (limitBytes / (1024 * 1024)).toFixed(0);

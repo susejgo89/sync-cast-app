@@ -61,9 +61,8 @@ export function showMandatoryPage(sectionId) {
  * @param {string} path - La ruta a la que se quiere navegar.
  */
 export function navigate(path) {
-    // Nos aseguramos de que la ruta en la URL siempre empiece con /app
-    const fullPath = path.startsWith('/app') ? path : `/app${path}`;
-    history.pushState({}, '', fullPath);
+    // Usamos la ruta original (ej. /dashboard) para que coincida con las reglas de Firebase
+    history.pushState({}, '', path);
     showPage(path);
 }
 

@@ -17,7 +17,7 @@
     ],
     "rewrites": [
       {
-        "source": "/@(dashboard|media|playlists|music-playlists|screens|groups|admin){,/**}",
+        "source": "/@(dashboard|media|playlists|music-playlists|screens|groups|admin|account){,/**}",
         "destination": "/app.html"
       },
       {

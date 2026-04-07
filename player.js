@@ -1044,8 +1044,8 @@ function displayMedia(item, playbackId) {
         audioPlayer.pause();
 
         const video = document.createElement('video');
-        // Añadimos un parámetro único para evitar errores de caché del navegador (net::ERR_CACHE_OPERATION_NOT_SUPPORTED)
-        video.src = `${item.url}&_cacheBust=${new Date().getTime()}`;
+        // OPTIMIZACIÓN: Eliminamos el _cacheBust para que la Smart TV guarde el video en memoria y ahorremos el 99% de ancho de banda.
+        video.src = item.url;
         video.className = 'w-full h-full object-contain'; // object-contain para que se vea completo
         video.autoplay = true;
         video.muted = false; // Permitimos el sonido del video

@@ -85,7 +85,10 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
     // --- VALIDACIÓN DE LÍMITE DE ALMACENAMIENTO ---
     const userDocRef = doc(db, 'users', userId);
     const userSnap = await getDoc(userDocRef);
-    const storageLimit = userSnap.exists() ? (userSnap.data().storageLimit || 104857600) : 104857600; // 100MB por defecto
+    const userData = userSnap.exists() ? userSnap.data() : {};
+    const storageLimit = userData.role === 'reseller'
+        ? (userData.totalStorageLimit || userData.storageLimit || 104857600)
+        : (userData.storageLimit || 104857600); // 100MB por defecto
     
     const totalUsed = currentUserMedia.reduce((sum, m) => sum + (m.size || 0), 0);
     

@@ -346,7 +346,10 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                     });
                     userDocSnap = await getDoc(userDocRef); // Re-fetch after creation
                 }
-                const screenLimit = userDocSnap.data()?.screenLimit || 3;
+                const userData = userDocSnap.data() || {};
+                const screenLimit = userData.role === 'reseller'
+                    ? (userData.totalScreenLimit || userData.screenLimit || 3)
+                    : (userData.screenLimit || 3);
         
                 const screensQuery = query(collection(db, 'screens'), where('userId', '==', currentUserId));
                 const screensSnapshot = await getDocs(screensQuery);
