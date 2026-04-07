@@ -112,6 +112,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let unsubscribeMusicPlaylists = null;
         let screensViewInstance = null;
         let currentUserId = null;
+        let currentUserData = null; // Para tener acceso a los límites en todo el script
         let groupsViewInstance = null;
         let adminViewInstance = null;
         let activePlaylistId = null;
@@ -282,8 +283,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 role: 'client', // Rol por defecto para nuevos registros
                 ownerId: null, // Es una cuenta principal, no pertenece a un reseller
                 status: 'active', // Estado inicial
-                screenLimit: 3, // Límite de pantallas por defecto
-                storageLimit: 1 * 1024 * 1024 * 1024, // 1 GB de almacenamiento por defecto en bytes
+                screenLimit: 1, // Límite de pantallas por defecto reducido a 1
+                storageLimit: 100 * 1024 * 1024, // 100 MB de almacenamiento inicial (en bytes) para evitar abusos
                 profileComplete: false // ¡CLAVE! Marcamos el perfil como incompleto.
             }).then(() => {
                 // Una vez creado el perfil, enviamos el email de verificación
@@ -335,6 +336,27 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             // Card de Medios
             const mediaCountEl = document.getElementById('media-count');
             if (mediaCountEl) mediaCountEl.textContent = userMediaData.length;
+
+            // --- NUEVO: Calcular el espacio de almacenamiento usado ---
+            if (currentUserData) {
+                const usedBytes = userMediaData.reduce((sum, m) => sum + (m.size || 0), 0);
+                const limitBytes = currentUserData.storageLimit || (100 * 1024 * 1024); // 100MB default
+                
+                const usedMB = (usedBytes / (1024 * 1024)).toFixed(1);
+                const limitMB = (limitBytes / (1024 * 1024)).toFixed(0);
+                const percent = Math.min((usedBytes / limitBytes) * 100, 100);
+
+                const storageBar = document.getElementById('dashboard-storage-bar');
+                const storageUsedEl = document.getElementById('dashboard-storage-used');
+                const storageLimitEl = document.getElementById('dashboard-storage-limit');
+
+                if (storageBar) {
+                    storageBar.style.width = `${percent}%`;
+                    storageBar.className = percent > 90 ? 'bg-red-500 h-1.5 rounded-full' : 'bg-pink-600 h-1.5 rounded-full';
+                }
+                if (storageUsedEl) storageUsedEl.textContent = `${usedMB} MB`;
+                if (storageLimitEl) storageLimitEl.textContent = `${limitMB} MB`;
+            }
 
             // Card de Playlists
             const visualPlaylistCountEl = document.getElementById('visual-playlist-count');
@@ -554,6 +576,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         }
 
         async function initializeAppForUser(user, userData) {
+            currentUserData = userData; // Guardamos la data globalmente
             setupProfileForms(user); // Prepara el formulario de "Mi Cuenta" en segundo plano
 
             const adminNavLink = document.getElementById('admin-nav-link');

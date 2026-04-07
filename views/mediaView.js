@@ -1,13 +1,14 @@
 // Contenido completo para views/mediaView.js
 
 import { db, storage } from '../firebase-config.js';
-import { collection, query, where, onSnapshot, doc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { collection, query, where, onSnapshot, doc, getDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 import { showConfirmModal } from '../utils/modals.js';
 import { translations } from '../utils/translations.js';
 import { createMediaCard } from '../components/mediaCard.js';
 
 let unsubscribeMedia = null;
+let currentUserMedia = []; // Para almacenar los medios actuales y calcular el peso total
 
 // Esta es la función que se exporta y que script.js busca
 export function initMediaView(userId, getLang, onUpdateCallback) {
@@ -43,6 +44,7 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
                         name: file.name,
                         url: downloadURL,
                         type: file.type,
+                        size: file.size, // ¡NUEVO! Guardamos el peso del archivo en bytes
                         storagePath: storagePath,
                         createdAt: serverTimestamp()
                     });
@@ -61,7 +63,7 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
             });
     };
 
-    fileUploadInput.addEventListener('change', (e) => {
+    fileUploadInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -80,6 +82,19 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
         return;
     }
     
+    // --- VALIDACIÓN DE LÍMITE DE ALMACENAMIENTO ---
+    const userDocRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userDocRef);
+    const storageLimit = userSnap.exists() ? (userSnap.data().storageLimit || 104857600) : 104857600; // 100MB por defecto
+    
+    const totalUsed = currentUserMedia.reduce((sum, m) => sum + (m.size || 0), 0);
+    
+    if (totalUsed + file.size > storageLimit) {
+        alert(`No tienes suficiente espacio. Límite: ${(storageLimit / (1024*1024)).toFixed(2)} MB`);
+        e.target.value = '';
+        return;
+    }
+
     // --- CORRECCIÓN CLAVE ---
     // Usamos 'userId', que es el parámetro que recibe la función initMediaView.
     // La variable 'currentUserId' no existe en este archivo.
@@ -89,6 +104,7 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
     const q = query(collection(db, 'media'), where('userId', '==', userId));
     unsubscribeMedia = onSnapshot(q, (snapshot) => {
         const userMediaData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        currentUserMedia = userMediaData; // Actualizamos la lista local
         
         const images = userMediaData.filter(m => m.type.startsWith('image/'));
         const videos = userMediaData.filter(m => m.type.startsWith('video/'));
