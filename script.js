@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, GoogleAuthProvider, signInWithPopup, applyActionCode } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, setLogLevel, collection, addDoc, query, where, onSnapshot, serverTimestamp, doc, deleteDoc, updateDoc, getDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         import { initMediaView } from './views/mediaView.js';
@@ -199,6 +199,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
+        // Forzar recarga del token por si verificó en otro dispositivo o pestaña
+        if (!user.emailVerified) {
+            try { await user.reload(); } catch (e) { console.error(e); }
+        }
+
         if (!user.emailVerified) {
             // CASO 1: Usuario logueado PERO NO VERIFICADO -> Muestra el mensaje
             authContainer.style.display = 'flex';
@@ -207,6 +212,21 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const logoutVerificationBtn = document.getElementById('logout-verification-button');
             if (logoutVerificationBtn) {
                 logoutVerificationBtn.onclick = () => auth.signOut();
+            }
+
+            const checkVerificationBtn = document.getElementById('check-verification-button');
+            if (checkVerificationBtn) {
+                checkVerificationBtn.onclick = async () => {
+                    const originalText = checkVerificationBtn.textContent;
+                    checkVerificationBtn.textContent = 'Comprobando...';
+                    await user.reload(); // Obligamos a Firebase a preguntar al servidor
+                    if (auth.currentUser.emailVerified) {
+                        window.location.reload(); // Si ya verificó, recargamos para que entre
+                    } else {
+                        showMessage("Tu cuenta aún no está verificada. Revisa tu correo.", true);
+                        checkVerificationBtn.textContent = originalText;
+                    }
+                };
             }
         } else {
             // CASO 2 y 3: Usuario VERIFICADO (perfil completo o incompleto)
@@ -259,6 +279,42 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             setTimeout(() => messageBox.classList.add('hidden'), 5000);
         };
 
+        const getVerificationActionCodeSettings = () => {
+            const origin = window.location.origin.replace(/\/$/, '');
+            return {
+                url: `${origin}/app.html`,
+                handleCodeInApp: true,
+            };
+        };
+
+    // --- Manejo de enlaces de acción de Firebase (Verificación de correo) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const oobCode = urlParams.get('oobCode');
+
+    if (mode === 'verifyEmail' && oobCode) {
+        loader.style.display = 'flex'; // Muestra el loader para evitar parpadeos visuales
+        applyActionCode(auth, oobCode).then(async () => {
+            // Limpiamos la URL para que no quede el código largo visible
+            window.history.replaceState(null, '', window.location.pathname);
+            
+            if (auth.currentUser) {
+                await auth.currentUser.reload(); // Actualiza el estado interno del usuario
+                window.location.reload(); // Recarga la página para entrar a la app directamente
+            } else {
+                loader.style.display = 'none';
+                showMessage("¡Cuenta verificada con éxito! Ya puedes iniciar sesión.", false);
+                // Aseguramos que se muestre el formulario de inicio de sesión
+                document.getElementById('verify-email-container').style.display = 'none';
+                document.getElementById('login-form-container').style.display = 'block';
+            }
+        }).catch((error) => {
+            loader.style.display = 'none';
+            console.error("Error al verificar código:", error);
+            showMessage("El enlace de verificación es inválido o ha expirado.", true);
+        });
+    }
+
         loginForm.addEventListener('submit', (e) => { e.preventDefault(); signInWithEmailAndPassword(auth, loginForm['login-email'].value, loginForm['login-password'].value).catch(() => showMessage(translations[currentLang].loginError, true)); });
         registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -288,7 +344,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 profileComplete: false // ¡CLAVE! Marcamos el perfil como incompleto.
             }).then(() => {
                 // Una vez creado el perfil, enviamos el email de verificación
-                sendEmailVerification(user)
+                sendEmailVerification(user, getVerificationActionCodeSettings())
                     .then(() => {
                         showMessage(translations[currentLang].accountCreated, false);
                         auth.signOut();
@@ -391,13 +447,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if (recentMedia.length > 0) {
                     recentMedia.forEach(media => {
                         const isVideo = media.type.startsWith('video');
-                        const thumb = document.createElement(isVideo ? 'video' : 'img');
-                        thumb.src = isVideo ? `${media.url.split('&token=')[0]}&token=${media.url.split('&token=')[1]}#t=0.5` : media.url;
-                        thumb.title = media.name;
-                        thumb.className = 'recent-upload-thumb';
-                        if (isVideo) thumb.muted = true;
-                        thumb.onerror = () => { thumb.src = 'https://placehold.co/100x60/EEE/31343C?text=Error'; };
-                        recentUploadsContainer.appendChild(thumb);
+                        const isAudio = media.type.startsWith('audio');
+                        
+                        if (isAudio) {
+                            const thumb = document.createElement('div');
+                            thumb.className = 'recent-upload-thumb flex items-center justify-center bg-gray-800 text-gray-500 rounded-md overflow-hidden';
+                            thumb.title = media.name;
+                            thumb.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"></path></svg>`;
+                            recentUploadsContainer.appendChild(thumb);
+                        } else {
+                            const thumb = document.createElement(isVideo ? 'video' : 'img');
+                            thumb.src = isVideo ? `${media.url.split('&token=')[0]}&token=${media.url.split('&token=')[1]}#t=0.5` : media.url;
+                            thumb.title = media.name;
+                            thumb.className = 'recent-upload-thumb object-cover';
+                            if (isVideo) thumb.muted = true;
+                            thumb.onerror = () => { thumb.src = 'https://placehold.co/100x60/EEE/31343C?text=Error'; };
+                            recentUploadsContainer.appendChild(thumb);
+                        }
                     });
                 } else {
                     recentUploadsContainer.innerHTML = `<p class="text-xs text-gray-400 col-span-3 text-center" data-lang="dashboardNoRecentUploads">${translations[currentLang].dashboardNoRecentUploads || 'No hay archivos recientes.'}</p>`;
