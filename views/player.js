@@ -910,8 +910,12 @@ pairBtn.addEventListener('click', async () => {
 function sendHeartbeat(screenId) {
     if (!screenId) return;
     const screenRef = doc(db, 'screens', screenId);
-    // Actualizamos el campo 'lastSeen' con la hora actual del servidor
-    updateDoc(screenRef, { lastSeen: serverTimestamp() })
+
+    // Reportamos la versión para soporte técnico proactivo en producción
+    updateDoc(screenRef, { 
+        lastSeen: serverTimestamp(),
+        appVersion: "1.1.0"
+    })
         .catch(err => console.error("Error al enviar heartbeat:", err));
 }
 

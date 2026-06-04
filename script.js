@@ -21,10 +21,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
          */
         async function applyWhiteLabeling() {
             const currentHostname = window.location.hostname;
-            // Añade tu nuevo dominio personalizado a esta lista para que se reconozca como el dominio principal
-            const defaultDomains = ['localhost', '127.0.0.1', 'sync-cast-app.web.app', 'sutechtvcorporativa.web.app', 'nexusreplay.com', 'www.nexusreplay.com']; 
-        
-            if (!defaultDomains.includes(currentHostname)) {
+            
+            // Solo buscamos marca blanca si no es un subdominio estándar de Firebase o el dominio oficial
+            const isDefaultDomain = currentHostname.includes('web.app') || 
+                                    currentHostname.includes('firebaseapp.com') || 
+                                    currentHostname.includes('nexusreplay.com') ||
+                                    currentHostname === 'localhost';
+
+            if (!isDefaultDomain) {
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, where("customDomain", "==", currentHostname), where("role", "==", "reseller"));
                 const querySnapshot = await getDocs(q);

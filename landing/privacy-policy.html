@@ -55,19 +55,39 @@
       color: #ffffff;
       transform: scale(1.2);
     }
+    /* Estilos para el selector de idioma */
+    .lang-flag {
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      opacity: 0.6;
+    }
+    .lang-flag.active, .lang-flag:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
 
   <!-- Barra de Navegación Simplificada -->
   <nav class="navbar navbar-dark sticky-top">
-    <div class="container">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
       <a class="navbar-brand" href="/landing/index.html">
         <img src="../assets/Sync (vert blan).png" alt="NexusRePlay Logo" height="60">
       </a>
-      <a href="../app.html" class="btn btn-outline-light">
-        Iniciar Sesión
-      </a>
+      <div class="d-flex align-items-center gap-3">
+        <!-- Selector de Idioma -->
+        <div class="d-flex align-items-center gap-2" id="policy-lang-selector">
+            <img src="https://flagcdn.com/es.svg" width="25" alt="Español" data-lang-id="es" class="lang-flag active">
+            <img src="https://flagcdn.com/gb.svg" width="25" alt="English" data-lang-id="en" class="lang-flag">
+            <img src="https://flagcdn.com/br.svg" width="25" alt="Português" data-lang-id="pt" class="lang-flag">
+        </div>
+        <a href="../app.html" class="btn btn-outline-light" data-lang="navLoginBtn">
+          Iniciar Sesión
+        </a>
+      </div>
     </div>
   </nav>
 
@@ -75,58 +95,58 @@
   <main class="py-5">
     <div class="container">
       <div class="policy-container p-4 p-md-5">
-        <h1 class="display-5 fw-bold mb-4">Política de Privacidad</h1>
-        <p class="text-muted">Última actualización: 24 de Mayo de 2024</p>
+        <h1 class="display-5 fw-bold mb-4" data-lang="policyTitle">Política de Privacidad</h1>
+        <p class="text-muted" data-lang="policyDate">Última actualización: 24 de Mayo de 2024</p>
 
-        <h2>1. Introducción</h2>
-        <p>Bienvenido a NexusRePlay ("nosotros", "nuestro"). Nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, divulgamos y salvaguardamos su información cuando visita nuestro sitio web y utiliza nuestra plataforma de software como servicio (SaaS).</p>
+        <h2 data-lang="p1Title">1. Introducción</h2>
+        <p data-lang="p1Desc">Bienvenido a NexusRePlay ("nosotros", "nuestro"). Nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, divulgamos y salvaguardamos su información cuando visita nuestro sitio web y utiliza nuestra plataforma de software como servicio (SaaS).</p>
 
-        <h2>2. Información que Recopilamos</h2>
-        <p>Podemos recopilar información sobre usted de varias maneras:</p>
+        <h2 data-lang="p2Title">2. Información que Recopilamos</h2>
+        <p data-lang="p2Desc">Podemos recopilar información sobre usted de varias maneras:</p>
         <ul>
-          <li><strong>Datos Personales:</strong> Información de identificación personal, como su nombre, dirección de correo electrónico, número de teléfono, que usted nos proporciona voluntariamente al registrarse en la plataforma.</li>
-          <li><strong>Datos de Uso:</strong> Información que nuestro servidor recopila automáticamente cuando accede al sitio, como su dirección IP, tipo de navegador, sistema operativo, etc.</li>
-          <li><strong>Datos de la Aplicación:</strong> Al utilizar nuestra plataforma, podemos recopilar información sobre las pantallas que gestiona, el contenido que sube (imágenes, videos) y las configuraciones que aplica.</li>
-          <li><strong>Datos Financieros:</strong> Información relacionada con los pagos, como datos de tarjetas de crédito, que recopilamos al procesar su suscripción. Estos datos son gestionados de forma segura por nuestro procesador de pagos (ej. Stripe) y no los almacenamos en nuestros servidores.</li>
+          <li data-lang="p2Li1"><strong>Datos Personales:</strong> Información de identificación personal, como su nombre, dirección de correo electrónico, número de teléfono, que usted nos proporciona voluntariamente al registrarse en la plataforma.</li>
+          <li data-lang="p2Li2"><strong>Datos de Uso:</strong> Información que nuestro servidor recopila automáticamente cuando accede al sitio, como su dirección IP, tipo de navegador, sistema operativo, etc.</li>
+          <li data-lang="p2Li3"><strong>Datos de la Aplicación:</strong> Al utilizar nuestra plataforma, podemos recopilar información sobre las pantallas que gestiona, el contenido que sube (imágenes, videos) y las configuraciones que aplica.</li>
+          <li data-lang="p2Li4"><strong>Datos Financieros:</strong> Información relacionada con los pagos, como datos de tarjetas de crédito, que recopilamos al procesar su suscripción. Estos datos son gestionados de forma segura por nuestro procesador de pagos (ej. Stripe) y no los almacenamos en nuestros servidores.</li>
         </ul>
 
-        <h2>3. Uso de su Información</h2>
-        <p>Usamos la información recopilada para:</p>
+        <h2 data-lang="p3Title">3. Uso de su Información</h2>
+        <p data-lang="p3Desc">Usamos la información recopilada para:</p>
         <ul>
-          <li>Crear y gestionar su cuenta.</li>
-          <li>Proveer, operar y mantener nuestro servicio.</li>
-          <li>Procesar sus transacciones y suscripciones.</li>
-          <li>Enviarle correos electrónicos administrativos y de marketing.</li>
-          <li>Mejorar nuestro sitio web y plataforma.</li>
-          <li>Monitorear y analizar el uso y las tendencias para mejorar su experiencia.</li>
+          <li data-lang="p3Li1">Crear y gestionar su cuenta.</li>
+          <li data-lang="p3Li2">Proveer, operar y mantener nuestro servicio.</li>
+          <li data-lang="p3Li3">Procesar sus transacciones y suscripciones.</li>
+          <li data-lang="p3Li4">Enviarle correos electrónicos administrativos y de marketing.</li>
+          <li data-lang="p3Li5">Mejorar nuestro sitio web y plataforma.</li>
+          <li data-lang="p3Li6">Monitorear y analizar el uso y las tendencias para mejorar su experiencia.</li>
         </ul>
 
-        <h2>4. Cookies y Tecnologías Similares</h2>
-        <p>Utilizamos cookies para ayudar a personalizar el sitio y mejorar su experiencia. Una cookie es una cadena de información que un sitio web almacena en el ordenador de un visitante. Utilizamos cookies para fines de autenticación (mantenerle conectado), preferencias y análisis. Puede configurar su navegador para rechazar las cookies, pero esto puede afectar la funcionalidad de nuestro servicio.</p>
+        <h2 data-lang="p4Title">4. Cookies y Tecnologías Similares</h2>
+        <p data-lang="p4Desc">Utilizamos cookies para ayudar a personalizar el sitio y mejorar su experiencia. Una cookie es una cadena de información que un sitio web almacena en el ordenador de un visitante. Utilizamos cookies para fines de autenticación (mantenerle conectado), preferencias y análisis. Puede configurar su navegador para rechazar las cookies, pero esto puede afectar la funcionalidad de nuestro servicio.</p>
 
-        <h2>5. Divulgación de su Información</h2>
-        <p>No compartiremos su información personal con terceros, excepto en las siguientes situaciones:</p>
+        <h2 data-lang="p5Title">5. Divulgación de su Información</h2>
+        <p data-lang="p5Desc">No compartiremos su información personal con terceros, excepto en las siguientes situaciones:</p>
         <ul>
-          <li><strong>Por Ley o para Proteger Derechos:</strong> Si la divulgación es necesaria para responder a un proceso legal o proteger los derechos, la propiedad y la seguridad de otros.</li>
-          <li><strong>Proveedores de Servicios:</strong> Podemos compartir su información con terceros que realizan servicios para nosotros o en nuestro nombre, como procesamiento de pagos, análisis de datos y alojamiento web.</li>
-          <li><strong>Transferencias Comerciales:</strong> En caso de una fusión, venta de activos de la empresa o adquisición, su información puede ser transferida.</li>
+          <li data-lang="p5Li1"><strong>Por Ley o para Proteger Derechos:</strong> Si la divulgación es necesaria para responder a un proceso legal o proteger los derechos, la propiedad y la seguridad de otros.</li>
+          <li data-lang="p5Li2"><strong>Proveedores de Servicios:</strong> Podemos compartir su información con terceros que realizan servicios para nosotros o en nuestro nombre, como procesamiento de pagos, análisis de datos y alojamiento web.</li>
+          <li data-lang="p5Li3"><strong>Transferencias Comerciales:</strong> En caso de una fusión, venta de activos de la empresa o adquisición, su información puede ser transferida.</li>
         </ul>
 
-        <h2>6. Seguridad de su Información</h2>
-        <p>Utilizamos medidas de seguridad administrativas, técnicas y físicas para ayudar a proteger su información personal. Si bien hemos tomado medidas razonables para asegurar la información personal que nos proporciona, tenga en cuenta que ningún sistema de seguridad es impenetrable.</p>
+        <h2 data-lang="p6Title">6. Seguridad de su Información</h2>
+        <p data-lang="p6Desc">Utilizamos medidas de seguridad administrativas, técnicas y físicas para ayudar a proteger su información personal. Si bien hemos tomado medidas razonables para asegurar la información personal que nos proporciona, tenga en cuenta que ningún sistema de seguridad es impenetrable.</p>
 
-        <h2>7. Sus Derechos de Privacidad</h2>
-        <p>Dependiendo de su ubicación, puede tener los siguientes derechos con respecto a sus datos personales:</p>
+        <h2 data-lang="p7Title">7. Sus Derechos de Privacidad</h2>
+        <p data-lang="p7Desc">Dependiendo de su ubicación, puede tener los siguientes derechos con respecto a sus datos personales:</p>
         <ul>
-          <li>El derecho a acceder, actualizar o eliminar la información que tenemos sobre usted.</li>
-          <li>El derecho a la rectificación.</li>
-          <li>El derecho a oponerse al procesamiento.</li>
-          <li>El derecho a la portabilidad de los datos.</li>
+          <li data-lang="p7Li1">El derecho a acceder, actualizar o eliminar la información que tenemos sobre usted.</li>
+          <li data-lang="p7Li2">El derecho a la rectificación.</li>
+          <li data-lang="p7Li3">El derecho a oponerse al procesamiento.</li>
+          <li data-lang="p7Li4">El derecho a la portabilidad de los datos.</li>
         </ul>
-        <p>Para ejercer estos derechos, por favor contáctenos utilizando la información de contacto a continuación.</p>
+        <p data-lang="p7Desc2">Para ejercer estos derechos, por favor contáctenos utilizando la información de contacto a continuación.</p>
 
-        <h2>8. Contacto</h2>
-        <p>Si tiene preguntas o comentarios sobre esta Política de Privacidad, por favor contáctenos en:</p>
+        <h2 data-lang="p8Title">8. Contacto</h2>
+        <p data-lang="p8Desc">Si tiene preguntas o comentarios sobre esta Política de Privacidad, por favor contáctenos en:</p>
         <p><strong>NexusRePlay</strong><br>
         Email: <a href="mailto:info@nexusreplay.com">info@nexusreplay.com</a></p>
 
@@ -141,21 +161,21 @@
         <!-- Columna 1: Logo y Descripción -->
         <div class="col-md-4 col-lg-5 mb-4">
           <img src="../assets/Sync (vert blan).png" alt="NexusRePlay Logo" height="60" class="mb-3">
-          <p class="text-white-50 pe-lg-5">La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.</p>
+          <p class="text-white-50 pe-lg-5" data-lang="footerDesc">La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.</p>
         </div>
         <!-- Columna 2: Enlaces de Navegación -->
         <div class="col-md-4 col-lg-3 mb-4">
-          <h5 class="text-white mb-3">Explorar</h5>
+          <h5 class="text-white mb-3" data-lang="footerExplore">Explorar</h5>
           <ul class="list-unstyled">
-            <li class="mb-2"><a href="/landing/index.html#caracteristicas" class="footer-link">Características</a></li>
-            <li class="mb-2"><a href="/landing/index.html#casos-de-uso" class="footer-link">Casos de Uso</a></li>
-            <li class="mb-2"><a href="/landing/index.html#planes" class="footer-link">Planes</a></li>
-            <li class="mb-2"><a href="/landing/index.html#faq" class="footer-link">FAQ</a></li>
+            <li class="mb-2"><a href="/landing/index.html#caracteristicas" class="footer-link" data-lang="footerFeat">Características</a></li>
+            <li class="mb-2"><a href="/landing/index.html#casos-de-uso" class="footer-link" data-lang="footerCases">Casos de Uso</a></li>
+            <li class="mb-2"><a href="/landing/index.html#planes" class="footer-link" data-lang="footerPlans">Planes</a></li>
+            <li class="mb-2"><a href="/landing/index.html#faq" class="footer-link" data-lang="footerFaq">FAQ</a></li>
           </ul>
         </div>
         <!-- Columna 3: Contacto y Redes Sociales -->
         <div class="col-md-4 col-lg-4 mb-4">
-          <h5 class="text-white mb-3">Conecta con Nosotros</h5>
+          <h5 class="text-white mb-3" data-lang="footerConnect">Conecta con Nosotros</h5>
           <a href="mailto:info@nexusreplay.com" class="footer-link d-block mb-3">info@nexusreplay.com</a>
           <div class="d-flex justify-content-center justify-content-md-start gap-3">
             <a href="#" class="footer-social-icon"><i class="bi bi-twitter-x"></i></a>
@@ -166,13 +186,194 @@
       </div>
       <hr class="my-4" style="border-color: rgba(255, 255, 255, 0.1);">
       <div class="d-flex flex-column flex-sm-row justify-content-between text-center">
-        <p class="text-white mb-3 mb-sm-0">© 2024 NexusRePlay. Todos los derechos reservados.</p>
-        <a href="privacy-policy.html" class="footer-link">Política de Privacidad</a>
+        <p class="text-white mb-3 mb-sm-0" data-lang="footerRights">© 2024 NexusRePlay. Todos los derechos reservados.</p>
+        <a href="/landing/privacy-policy.html" class="footer-link" data-lang="footerPolicy">Política de Privacidad</a>
       </div>
     </div>
   </footer>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <!-- Script Multilenguaje -->
+  <script>
+    const policyTranslations = {
+      es: {
+        navLoginBtn: "Iniciar Sesión",
+        policyTitle: "Política de Privacidad",
+        policyDate: "Última actualización: 24 de Mayo de 2024",
+        p1Title: "1. Introducción",
+        p1Desc: "Bienvenido a NexusRePlay (\"nosotros\", \"nuestro\"). Nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos, divulgamos y salvaguardamos su información cuando visita nuestro sitio web y utiliza nuestra plataforma de software como servicio (SaaS).",
+        p2Title: "2. Información que Recopilamos",
+        p2Desc: "Podemos recopilar información sobre usted de varias maneras:",
+        p2Li1: "<strong>Datos Personales:</strong> Información de identificación personal, como su nombre, dirección de correo electrónico, número de teléfono, que usted nos proporciona voluntariamente al registrarse en la plataforma.",
+        p2Li2: "<strong>Datos de Uso:</strong> Información que nuestro servidor recopila automáticamente cuando accede al sitio, como su dirección IP, tipo de navegador, sistema operativo, etc.",
+        p2Li3: "<strong>Datos de la Aplicación:</strong> Al utilizar nuestra plataforma, podemos recopilar información sobre las pantallas que gestiona, el contenido que sube (imágenes, videos) y las configuraciones que aplica.",
+        p2Li4: "<strong>Datos Financieros:</strong> Información relacionada con los pagos, como datos de tarjetas de crédito, que recopilamos al procesar su suscripción. Estos datos son gestionados de forma segura por nuestro procesador de pagos (ej. Stripe) y no los almacenamos en nuestros servidores.",
+        p3Title: "3. Uso de su Información",
+        p3Desc: "Usamos la información recopilada para:",
+        p3Li1: "Crear y gestionar su cuenta.",
+        p3Li2: "Proveer, operar y mantener nuestro servicio.",
+        p3Li3: "Procesar sus transacciones y suscripciones.",
+        p3Li4: "Enviarle correos electrónicos administrativos y de marketing.",
+        p3Li5: "Mejorar nuestro sitio web y plataforma.",
+        p3Li6: "Monitorear y analizar el uso y las tendencias para mejorar su experiencia.",
+        p4Title: "4. Cookies y Tecnologías Similares",
+        p4Desc: "Utilizamos cookies para ayudar a personalizar el sitio y mejorar su experiencia. Una cookie es una cadena de información que un sitio web almacena en el ordenador de un visitante. Utilizamos cookies para fines de autenticación (mantenerle conectado), preferencias y análisis. Puede configurar su navegador para rechazar las cookies, pero esto puede afectar la funcionalidad de nuestro servicio.",
+        p5Title: "5. Divulgación de su Información",
+        p5Desc: "No compartiremos su información personal con terceros, excepto en las siguientes situaciones:",
+        p5Li1: "<strong>Por Ley o para Proteger Derechos:</strong> Si la divulgación es necesaria para responder a un proceso legal o proteger los derechos, la propiedad y la seguridad de otros.",
+        p5Li2: "<strong>Proveedores de Servicios:</strong> Podemos compartir su información con terceros que realizan servicios para nosotros o en nuestro nombre, como procesamiento de pagos, análisis de datos y alojamiento web.",
+        p5Li3: "<strong>Transferencias Comerciales:</strong> En caso de una fusión, venta de activos de la empresa o adquisición, su información puede ser transferida.",
+        p6Title: "6. Seguridad de su Información",
+        p6Desc: "Utilizamos medidas de seguridad administrativas, técnicas y físicas para ayudar a proteger su información personal. Si bien hemos tomado medidas razonables para asegurar la información personal que nos proporciona, tenga en cuenta que ningún sistema de seguridad es impenetrable.",
+        p7Title: "7. Sus Derechos de Privacidad",
+        p7Desc: "Dependiendo de su ubicación, puede tener los siguientes derechos con respecto a sus datos personales:",
+        p7Li1: "El derecho a acceder, actualizar o eliminar la información que tenemos sobre usted.",
+        p7Li2: "El derecho a la rectificación.",
+        p7Li3: "El derecho a oponerse al procesamiento.",
+        p7Li4: "El derecho a la portabilidad de los datos.",
+        p7Desc2: "Para ejercer estos derechos, por favor contáctenos utilizando la información de contacto a continuación.",
+        p8Title: "8. Contacto",
+        p8Desc: "Si tiene preguntas o comentarios sobre esta Política de Privacidad, por favor contáctenos en:",
+        footerDesc: "La plataforma definitiva para gestionar tu contenido visual de forma fácil, remota y profesional.",
+        footerExplore: "Explorar",
+        footerFeat: "Características",
+        footerCases: "Casos de Uso",
+        footerPlans: "Planes",
+        footerFaq: "FAQ",
+        footerConnect: "Conecta con Nosotros",
+        footerRights: "© 2024 NexusRePlay. Todos los derechos reservados.",
+        footerPolicy: "Política de Privacidad"
+      },
+      en: {
+        navLoginBtn: "Login",
+        policyTitle: "Privacy Policy",
+        policyDate: "Last updated: May 24, 2024",
+        p1Title: "1. Introduction",
+        p1Desc: "Welcome to NexusRePlay (\"we\", \"our\", \"us\"). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our SaaS platform.",
+        p2Title: "2. Information We Collect",
+        p2Desc: "We may collect information about you in a variety of ways:",
+        p2Li1: "<strong>Personal Data:</strong> Personally identifiable information, such as your name, email address, and phone number, that you voluntarily give to us when registering on the platform.",
+        p2Li2: "<strong>Usage Data:</strong> Information our servers automatically collect when you access the site, such as your IP address, browser type, operating system, etc.",
+        p2Li3: "<strong>Application Data:</strong> When using our platform, we may collect information about the screens you manage, the content you upload (images, videos), and the settings you apply.",
+        p2Li4: "<strong>Financial Data:</strong> Data related to your payment method (e.g., valid credit card number, card brand, expiration date) that we may collect when you purchase a subscription. We use third-party payment processors (e.g., Stripe) and do not store this data.",
+        p3Title: "3. Use of Your Information",
+        p3Desc: "We use the information we collect to:",
+        p3Li1: "Create and manage your account.",
+        p3Li2: "Provide, operate, and maintain our service.",
+        p3Li3: "Process your transactions and subscriptions.",
+        p3Li4: "Send you administrative and marketing emails.",
+        p3Li5: "Improve our website and platform.",
+        p3Li6: "Monitor and analyze usage and trends to improve your experience.",
+        p4Title: "4. Cookies and Similar Technologies",
+        p4Desc: "We use cookies to help customize the Site and improve your experience. A cookie is a string of information that a website stores on a visitor's computer. We use cookies for authentication (keeping you logged in), preferences, and analytics. You can set your browser to refuse cookies, but this may affect the functionality of our service.",
+        p5Title: "5. Disclosure of Your Information",
+        p5Desc: "We will not share your personal information with third parties, except in the following situations:",
+        p5Li1: "<strong>By Law or to Protect Rights:</strong> If we believe the release of information about you is necessary to respond to legal process or to protect the rights, property, and safety of others.",
+        p5Li2: "<strong>Third-Party Service Providers:</strong> We may share your information with third parties that perform services for us or on our behalf, including payment processing, data analysis, and web hosting.",
+        p5Li3: "<strong>Business Transfers:</strong> We may share or transfer your information in connection with, or during negotiations of, any merger, sale of company assets, financing, or acquisition.",
+        p6Title: "6. Security of Your Information",
+        p6Desc: "We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that no security system is impenetrable.",
+        p7Title: "7. Your Privacy Rights",
+        p7Desc: "Depending on your location, you may have the following rights regarding your personal data:",
+        p7Li1: "The right to access, update or delete the information we have on you.",
+        p7Li2: "The right of rectification.",
+        p7Li3: "The right to object to processing.",
+        p7Li4: "The right to data portability.",
+        p7Desc2: "To exercise these rights, please contact us using the contact information below.",
+        p8Title: "8. Contact Us",
+        p8Desc: "If you have questions or comments about this Privacy Policy, please contact us at:",
+        footerDesc: "The ultimate platform to manage your visual content easily, remotely, and professionally.",
+        footerExplore: "Explore",
+        footerFeat: "Features",
+        footerCases: "Use Cases",
+        footerPlans: "Plans",
+        footerFaq: "FAQ",
+        footerConnect: "Connect with Us",
+        footerRights: "© 2024 NexusRePlay. All rights reserved.",
+        footerPolicy: "Privacy Policy"
+      },
+      pt: {
+        navLoginBtn: "Entrar",
+        policyTitle: "Política de Privacidade",
+        policyDate: "Última atualização: 24 de Maio de 2024",
+        p1Title: "1. Introdução",
+        p1Desc: "Bem-vindo ao NexusRePlay (\"nós\", \"nosso\"). Temos o compromisso de proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações quando você visita nosso site e usa nossa plataforma SaaS.",
+        p2Title: "2. Informações que Coletamos",
+        p2Desc: "Podemos coletar informações sobre você de várias maneiras:",
+        p2Li1: "<strong>Dados Pessoais:</strong> Informações de identificação pessoal, como seu nome, endereço de e-mail e número de telefone, que você nos fornece voluntariamente ao se registrar na plataforma.",
+        p2Li2: "<strong>Dados de Uso:</strong> Informações que nossos servidores coletam automaticamente ao acessar o site, como seu endereço IP, tipo de navegador, sistema operacional, etc.",
+        p2Li3: "<strong>Dados do Aplicativo:</strong> Ao usar nossa plataforma, podemos coletar informações sobre as telas que você gerencia, o conteúdo que envia (imagens, vídeos) e as configurações que aplica.",
+        p2Li4: "<strong>Dados Financeiros:</strong> Informações relacionadas a pagamentos que coletamos ao processar sua assinatura. Esses dados são gerenciados de forma segura por nosso processador de pagamentos (ex: Stripe) e não os armazenamos em nossos servidores.",
+        p3Title: "3. Uso das Suas Informações",
+        p3Desc: "Usamos as informações coletadas para:",
+        p3Li1: "Criar e gerenciar sua conta.",
+        p3Li2: "Fornecer, operar e manter nosso serviço.",
+        p3Li3: "Processar suas transações e assinaturas.",
+        p3Li4: "Enviar e-mails administrativos e de marketing.",
+        p3Li5: "Melhorar nosso site e plataforma.",
+        p3Li6: "Monitorar e analisar uso e tendências para melhorar sua experiência.",
+        p4Title: "4. Cookies e Tecnologias Semelhantes",
+        p4Desc: "Usamos cookies para ajudar a personalizar o site e melhorar sua experiência. Usamos cookies para fins de autenticação (mantê-lo logado), preferências e análises. Você pode configurar seu navegador para recusar cookies, mas isso pode afetar a funcionalidade de nosso serviço.",
+        p5Title: "5. Divulgação das Suas Informações",
+        p5Desc: "Não compartilharemos suas informações pessoais com terceiros, exceto nas seguintes situações:",
+        p5Li1: "<strong>Por Lei ou para Proteger Direitos:</strong> Se a divulgação for necessária para responder a um processo legal ou proteger os direitos, a propriedade e a segurança de terceiros.",
+        p5Li2: "<strong>Prestadores de Serviços:</strong> Podemos compartilhar suas informações com terceiros que realizam serviços para nós, como processamento de pagamentos, análise de dados e hospedagem web.",
+        p5Li3: "<strong>Transferências Comerciais:</strong> Em caso de fusão, venda de ativos da empresa ou aquisição, suas informações podem ser transferidas.",
+        p6Title: "6. Segurança das Suas Informações",
+        p6Desc: "Usamos medidas de segurança administrativas, técnicas e físicas para ajudar a proteger suas informações pessoais. Embora tenhamos tomado medidas razoáveis, lembre-se de que nenhum sistema de segurança é impenetrável.",
+        p7Title: "7. Seus Direitos de Privacidade",
+        p7Desc: "Dependendo de sua localização, você pode ter os seguintes direitos em relação aos seus dados pessoais:",
+        p7Li1: "O direito de acessar, atualizar ou excluir as informações que temos sobre você.",
+        p7Li2: "O direito de retificação.",
+        p7Li3: "O direito de se opor ao processamento.",
+        p7Li4: "O direito à portabilidade de dados.",
+        p7Desc2: "Para exercer esses direitos, entre em contato conosco usando as informações abaixo.",
+        p8Title: "8. Contato",
+        p8Desc: "Se você tiver dúvidas ou comentários sobre esta Política de Privacidade, entre em contato conosco em:",
+        footerDesc: "A plataforma definitiva para gerenciar seu conteúdo visual de forma fácil, remota e profissional.",
+        footerExplore: "Explorar",
+        footerFeat: "Recursos",
+        footerCases: "Casos de Uso",
+        footerPlans: "Planos",
+        footerFaq: "FAQ",
+        footerConnect: "Conecte-se Conosco",
+        footerRights: "© 2024 NexusRePlay. Todos os direitos reservados.",
+        footerPolicy: "Política de Privacidade"
+      }
+    };
+
+    const langSelector = document.getElementById('policy-lang-selector');
+    const flags = langSelector.querySelectorAll('.lang-flag');
+
+    function setLanguage(lang) {
+      document.documentElement.lang = lang;
+      const translations = policyTranslations[lang];
+      
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        const key = el.getAttribute('data-lang');
+        if (translations[key]) {
+          el.innerHTML = translations[key]; // Usamos innerHTML para no perder los <strong> o <a>
+        }
+      });
+
+      flags.forEach(flag => {
+        flag.classList.toggle('active', flag.dataset.langId === lang);
+      });
+    }
+
+    langSelector.addEventListener('click', (e) => {
+      if (e.target.classList.contains('lang-flag')) {
+        setLanguage(e.target.dataset.langId);
+      }
+    });
+
+    // Detectar el idioma del navegador por defecto (opcional)
+    const userLang = navigator.language.split('-')[0];
+    if (policyTranslations[userLang]) {
+      setLanguage(userLang);
+    }
+  </script>
 </body>
 </html>

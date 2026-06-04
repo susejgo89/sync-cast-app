@@ -40,14 +40,14 @@ widgetStyles.textContent = `
         color: white;
         padding: 8px 25px;
         z-index: 999;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 2px solid rgba(255, 255, 255, 0.2);
         height: 50px;
     }
     .widget-title {
         padding: 6px 16px;
         border-radius: 8px;
-        font-size: 0.9rem;
-        font-weight: 700;
+        font-size: 1rem;
+        font-weight: 800;
         margin-right: 15px;
         text-transform: uppercase;
         flex-shrink: 0;
@@ -1069,9 +1069,14 @@ function displayMedia(item, playbackId) {
         // ¡CORRECCIÓN CLAVE! Rompemos el bucle infinito.
         // Si un video falla, en lugar de llamar a playNextItem() inmediatamente,
         // lo hacemos después de un breve instante. Esto evita el "Maximum call stack size exceeded".
-        video.onerror = () => { 
-            console.error("Error al cargar o reproducir el video, saltando al siguiente:", item.url); 
-            setTimeout(safePlayNext, 100); 
+        video.onerror = (e) => { 
+            console.error("Error en reproducción de video:", item.url, e);
+            // Mostramos un mensaje breve en consola/log para depuración de testers
+            displayMessage(translations[document.documentElement.lang || 'es'].errorLoadingVideo || "Error cargando video, saltando...");
+            
+            // Si el video falla, esperamos 3 segundos antes de saltar para no entrar en un bucle infinito
+            // de errores si la conexión cayó por completo.
+            setTimeout(safePlayNext, 3000); 
         };
 
     } else if (item.type === 'weather') {
@@ -1475,8 +1480,12 @@ pairBtn.addEventListener('click', async () => {
 function sendHeartbeat(screenId) {
     if (!screenId) return;
     const screenRef = doc(db, 'screens', screenId);
-    // Actualizamos el campo 'lastSeen' con la hora actual del servidor
-    updateDoc(screenRef, { lastSeen: serverTimestamp() })
+
+    // Actualizamos 'lastSeen' y reportamos la versión en una sola llamada eficiente
+    updateDoc(screenRef, { 
+        lastSeen: serverTimestamp(),
+        appVersion: "1.1.0"
+    })
         .catch(err => console.error("Error al enviar heartbeat:", err));
 }
 
