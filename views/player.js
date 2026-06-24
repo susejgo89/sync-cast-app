@@ -45,14 +45,14 @@ widgetStyles.textContent = `
         color: white;
         padding: 8px 25px;
         z-index: 999;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 2px solid rgba(255, 255, 255, 0.2);
         height: 50px;
     }
     .widget-title {
         padding: 6px 16px;
         border-radius: 8px;
-        font-size: 0.9rem;
-        font-weight: 700;
+        font-size: 1rem;
+        font-weight: 800;
         margin-right: 15px;
         text-transform: uppercase;
         flex-shrink: 0;
@@ -496,8 +496,10 @@ function handleQrCodeWidget(screenId, settings) {
 
     if (show && enabled) {
         qrContainer.innerHTML = ''; // Limpia el QR anterior para evitar duplicados
-        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?id=${screenId}`, width: 128, height: 128 });
-        document.getElementById('qr-code-text').textContent = translations[lang]?.scanForMenu || "Escanea para más info";
+        new QRCode(qrContainer, { text: `${window.location.origin}/viewer.html?screenId=${screenId}`, width: 128, height: 128 });
+        
+        const displayText = settings.text && settings.text.trim() !== '' ? settings.text : (translations[lang]?.scanForMenu || "Escanea para más info");
+        document.getElementById('qr-code-text').textContent = displayText;
         qrCodeWidget.style.display = 'flex';
     } else {
         qrCodeWidget.style.display = 'none';
@@ -544,7 +546,7 @@ function resetPlayer() {
     if (unsubscribeMusicPlaylistListener) unsubscribeMusicPlaylistListener();
 
     // Limpiamos el ID guardado y recargamos la página.
-    localStorage.removeItem('nexusplay_screen_id');    
+    localStorage.removeItem('nexusreplay_screen_id');    
     window.location.replace(window.location.origin + window.location.pathname); // Método más robusto para recargar
 }
 
@@ -878,7 +880,7 @@ pairBtn.addEventListener('click', async () => {
             inputs[0].focus();
         } else {
             // ¡Éxito! La pantalla es válida y no está enlazada.
-            localStorage.setItem('nexusplay_screen_id', screenId);
+            localStorage.setItem('nexusreplay_screen_id', screenId);
 
             await updateDoc(screenDocRef, {
                 isPaired: true
@@ -925,7 +927,7 @@ function init() {
     setLanguage(userLang);
 
     // Comprobamos si el dispositivo ya está enlazado
-    const savedScreenId = localStorage.getItem('nexusplay_screen_id');
+    const savedScreenId = localStorage.getItem('nexusreplay_screen_id');
     if (savedScreenId) {
         // Si ya lo está, iniciamos la reproducción directamente
         // Si ya está enlazado, iniciamos la reproducción Y el heartbeat

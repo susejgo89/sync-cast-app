@@ -60,29 +60,10 @@ Desarrollar NexusRePlay implicó retos técnicos significativos que fortaleciero
 5.  **Optimización de Recursos:** Gestión de límites de almacenamiento y validación de archivos en el lado del cliente y del servidor.
 6.  **Experiencia de Usuario (UX):** Crear un flujo de "Emparejamiento" (Pairing) sencillo mediante códigos de 6 dígitos, similar a aplicaciones de Smart TV comerciales.
 
-## 🚀 Instalación y Configuración
 
-1.  Clona el repositorio.
-2.  Crea un proyecto en Firebase.
-3.  Habilita Firestore, Authentication, Storage y Cloud Functions.
-4.  Configura tus credenciales en un archivo `firebase-config.js` siguiendo el ejemplo:
-
-```javascript
-export const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "tu-app.firebaseapp.com",
-  projectId: "tu-app",
-  storageBucket: "tu-app.appspot.com",
-  messagingSenderId: "id",
-  appId: "app-id"
-};
-```
-
-5.  Despliega las Cloud Functions situadas en la carpeta `/functions`.
-6.  Abre `index.html` para el panel o `player.html` para el reproductor.
 
 ---
 
-Desarrollado con ❤️ por tu nombre/empresa.
+Desarrollado con ❤️ por Susej Gonzalez.
 
 *NexusRePlay - Dinamismo en cada pixel.*
