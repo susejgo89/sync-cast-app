@@ -838,42 +838,109 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const userId = user.uid;
 
         // 1. Borrar archivos de Storage y docs de 'media'
-        const mediaQuery = query(collection(db, 'media'), where('userId', '==', userId));
-        const mediaDocs = await getDocs(mediaQuery);
-        for (const mediaDoc of mediaDocs.docs) {
-            const data = mediaDoc.data();
-            if (data.storagePath) {
-                try {
-                    await deleteObject(ref(storage, data.storagePath));
-                } catch (storageErr) {
-                    console.warn(`No se pudo borrar el archivo de Storage: ${data.storagePath}`, storageErr);
+        try {
+            console.log("Iniciando purga de 'media' y Storage...");
+            const mediaQuery = query(collection(db, 'media'), where('userId', '==', userId));
+            const mediaDocs = await getDocs(mediaQuery);
+            for (const mediaDoc of mediaDocs.docs) {
+                const data = mediaDoc.data();
+                if (data.storagePath) {
+                    try {
+                        await deleteObject(ref(storage, data.storagePath));
+                    } catch (storageErr) {
+                        console.warn(`No se pudo borrar el archivo de Storage: ${data.storagePath}`, storageErr);
+                    }
                 }
+                await deleteDoc(doc(db, 'media', mediaDoc.id));
             }
-            await deleteDoc(doc(db, 'media', mediaDoc.id));
+            console.log("Purga de 'media' completada.");
+        } catch (err) {
+            console.error("Fallo al purgar 'media':", err);
         }
 
-        // 2. Borrar documentos de las colecciones de Firestore
-        const collectionsToPurge = ['playlists', 'musicPlaylists', 'screens', 'groups', 'qrMenus'];
-        for (const colName of collectionsToPurge) {
-            const colQuery = query(collection(db, colName), where('userId', '==', userId));
-            const colDocs = await getDocs(colQuery);
-            for (const colDoc of colDocs.docs) {
-                await deleteDoc(doc(db, colName, colDoc.id));
+        // 2. Borrar 'playlists' y extraer 'qrMenuId's para borrarlos uno a uno
+        try {
+            console.log("Iniciando purga de 'playlists' y 'qrMenus' asociados...");
+            const playlistsQuery = query(collection(db, 'playlists'), where('userId', '==', userId));
+            const playlistsDocs = await getDocs(playlistsQuery);
+            for (const playlistDoc of playlistsDocs.docs) {
+                const items = playlistDoc.data().items || [];
+                // Borrar los qrMenus referenciados en esta playlist
+                for (const item of items) {
+                    if (item.qrMenuId) {
+                        try {
+                            await deleteDoc(doc(db, 'qrMenus', item.qrMenuId));
+                            console.log(`qrMenu ${item.qrMenuId} eliminado.`);
+                        } catch (qrErr) {
+                            console.warn(`No se pudo eliminar qrMenu ${item.qrMenuId}:`, qrErr);
+                        }
+                    }
+                }
+                await deleteDoc(doc(db, 'playlists', playlistDoc.id));
             }
+            console.log("Purga de 'playlists' completada.");
+        } catch (err) {
+            console.error("Fallo al purgar 'playlists':", err);
         }
 
-        // También borrar pantallas asociadas por 'pairedUserId' si existiera
-        const screensQuery2 = query(collection(db, 'screens'), where('pairedUserId', '==', userId));
-        const screensDocs2 = await getDocs(screensQuery2);
-        for (const doc2 of screensDocs2.docs) {
-            await deleteDoc(doc(db, 'screens', doc2.id));
+        // 3. Borrar 'musicPlaylists'
+        try {
+            console.log("Iniciando purga de 'musicPlaylists'...");
+            const musicQuery = query(collection(db, 'musicPlaylists'), where('userId', '==', userId));
+            const musicDocs = await getDocs(musicQuery);
+            for (const musicDoc of musicDocs.docs) {
+                await deleteDoc(doc(db, 'musicPlaylists', musicDoc.id));
+            }
+            console.log("Purga de 'musicPlaylists' completada.");
+        } catch (err) {
+            console.error("Fallo al purgar 'musicPlaylists':", err);
         }
 
-        // 3. Borrar el documento del usuario en 'users'
-        await deleteDoc(doc(db, 'users', userId));
+        // 4. Borrar 'screens' (propios y asociados por pairedUserId)
+        try {
+            console.log("Iniciando purga de 'screens'...");
+            const screensQuery = query(collection(db, 'screens'), where('userId', '==', userId));
+            const screensDocs = await getDocs(screensQuery);
+            for (const screenDoc of screensDocs.docs) {
+                await deleteDoc(doc(db, 'screens', screenDoc.id));
+            }
 
-        // 4. Eliminar el usuario de Firebase Auth
+            const screensQuery2 = query(collection(db, 'screens'), where('pairedUserId', '==', userId));
+            const screensDocs2 = await getDocs(screensQuery2);
+            for (const doc2 of screensDocs2.docs) {
+                await deleteDoc(doc(db, 'screens', doc2.id));
+            }
+            console.log("Purga de 'screens' completada.");
+        } catch (err) {
+            console.error("Fallo al purgar 'screens':", err);
+        }
+
+        // 5. Borrar 'groups'
+        try {
+            console.log("Iniciando purga de 'groups'...");
+            const groupsQuery = query(collection(db, 'groups'), where('userId', '==', userId));
+            const groupsDocs = await getDocs(groupsQuery);
+            for (const groupDoc of groupsDocs.docs) {
+                await deleteDoc(doc(db, 'groups', groupDoc.id));
+            }
+            console.log("Purga de 'groups' completada.");
+        } catch (err) {
+            console.error("Fallo al purgar 'groups':", err);
+        }
+
+        // 6. Borrar documento del perfil de usuario en 'users'
+        try {
+            console.log("Iniciando eliminación del perfil en 'users'...");
+            await deleteDoc(doc(db, 'users', userId));
+            console.log("Perfil en 'users' eliminado.");
+        } catch (err) {
+            console.error("Fallo al eliminar perfil en 'users' (puede ser restricción de reglas de Firestore):", err);
+        }
+
+        // 7. Eliminar el usuario de Firebase Auth
+        console.log("Eliminando usuario de Firebase Auth...");
         await deleteUser(user);
+        console.log("Usuario de Firebase Auth eliminado con éxito.");
 
         loader.style.display = 'none';
         window.location.href = 'landing/index.html';
