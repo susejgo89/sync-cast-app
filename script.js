@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, GoogleAuthProvider, signInWithPopup, applyActionCode } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, GoogleAuthProvider, signInWithPopup, applyActionCode, deleteUser, reauthenticateWithCredential, EmailAuthProvider, reauthenticateWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, setLogLevel, collection, addDoc, query, where, onSnapshot, serverTimestamp, doc, deleteDoc, updateDoc, getDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         import { initMediaView } from './views/mediaView.js';
@@ -748,6 +748,135 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         quickAddPlaylistBtn.addEventListener('click', () => {
             document.getElementById('add-playlist-modal').classList.add('active');
         });
+    }
+
+    // --- Lógica de Eliminación de Cuenta ---
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    const reauthModal = document.getElementById('reauth-modal');
+    const reauthForm = document.getElementById('reauth-form');
+    const reauthCancelBtn = document.getElementById('reauth-cancel');
+    const reauthPasswordInput = document.getElementById('reauth-password');
+
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', () => {
+            showConfirmModal(
+                translations[currentLang].deleteAccountConfirmTitle || "Confirmar Eliminación de Cuenta",
+                translations[currentLang].deleteAccountConfirmMsg || "Esta acción es irreversible y borrará todo tu contenido. ¿Seguro que deseas eliminar tu cuenta permanentemente?",
+                async () => {
+                    const user = auth.currentUser;
+                    if (!user) return;
+                    
+                    // Mostrar loader
+                    loader.style.display = 'flex';
+
+                    try {
+                        // Intentamos realizar la eliminación directamente
+                        await purgeUserDataAndAuth(user);
+                    } catch (error) {
+                        loader.style.display = 'none';
+                        if (error.code === 'auth/requires-recent-login') {
+                            // Si requiere login reciente, intentamos manejarlo
+                            const providerId = user.providerData[0]?.providerId;
+                            if (providerId === 'google.com') {
+                                try {
+                                    loader.style.display = 'flex';
+                                    const provider = new GoogleAuthProvider();
+                                    await reauthenticateWithPopup(user, provider);
+                                    await purgeUserDataAndAuth(user);
+                                } catch (reauthErr) {
+                                    loader.style.display = 'none';
+                                    console.error("Error al re-autenticar con Google:", reauthErr);
+                                    showMessage(translations[currentLang].deleteAccountError || "Error al eliminar la cuenta.", true);
+                                }
+                            } else {
+                                // Para email/contraseña, abrimos el modal
+                                if (reauthModal) {
+                                    reauthPasswordInput.value = '';
+                                    reauthModal.classList.add('active');
+                                }
+                            }
+                        } else {
+                            console.error("Error al eliminar cuenta:", error);
+                            showMessage(translations[currentLang].deleteAccountError || "Error al eliminar la cuenta.", true);
+                        }
+                    }
+                }
+            );
+        });
+    }
+
+    if (reauthCancelBtn && reauthModal) {
+        reauthCancelBtn.addEventListener('click', () => {
+            reauthModal.classList.remove('active');
+        });
+    }
+
+    if (reauthForm) {
+        reauthForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = reauthPasswordInput.value;
+            const user = auth.currentUser;
+            if (!user) return;
+
+            reauthModal.classList.remove('active');
+            loader.style.display = 'flex';
+
+            try {
+                const credential = EmailAuthProvider.credential(user.email, password);
+                await reauthenticateWithCredential(user, credential);
+                await purgeUserDataAndAuth(user);
+            } catch (error) {
+                loader.style.display = 'none';
+                console.error("Error de re-autenticación:", error);
+                showMessage(translations[currentLang].loginError || "Contraseña incorrecta.", true);
+            }
+        });
+    }
+
+    // Función interna para borrar los datos del usuario en Firestore y Storage, y luego borrar el usuario de Auth
+    async function purgeUserDataAndAuth(user) {
+        const userId = user.uid;
+
+        // 1. Borrar archivos de Storage y docs de 'media'
+        const mediaQuery = query(collection(db, 'media'), where('userId', '==', userId));
+        const mediaDocs = await getDocs(mediaQuery);
+        for (const mediaDoc of mediaDocs.docs) {
+            const data = mediaDoc.data();
+            if (data.storagePath) {
+                try {
+                    await deleteObject(ref(storage, data.storagePath));
+                } catch (storageErr) {
+                    console.warn(`No se pudo borrar el archivo de Storage: ${data.storagePath}`, storageErr);
+                }
+            }
+            await deleteDoc(doc(db, 'media', mediaDoc.id));
+        }
+
+        // 2. Borrar documentos de las colecciones de Firestore
+        const collectionsToPurge = ['playlists', 'musicPlaylists', 'screens', 'groups', 'qrMenus'];
+        for (const colName of collectionsToPurge) {
+            const colQuery = query(collection(db, colName), where('userId', '==', userId));
+            const colDocs = await getDocs(colQuery);
+            for (const colDoc of colDocs.docs) {
+                await deleteDoc(doc(db, colName, colDoc.id));
+            }
+        }
+
+        // También borrar pantallas asociadas por 'pairedUserId' si existiera
+        const screensQuery2 = query(collection(db, 'screens'), where('pairedUserId', '==', userId));
+        const screensDocs2 = await getDocs(screensQuery2);
+        for (const doc2 of screensDocs2.docs) {
+            await deleteDoc(doc(db, 'screens', doc2.id));
+        }
+
+        // 3. Borrar el documento del usuario en 'users'
+        await deleteDoc(doc(db, 'users', userId));
+
+        // 4. Eliminar el usuario de Firebase Auth
+        await deleteUser(user);
+
+        loader.style.display = 'none';
+        window.location.href = 'landing/index.html';
     }
 
 });
