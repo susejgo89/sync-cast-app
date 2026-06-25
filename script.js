@@ -343,8 +343,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 role: 'client', // Rol por defecto para nuevos registros
                 ownerId: null, // Es una cuenta principal, no pertenece a un reseller
                 status: 'active', // Estado inicial
-                screenLimit: 1, // Límite de pantallas por defecto reducido a 1
-                storageLimit: 100 * 1024 * 1024, // 100 MB de almacenamiento inicial (en bytes) para evitar abusos
+                screenLimit: 0, // Límite de pantallas por defecto a 0
+                storageLimit: 0, // 0 MB de almacenamiento inicial por defecto
                 profileComplete: false // ¡CLAVE! Marcamos el perfil como incompleto.
             }).then(() => {
                 // Una vez creado el perfil, enviamos el email de verificación
@@ -401,12 +401,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             if (currentUserData) {
                 const usedBytes = userMediaData.reduce((sum, m) => sum + (m.size || 0), 0);
                 const limitBytes = currentUserData.role === 'reseller' 
-                    ? (currentUserData.totalStorageLimit || currentUserData.storageLimit || (100 * 1024 * 1024))
-                    : (currentUserData.storageLimit || (100 * 1024 * 1024)); // 100MB default
+                    ? (currentUserData.totalStorageLimit ?? currentUserData.storageLimit ?? (100 * 1024 * 1024))
+                    : (currentUserData.storageLimit ?? (100 * 1024 * 1024)); // 100MB default
                 
                 const usedMB = (usedBytes / (1024 * 1024)).toFixed(1);
                 const limitMB = (limitBytes / (1024 * 1024)).toFixed(0);
-                const percent = Math.min((usedBytes / limitBytes) * 100, 100);
+                const percent = limitBytes > 0 ? Math.min((usedBytes / limitBytes) * 100, 100) : 100;
 
                 const storageBar = document.getElementById('dashboard-storage-bar');
                 const storageUsedEl = document.getElementById('dashboard-storage-used');

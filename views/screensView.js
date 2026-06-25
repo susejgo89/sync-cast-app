@@ -342,14 +342,14 @@ export function initScreensView(userId, getPlaylists, getMusicPlaylists, getLang
                     await setDoc(userDocRef, {
                         email: user.email,
                         createdAt: serverTimestamp(),
-                        screenLimit: 3
+                        screenLimit: 0
                     });
                     userDocSnap = await getDoc(userDocRef); // Re-fetch after creation
                 }
                 const userData = userDocSnap.data() || {};
                 const screenLimit = userData.role === 'reseller'
-                    ? (userData.totalScreenLimit || userData.screenLimit || 3)
-                    : (userData.screenLimit || 3);
+                    ? (userData.totalScreenLimit ?? userData.screenLimit ?? 3)
+                    : (userData.screenLimit ?? 3);
         
                 const screensQuery = query(collection(db, 'screens'), where('userId', '==', currentUserId));
                 const screensSnapshot = await getDocs(screensQuery);

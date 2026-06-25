@@ -87,8 +87,8 @@ export function initMediaView(userId, getLang, onUpdateCallback) {
     const userSnap = await getDoc(userDocRef);
     const userData = userSnap.exists() ? userSnap.data() : {};
     const storageLimit = userData.role === 'reseller'
-        ? (userData.totalStorageLimit || userData.storageLimit || 104857600)
-        : (userData.storageLimit || 104857600); // 100MB por defecto
+        ? (userData.totalStorageLimit ?? userData.storageLimit ?? 104857600)
+        : (userData.storageLimit ?? 104857600); // 100MB por defecto
     
     const totalUsed = currentUserMedia.reduce((sum, m) => sum + (m.size || 0), 0);
     
