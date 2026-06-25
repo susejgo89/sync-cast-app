@@ -103,6 +103,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
         const verifyContainer = document.getElementById('verify-email-container');
+        const registerTerms = document.getElementById('register-terms');
+        const registerSubmitBtn = document.getElementById('register-submit-btn');
+
+        if (registerTerms && registerSubmitBtn) {
+            registerTerms.addEventListener('change', () => {
+                registerSubmitBtn.disabled = !registerTerms.checked;
+            });
+        }
     
         
         // --- State Variables ---
@@ -325,6 +333,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     const pass = registerForm['register-password'].value;
     const email = registerForm['register-email'].value;
 
+    if (registerTerms && !registerTerms.checked) {
+        showMessage("Debes aceptar los Términos de Servicio y la Política de Privacidad.", true);
+        return;
+    }
+
     if (pass.length < 6) {
         showMessage(translations[currentLang].passwordTooShort, true);
         return;
@@ -345,7 +358,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 status: 'active', // Estado inicial
                 screenLimit: 0, // Límite de pantallas por defecto a 0
                 storageLimit: 0, // 0 MB de almacenamiento inicial por defecto
-                profileComplete: false // ¡CLAVE! Marcamos el perfil como incompleto.
+                profileComplete: false, // ¡CLAVE! Marcamos el perfil como incompleto.
+                termsAcceptedAt: serverTimestamp(), // VITAL para respaldo legal
+                termsVersion: '1.0' // Versión de los términos aceptada
             }).then(() => {
                 // Una vez creado el perfil, enviamos el email de verificación
                 sendEmailVerification(user, getVerificationActionCodeSettings())
@@ -367,6 +382,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             loginFormContainer.style.display = 'none'; // Usamos el nombre correcto
             verifyContainer.style.display = 'none';
             registerFormContainer.style.display = 'block'; // Usamos el nombre correcto
+            if (registerForm) registerForm.reset();
+            if (registerSubmitBtn) registerSubmitBtn.disabled = true;
         });
 
         showLoginLink.addEventListener('click', (e) => {

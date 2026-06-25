@@ -56,7 +56,23 @@
                 <form id="register-form" class="mt-8 space-y-6">
                     <input id="register-email" type="email" required class="w-full px-4 py-3 rounded-lg bg-neutral-700 border border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="emailPlaceholder">
                     <input id="register-password" type="password" required class="w-full px-4 py-3 rounded-lg bg-neutral-700 border border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-violet-500" data-lang-placeholder="passwordPlaceholder6Chars">
-                    <button type="submit" class="w-full py-3 px-4 text-white font-semibold rounded-lg bg-[#00FFF7] hover:bg-[#00B3AD] transition-all duration-300 transform hover:scale-105 shadow-lg" data-lang="registerButton">Registrar</button>
+                    
+                    <div class="flex items-start my-4">
+                        <div class="flex items-center h-5">
+                            <input id="register-terms" type="checkbox" required class="w-4 h-4 text-violet-600 border-neutral-600 rounded bg-neutral-700 focus:ring-violet-500 focus:ring-offset-neutral-800">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="register-terms" class="text-neutral-300">
+                                <span data-lang="registerAcceptTerms">Acepto los</span>
+                                <a href="/terms.html" target="_blank" class="text-violet-400 hover:underline font-semibold" data-lang="termsOfServiceLink">Términos de Servicio</a>
+                                <span data-lang="registerAnd">y la</span>
+                                <a href="/privacy.html" target="_blank" class="text-violet-400 hover:underline font-semibold" data-lang="privacyPolicyLink">Política de Privacidad</a>
+                                <span data-lang="registerSuffix">de NexusRePlay.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="register-submit-btn" disabled class="w-full py-3 px-4 text-white font-semibold rounded-lg bg-[#00FFF7] hover:bg-[#00B3AD] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:transform-none transition-all duration-300 transform hover:scale-105 shadow-lg" data-lang="registerButton">Registrar</button>
                 </form>
 
                 <div class="my-4 flex items-center">
@@ -239,6 +255,11 @@
                         </div>
                     </div>
                     <button id="logout-button" class="w-full mt-4 flex items-center justify-center px-4 py-2.5 rounded-lg text-red-400 hover:bg-[#4b0082] hover:text-white transition duration-200"><svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg><span data-lang="logoutButton">Cerrar Sesión</span></button>
+                    <div class="mt-4 pt-2 border-t border-neutral-700/50 text-center text-xs text-neutral-500 space-x-1">
+                        <a href="/terms.html" target="_blank" class="hover:text-neutral-300" data-lang="termsOfService">Términos de Servicio</a>
+                        <span>•</span>
+                        <a href="/privacy.html" target="_blank" class="hover:text-neutral-300" data-lang="privacyPolicy">Política de Privacidad</a>
+                    </div>
                 </div>
             </aside>
             <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden lg:hidden z-20"></div>
