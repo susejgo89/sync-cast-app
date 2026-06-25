@@ -79,40 +79,148 @@
       }
     }
 
-    /* Estilos para los enlaces de navegación (NUEVO DISEÑO) */
+    /* Estilos para los enlaces de navegación (NUEVO DISEÑO MAS MODERNO Y EVITA AMONTONAMIENTO) */
     .navbar-nav .nav-link {
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.8);
-      padding: 0.5rem 1rem;
-      margin: 0 0.5rem;
-      position: relative; /* Necesario para el pseudo-elemento ::after */
-      background-color: transparent; /* Sin fondo por defecto */
-      border-radius: 0;
-      transition: color 0.3s ease;
+      font-weight: 500;
+      font-size: 0.95rem; /* Ajustado de 1.1rem para evitar desbordes */
+      color: rgba(255, 255, 255, 0.85);
+      padding: 0.4rem 0.8rem;
+      margin: 0 0.2rem;
+      position: relative;
+      background-color: transparent;
+      border-radius: 20px;
+      transition: all 0.25s ease;
     }
 
-    /* Efecto de subrayado animado */
+    /* Efecto de resalte moderno */
     .navbar-nav .nav-link::after {
       content: '';
       position: absolute;
-      bottom: -2px; /* Posición justo debajo del texto */
+      bottom: 2px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 2px;
-      background-color: #7c3aed; /* Color de la marca */
-      transition: width 0.3s ease-out;
+      background-color: #a78bfa; /* Color morado suave */
+      transition: width 0.25s ease-out;
     }
 
     .navbar-nav .nav-link:hover,
     .navbar-nav .nav-link.active {
-      color: white;
+      color: white !important;
+      background-color: rgba(255, 255, 255, 0.08); /* Fondo sutil al hover */
     }
 
     .navbar-nav .nav-link:hover::after,
     .navbar-nav .nav-link.active::after {
-      width: 70%; /* El subrayado crece al pasar el ratón */
+      width: 50%;
+    }
+
+    /* Badge próximamente en la navbar */
+    .nav-coming-soon-badge {
+      background-color: rgba(167, 139, 250, 0.15) !important;
+      border: 1px solid rgba(167, 139, 250, 0.3) !important;
+      color: #c084fc !important;
+      font-size: 0.65rem !important;
+      padding: 0.15rem 0.45rem !important;
+      border-radius: 10px !important;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    /* Estilo moderno y premium para el botón de login */
+    .navbar .btn-login {
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .navbar .btn-login:hover {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border-color: transparent;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+      transform: translateY(-1px);
+      color: white;
+    }
+
+    /* Estilo premium para el distintivo Próximamente en el cuerpo */
+    .badge-coming-soon-premium {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(167, 139, 250, 0.18)) !important;
+      border: 1px solid rgba(167, 139, 250, 0.45) !important;
+      color: #c084fc !important;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.35rem !important;
+      border-radius: 50px !important;
+      font-weight: 700;
+      animation: badge-pulse 2s infinite alternate;
+    }
+    
+    .premium-badge-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #c084fc;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px #c084fc;
+      animation: dot-ping 1.5s infinite ease-in-out;
+    }
+
+    @keyframes badge-pulse {
+      0% {
+        box-shadow: 0 0 10px rgba(167, 139, 250, 0.1), inset 0 0 5px rgba(167, 139, 250, 0.1);
+        border-color: rgba(167, 139, 250, 0.3);
+      }
+      100% {
+        box-shadow: 0 0 25px rgba(167, 139, 250, 0.35), inset 0 0 10px rgba(167, 139, 250, 0.25);
+        border-color: rgba(167, 139, 250, 0.65);
+      }
+    }
+
+    @keyframes dot-ping {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.6);
+        opacity: 1;
+        box-shadow: 0 0 12px #c084fc;
+      }
+    }
+
+    /* Media queries para evitar amontonamiento en resoluciones medias de laptop (992px a 1200px) */
+    @media (min-width: 992px) and (max-width: 1200px) {
+      .navbar-nav .nav-link {
+        font-size: 0.82rem !important;
+        padding: 0.35rem 0.5rem !important;
+        margin: 0 0.15rem !important;
+      }
+      .navbar-brand img {
+        height: 60px !important;
+      }
+      #landing-lang-selector {
+        gap: 0.5rem !important;
+      }
+      #landing-lang-selector img {
+        width: 20px !important;
+      }
+      .navbar .btn-login {
+        padding: 0.4rem 0.9rem !important;
+        font-size: 0.8rem !important;
+      }
     }
 
     /* Estilos para el selector de idioma del landing */
@@ -701,7 +809,7 @@
           <li class="nav-item">
             <a class="nav-link d-flex align-items-center gap-1" href="#servicio-ia">
               <span data-lang="navAI">Agentes IA</span>
-              <span class="badge bg-secondary text-white fw-bold" style="font-size: 0.65rem !important;" data-lang="comingSoonBadge">Próximamente</span>
+              <span class="nav-coming-soon-badge" data-lang="comingSoonBadge">Próximamente</span>
             </a>
           </li>
           <li class="nav-item">
@@ -715,7 +823,7 @@
             <img src="https://flagcdn.com/br.svg" width="25" alt="Português" data-lang-id="pt" class="lang-flag">
         </div>
 
-        <a href="../app.html" class="btn btn-outline-light">
+        <a href="../app.html" class="btn btn-login">
           <span data-lang="loginButton">Iniciar Sesión</span>
         </a>
       </div>
@@ -1058,7 +1166,12 @@
     <div class="container py-5">
       <div class="row justify-content-center text-center mb-5">
         <div class="col-lg-8 fade-in-section">
-          <span class="badge bg-secondary text-white mb-3 px-3 py-2 rounded-pill fw-bold" data-lang="aiBadge">PRÓXIMAMENTE</span>
+          <div class="d-inline-flex align-items-center justify-content-center mb-3">
+            <span class="badge-coming-soon-premium">
+              <span class="premium-badge-dot"></span>
+              <span data-lang="aiBadge">PRÓXIMAMENTE</span>
+            </span>
+          </div>
           <h2 class="display-4 fw-bold mb-3" data-lang="aiTitle">Diseñamos tu Propio Agente de IA</h2>
           <p class="lead text-white-50" data-lang="aiSubtitle">Un servicio exclusivo donde creamos, entrenamos y personalizamos un asistente virtual inteligente para tu WhatsApp y Web.</p>
         </div>
