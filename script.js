@@ -412,6 +412,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         });
 
         async function detectUserCurrency() {
+            // Intento 1: Geolocalización por IP
             try {
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
@@ -419,14 +420,37 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     if (CURRENCY_CONFIGS[data.currency]) {
                         userCurrency = data.currency;
                         userCountry = data.country_name || '';
-                    } else {
-                        userCurrency = 'USD';
+                        console.log(`[Stripe] GeoIP detectó: ${userCountry}, Moneda: ${userCurrency}`);
+                        updatePricePreview();
+                        return;
                     }
-                    console.log(`Ubicación detectada: ${userCountry}, Moneda: ${userCurrency}`);
                 }
             } catch (err) {
-                console.warn("No se pudo detectar la geolocalización, usando USD por defecto.", err);
+                console.warn("[Stripe] GeoIP falló o fue bloqueado. Usando fallback por locale del navegador...", err);
             }
+
+            // Intento 2: Fallback por idioma del navegador (no bloqueable por AdBlock)
+            const locale = navigator.language || 'en-US';
+            if (locale.includes('BR') || locale.startsWith('pt')) {
+                userCurrency = 'BRL';
+                userCountry = 'Brasil (Browser Locale)';
+            } else if (locale.includes('CL')) {
+                userCurrency = 'CLP';
+                userCountry = 'Chile (Browser Locale)';
+            } else if (locale.includes('MX')) {
+                userCurrency = 'MXN';
+                userCountry = 'México (Browser Locale)';
+            } else if (locale.includes('AR')) {
+                userCurrency = 'ARS';
+                userCountry = 'Argentina (Browser Locale)';
+            } else if (locale.includes('CO')) {
+                userCurrency = 'COP';
+                userCountry = 'Colombia (Browser Locale)';
+            } else {
+                userCurrency = 'USD';
+                userCountry = 'Internacional / Default';
+            }
+            console.log(`[Stripe] Locale detectó: ${userCountry}, Moneda: ${userCurrency}`);
             updatePricePreview();
         }
 
