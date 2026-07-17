@@ -502,7 +502,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                         }
                         if (checkoutPricingContainer) checkoutPricingContainer.classList.add('hidden');
                         if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
-                    } else if (userData.screenLimit > 0) {
+                    } else if (userData.role === 'client' && userData.ownerId && userData.screenLimit > 0) {
                         // Plan Corporativo / Asignado manualmente por un distribuidor
                         if (currentPlanName) {
                             currentPlanName.textContent = translations[currentLang].assignedPlan
@@ -580,7 +580,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 const screensUpgradeBanner = document.getElementById('screens-upgrade-banner');
                 const mediaUpgradeBanner = document.getElementById('media-upgrade-banner');
 
-                const isCorporateOrReseller = userData.role === 'reseller' || (userData.role === 'client' && userData.screenLimit > 0 && snapshot.empty);
+                const isCorporateOrReseller = userData.role === 'reseller' || (userData.role === 'client' && userData.ownerId && userData.screenLimit > 0 && snapshot.empty);
                 const isPaidSub = !snapshot.empty;
                 const isFree = !isCorporateOrReseller && !isPaidSub;
                 
