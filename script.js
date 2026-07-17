@@ -47,6 +47,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             // Inicializar el Chatbot de IA
             initChatbot();
 
+            // Inicializar la geolocalización de moneda para Stripe
+            detectUserCurrency();
+
             // --- EVENT LISTENER DELEGADO PARA FORMULARIOS DE PERFIL ---
             // Este listener se añade al body y escucha los 'submit' que ocurran dentro.
             // Así, aunque los formularios se creen dinámicamente, siempre funcionará.
@@ -130,7 +133,21 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         let activePlaylistId = null;
         let currentScreenForQr = null;
         let draggedItem = null;
-        
+        let unsubscribeSubscription = null;
+        let userCurrency = 'USD';
+        let userCountry = '';
+
+        const STRIPE_PRICE_ID = 'price_1Tn4tYA2fj8bYZZKdfBHdL8l';
+
+        const CURRENCY_CONFIGS = {
+            USD: { symbol: '$', tier1: 15.99, tier2: 9.99, code: 'USD' },
+            BRL: { symbol: 'R$', tier1: 79.99, tier2: 49.99, code: 'BRL' },
+            CLP: { symbol: '$', tier1: 14279, tier2: 9500, code: 'CLP' },
+            MXN: { symbol: '$', tier1: 270.78, tier2: 180.00, code: 'MXN' },
+            EUR: { symbol: '€', tier1: 13.58, tier2: 9.00, code: 'EUR' },
+            ARS: { symbol: '$', tier1: 22853.86, tier2: 15000.00, code: 'ARS' },
+            COP: { symbol: '$', tier1: 53187.27, tier2: 35000.00, code: 'COP' }
+        };
 
         
 
@@ -273,6 +290,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         if (screensViewInstance) screensViewInstance.unsubscribe();
         if (groupsViewInstance) groupsViewInstance.unsubscribe();
         if (adminViewInstance) adminViewInstance.unsubscribe();
+        if (unsubscribeSubscription) { unsubscribeSubscription(); unsubscribeSubscription = null; }
     }
     
     loader.style.display = 'none';
@@ -392,6 +410,126 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             verifyContainer.style.display = 'none';
             loginFormContainer.style.display = 'block'; // Usamos el nombre correcto
         });
+
+        async function detectUserCurrency() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                if (data && data.currency) {
+                    if (CURRENCY_CONFIGS[data.currency]) {
+                        userCurrency = data.currency;
+                        userCountry = data.country_name || '';
+                    } else {
+                        userCurrency = 'USD';
+                    }
+                    console.log(`Ubicación detectada: ${userCountry}, Moneda: ${userCurrency}`);
+                }
+            } catch (err) {
+                console.warn("No se pudo detectar la geolocalización, usando USD por defecto.", err);
+            }
+            updatePricePreview();
+        }
+
+        function updatePricePreview() {
+            const qtyInput = document.getElementById('checkout-screens-qty');
+            const previewEl = document.getElementById('checkout-price-preview');
+            if (!qtyInput || !previewEl) return;
+
+            const qty = parseInt(qtyInput.value) || 1;
+            const config = CURRENCY_CONFIGS[userCurrency] || CURRENCY_CONFIGS['USD'];
+            
+            const pricePerUnit = qty >= 6 ? config.tier2 : config.tier1;
+            const total = qty * pricePerUnit;
+
+            let formattedTotal;
+            if (userCurrency === 'CLP' || userCurrency === 'COP') {
+                formattedTotal = Math.round(total).toLocaleString();
+            } else {
+                formattedTotal = total.toFixed(2);
+            }
+
+            previewEl.textContent = `= ${config.symbol}${formattedTotal} ${config.code}`;
+        }
+
+        function listenToSubscription(userId) {
+            if (unsubscribeSubscription) unsubscribeSubscription();
+            
+            const q = query(
+                collection(db, "customers", userId, "subscriptions"),
+                where("status", "in", ["active", "trialing"])
+            );
+
+            unsubscribeSubscription = onSnapshot(q, async (snapshot) => {
+                const currentPlanName = document.getElementById('current-plan-name');
+                const checkoutPricingContainer = document.getElementById('checkout-pricing-container');
+                const manageSubscriptionContainer = document.getElementById('manage-subscription-container');
+                
+                const userDocRef = doc(db, 'users', userId);
+                const userDocSnap = await getDoc(userDocRef);
+                const userData = userDocSnap.exists() ? userDocSnap.data() : {};
+                const hasAiAgent = userData.hasAiAgent || false;
+
+                if (snapshot.empty) {
+                    if (currentPlanName) {
+                        currentPlanName.textContent = hasAiAgent 
+                            ? `${translations[currentLang].navScreens}: 1 TV + Agente IA`
+                            : translations[currentLang].none || "Plan Gratuito (0 TVs / 0MB)";
+                        currentPlanName.className = "font-bold text-gray-500";
+                    }
+                    if (checkoutPricingContainer) checkoutPricingContainer.classList.remove('hidden');
+                    if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
+                    
+                    const targetScreenLimit = hasAiAgent ? 1 : 0;
+                    const targetStorageLimit = hasAiAgent ? (100 * 1024 * 1024) : 0;
+                    
+                    if (userData.screenLimit !== targetScreenLimit || userData.storageLimit !== targetStorageLimit) {
+                        try {
+                            await updateDoc(userDocRef, {
+                                screenLimit: targetScreenLimit,
+                                storageLimit: targetStorageLimit
+                            });
+                            if (currentUserData) {
+                                currentUserData.screenLimit = targetScreenLimit;
+                                currentUserData.storageLimit = targetStorageLimit;
+                            }
+                        } catch (err) {
+                            console.warn("Fallo al actualizar límites por defecto en Firestore:", err);
+                        }
+                    }
+                } else {
+                    const subscription = snapshot.docs[0].data();
+                    const quantity = subscription.items[0].quantity;
+                    
+                    if (currentPlanName) {
+                        currentPlanName.textContent = `${translations[currentLang].navScreens}: ${quantity} TV(s)`;
+                        currentPlanName.className = "font-bold text-emerald-600";
+                    }
+                    if (checkoutPricingContainer) checkoutPricingContainer.classList.add('hidden');
+                    if (manageSubscriptionContainer) manageSubscriptionContainer.classList.remove('hidden');
+                    
+                    const targetScreenLimit = Math.max(quantity, hasAiAgent ? 1 : 0);
+                    const targetStorageLimit = targetScreenLimit * 100 * 1024 * 1024;
+
+                    if (userData.screenLimit !== targetScreenLimit || userData.storageLimit !== targetStorageLimit) {
+                        try {
+                            await updateDoc(userDocRef, {
+                                screenLimit: targetScreenLimit,
+                                storageLimit: targetStorageLimit
+                            });
+                            if (currentUserData) {
+                                currentUserData.screenLimit = targetScreenLimit;
+                                currentUserData.storageLimit = targetStorageLimit;
+                            }
+                        } catch (err) {
+                            console.warn("Fallo al actualizar límites de suscripción en Firestore:", err);
+                        }
+                    }
+                }
+                
+                updateDashboardCards();
+            });
+        }
+
 
         function formatTimeAgo(date, lang) {
             const now = new Date();
@@ -679,6 +817,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
 
             loadInitialData(user.uid, userData.role);
+            
+            // Iniciar el listener de suscripción en tiempo real de Stripe
+            listenToSubscription(user.uid);
         }
 
         // Listener para abrir el modal de QR desde playlistsView
@@ -747,6 +888,106 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     if (quickAddPlaylistBtn) {
         quickAddPlaylistBtn.addEventListener('click', () => {
             document.getElementById('add-playlist-modal').classList.add('active');
+        });
+    }
+
+    // --- Lógica de Facturación y Stripe ---
+    const qtyInput = document.getElementById('checkout-screens-qty');
+    if (qtyInput) {
+        qtyInput.addEventListener('input', updatePricePreview);
+        qtyInput.addEventListener('change', updatePricePreview);
+    }
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+
+            checkoutBtn.disabled = true;
+            const originalText = checkoutBtn.innerHTML;
+            checkoutBtn.innerHTML = `<span>${translations[currentLang].redirectingToStripe || 'Redirigiendo a Stripe...'}</span>`;
+
+            try {
+                const checkoutSessionRef = await addDoc(
+                    collection(db, "customers", user.uid, "checkout_sessions"),
+                    {
+                        price: STRIPE_PRICE_ID,
+                        quantity: qty,
+                        success_url: window.location.origin + "/app.html?session=success",
+                        cancel_url: window.location.origin + "/app.html?session=cancel",
+                    }
+                );
+
+                const unsubCheckout = onSnapshot(checkoutSessionRef, (snap) => {
+                    const data = snap.data();
+                    if (data) {
+                        const { error, url } = data;
+                        if (error) {
+                            console.error("Error de Stripe Checkout:", error);
+                            alert(`Error: ${error.message}`);
+                            checkoutBtn.disabled = false;
+                            checkoutBtn.innerHTML = originalText;
+                            unsubCheckout();
+                        }
+                        if (url) {
+                            unsubCheckout();
+                            window.location.assign(url);
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error al iniciar checkout:", error);
+                alert("Error al iniciar el pago.");
+                checkoutBtn.disabled = false;
+                checkoutBtn.innerHTML = originalText;
+            }
+        });
+    }
+
+    const manageBillingBtn = document.getElementById('manage-billing-btn');
+    if (manageBillingBtn) {
+        manageBillingBtn.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            manageBillingBtn.disabled = true;
+            const originalText = manageBillingBtn.innerHTML;
+            manageBillingBtn.innerHTML = `<span>${translations[currentLang].redirectingToStripe || 'Redirigiendo a Stripe...'}</span>`;
+
+            try {
+                const portalSessionRef = await addDoc(
+                    collection(db, "customers", user.uid, "portal_sessions"),
+                    {
+                        return_url: window.location.origin + "/app.html",
+                    }
+                );
+
+                const unsubPortal = onSnapshot(portalSessionRef, (snap) => {
+                    const data = snap.data();
+                    if (data) {
+                        const { error, url } = data;
+                        if (error) {
+                            console.error("Error del portal de Stripe:", error);
+                            alert(`Error: ${error.message}`);
+                            manageBillingBtn.disabled = false;
+                            manageBillingBtn.innerHTML = originalText;
+                            unsubPortal();
+                        }
+                        if (url) {
+                            unsubPortal();
+                            window.location.assign(url);
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error al iniciar portal:", error);
+                alert("Error al acceder al portal de facturación.");
+                manageBillingBtn.disabled = false;
+                manageBillingBtn.innerHTML = originalText;
+            }
         });
     }
 

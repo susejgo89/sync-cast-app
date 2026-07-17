@@ -709,6 +709,34 @@
                             <form id="account-form" class="grid grid-cols-1 md:grid-cols-2 gap-6"></form>
                         </div>
                         
+                        <!-- Suscripción / Plan de Pantallas -->
+                        <div class="bg-white p-8 rounded-2xl shadow-lg space-y-6">
+                            <h3 class="text-xl font-bold text-gray-800" data-lang="subscriptionSectionTitle">Mi Plan de Pantallas</h3>
+                            <div id="subscription-status-container" class="p-4 rounded-xl bg-gray-50 border border-gray-200">
+                                <p class="text-sm text-gray-600"><span class="font-semibold" data-lang="currentPlanLabel">Plan actual:</span> <span id="current-plan-name" class="font-bold text-violet-600">Plan Gratuito (0 TVs / 0MB)</span></p>
+                            </div>
+                            
+                            <div id="checkout-pricing-container" class="space-y-4">
+                                <h4 class="text-sm font-semibold text-gray-700" data-lang="pricingTitle">Elige tu Plan de Pantallas</h4>
+                                <p class="text-xs text-gray-500" data-lang="pricingSubtitle">Precios dinámicos por volumen</p>
+                                <div class="flex items-center space-x-3 mt-2">
+                                    <label for="checkout-screens-qty" class="text-sm text-gray-600" data-lang="screensCount">Número de Pantallas:</label>
+                                    <input type="number" id="checkout-screens-qty" min="1" max="100" value="1" class="w-20 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
+                                    <span id="checkout-price-preview" class="text-sm font-bold text-gray-800"></span>
+                                </div>
+                                <p class="text-[11px] text-gray-400" data-lang="currencyNote">Precios detectados automáticamente para tu moneda local</p>
+                                <button id="checkout-btn" class="w-full mt-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-lg shadow-md transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2">
+                                    <span data-lang="subscribeBtn">Contratar Licencias</span>
+                                </button>
+                            </div>
+
+                            <div id="manage-subscription-container" class="hidden">
+                                <button id="manage-billing-btn" class="w-full px-6 py-3 border border-violet-600 text-violet-600 hover:bg-violet-50 font-semibold rounded-lg shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2">
+                                    <span data-lang="manageBillingBtn">Gestionar Facturación y Cancelar</span>
+                                </button>
+                            </div>
+                        </div>
+                        
                         <!-- Zona de Peligro: Eliminar Cuenta -->
                         <div class="bg-red-50/40 border border-red-200/60 p-8 rounded-2xl shadow-lg">
                             <h3 class="text-xl font-bold text-red-700" data-lang="dangerZoneTitle">Zona de Peligro</h3>
