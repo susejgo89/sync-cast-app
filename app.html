@@ -243,6 +243,19 @@
                         <span data-lang="navAdmin">Gestión de Clientes</span>
                     </a>
                 </nav>
+                
+                <!-- Promo / Upgrade Sidebar Card -->
+                <div id="sidebar-upgrade-card" class="px-4 mb-4">
+                    <a href="/account" data-route="/account" class="block p-4 bg-gradient-to-r from-violet-600/80 to-fuchsia-600/80 hover:from-violet-700/90 hover:to-fuchsia-700/90 rounded-xl shadow-md border border-violet-500/20 text-center transform hover:scale-[1.02] active:scale-[0.98] transition-all group">
+                        <p class="text-xs font-bold text-white uppercase tracking-wider" data-lang="sidebarUpgradeTitle">¿Necesitas más Pantallas?</p>
+                        <p class="text-[10px] text-violet-100 mt-1" data-lang="sidebarUpgradeDesc">Amplía tu plan y sube más archivos al instante</p>
+                        <span class="inline-flex items-center mt-2.5 px-3 py-1 rounded-full text-[10px] font-bold bg-white text-violet-700 shadow-sm group-hover:bg-violet-50 transition-colors">
+                            <span data-lang="sidebarUpgradeBtn">Actualizar Plan</span>
+                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </span>
+                    </a>
+                </div>
+
                 <div class="px-4 py-6 border-t border-neutral-700">
                     <a href="/account" data-route="/account" class="nav-link flex items-center p-2 rounded-lg hover:bg-neutral-700 transition-colors duration-200">
                         <div id="user-info" class="flex items-center w-full"></div>
@@ -405,6 +418,21 @@
                     </div>
                     <div id="upload-progress-container" class="mt-4 w-full bg-gray-200 rounded-full h-2.5 hidden">
                         <div id="upload-progress-bar" class="bg-violet-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <!-- Banner de Límite / Compra en Biblioteca de Medios -->
+                    <div id="media-upgrade-banner" class="hidden mt-6 p-4 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-violet-600 text-white rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-700 font-semibold" data-lang="mediaUpgradeBannerTitle">Límite de Almacenamiento: Plan Gratuito (0MB)</p>
+                                <p class="text-[10px] text-gray-500" data-lang="mediaUpgradeBannerDesc">Aumenta tu espacio de almacenamiento contratando licencias de pantallas en tu cuenta.</p>
+                            </div>
+                        </div>
+                        <a href="/account" data-route="/account" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold rounded-lg shadow transition-colors shrink-0">
+                            <span data-lang="sidebarUpgradeBtn">Actualizar Plan</span>
+                        </a>
                     </div>
                     <div class="mt-8 space-y-10">
                         <div>
@@ -582,6 +610,20 @@
                             <span data-lang="addScreen">Añadir Pantalla</span>
                         </button>
                     </div>
+                    <!-- Banner de Límite / Compra en Pantallas -->
+                    <div id="screens-upgrade-banner" class="hidden mt-6 p-6 rounded-2xl bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-lg border border-violet-400/20 relative overflow-hidden group">
+                        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:scale-125 transition-transform duration-500"></div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                            <div>
+                                <h3 class="text-lg font-bold" data-lang="screensUpgradeBannerTitle">¡Empieza a conectar tus pantallas!</h3>
+                                <p class="text-xs text-violet-100 mt-1" data-lang="screensUpgradeBannerDesc">Actualmente te encuentras en el Plan Gratuito. Contrata licencias para activar tus pantallas y transmitir contenido.</p>
+                            </div>
+                            <a href="/account" data-route="/account" class="inline-flex items-center justify-center px-5 py-2.5 bg-white text-violet-700 font-bold rounded-xl shadow hover:bg-violet-50 transition-colors shrink-0 text-sm">
+                                <span data-lang="screensUpgradeBannerBtn">Contratar Pantallas</span>
+                                <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </a>
+                        </div>
+                    </div>
                     <div id="screens-list" class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </div>
                 <div id="groups-section" class="page-section hidden h-full flex flex-col">
@@ -710,28 +752,67 @@
                         </div>
                         
                         <!-- Suscripción / Plan de Pantallas -->
-                        <div class="bg-white p-8 rounded-2xl shadow-lg space-y-6">
-                            <h3 class="text-xl font-bold text-gray-800" data-lang="subscriptionSectionTitle">Mi Plan de Pantallas</h3>
-                            <div id="subscription-status-container" class="p-4 rounded-xl bg-gray-50 border border-gray-200">
-                                <p class="text-sm text-gray-600"><span class="font-semibold" data-lang="currentPlanLabel">Plan actual:</span> <span id="current-plan-name" class="font-bold text-violet-600">Plan Gratuito (0 TVs / 0MB)</span></p>
+                        <div class="bg-gradient-to-br from-white to-violet-50/20 p-8 rounded-3xl border border-violet-100 shadow-xl space-y-8 relative overflow-hidden group">
+                            <!-- Fondo decorativo abstracto con degradado suave -->
+                            <div class="absolute -top-12 -right-12 w-32 h-32 bg-violet-100/40 rounded-full blur-2xl pointer-events-none group-hover:scale-110 transition-transform duration-500"></div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <div class="p-3 bg-violet-600 text-white rounded-2xl shadow-lg shadow-violet-600/20">
+                                    <!-- Icono de TV/Pantalla -->
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-extrabold text-gray-800 tracking-tight" data-lang="subscriptionSectionTitle">Mi Plan de Pantallas</h3>
+                                    <p class="text-xs text-gray-400" data-lang="pricingSubtitle">Precios dinámicos por volumen</p>
+                                </div>
+                            </div>
+
+                            <div id="subscription-status-container" class="p-5 rounded-2xl bg-neutral-50 border border-neutral-100 flex justify-between items-center transition-all duration-300 hover:shadow-inner">
+                                <div>
+                                    <span class="text-xs text-gray-400 uppercase tracking-wider font-bold block" data-lang="currentPlanLabel">Plan actual:</span>
+                                    <span id="current-plan-name" class="font-extrabold text-lg text-violet-600 mt-1 block">Plan Gratuito (0 TVs / 0MB)</span>
+                                </div>
+                                <div class="px-3 py-1 text-xs font-semibold rounded-full bg-violet-50 text-violet-700 animate-pulse border border-violet-100" id="current-plan-badge">
+                                    Gratis
+                                </div>
                             </div>
                             
-                            <div id="checkout-pricing-container" class="space-y-4">
-                                <h4 class="text-sm font-semibold text-gray-700" data-lang="pricingTitle">Elige tu Plan de Pantallas</h4>
-                                <p class="text-xs text-gray-500" data-lang="pricingSubtitle">Precios dinámicos por volumen</p>
-                                <div class="flex items-center space-x-3 mt-2">
-                                    <label for="checkout-screens-qty" class="text-sm text-gray-600" data-lang="screensCount">Número de Pantallas:</label>
-                                    <input type="number" id="checkout-screens-qty" min="1" max="100" value="1" class="w-20 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
-                                    <span id="checkout-price-preview" class="text-sm font-bold text-gray-800"></span>
+                            <!-- Contenedor de Compra (Checkout) -->
+                            <div id="checkout-pricing-container" class="space-y-6">
+                                <div class="space-y-2">
+                                    <h4 class="text-sm font-bold text-gray-700" data-lang="pricingTitle">Elige tu Plan de Pantallas</h4>
+                                    <!-- Contenedor con selector interactivo más estilizado -->
+                                    <div class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-violet-200 transition-colors">
+                                        <div class="flex items-center space-x-3">
+                                            <label for="checkout-screens-qty" class="text-sm text-gray-500 font-medium" data-lang="screensCount">Número de Pantallas:</label>
+                                            <input type="number" id="checkout-screens-qty" min="1" max="100" value="1" class="w-16 px-2 py-1.5 font-bold text-center border-b-2 border-violet-600 focus:outline-none focus:border-violet-700 text-lg text-gray-800 transition-colors">
+                                        </div>
+                                        <span id="checkout-price-preview" class="text-xl font-black text-gray-900 tracking-tight"></span>
+                                    </div>
                                 </div>
-                                <p class="text-[11px] text-gray-400" data-lang="currencyNote">Precios detectados automáticamente para tu moneda local</p>
-                                <button id="checkout-btn" class="w-full mt-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-lg shadow-md transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2">
+                                
+                                <div class="bg-violet-50/50 p-4 rounded-xl border border-violet-100/50 space-y-1">
+                                    <p class="text-xs text-violet-700 font-semibold flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5 text-violet-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                        Escalado dinámico:
+                                    </p>
+                                    <ul class="text-[11px] text-violet-600/80 pl-5 list-disc leading-relaxed">
+                                        <li>1-5 pantallas: Tarifa base local (ej. R$ 79.99 c/u)</li>
+                                        <li>6+ pantallas: Tarifa con descuento de volumen (ej. R$ 49.99 c/u)</li>
+                                    </ul>
+                                </div>
+                                
+                                <p class="text-[10px] text-gray-400 text-center" data-lang="currencyNote">Precios detectados automáticamente para tu moneda local</p>
+                                <button id="checkout-btn" class="w-full mt-2 px-6 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-violet-600/20 hover:shadow-xl hover:shadow-violet-600/30 transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2">
                                     <span data-lang="subscribeBtn">Contratar Licencias</span>
+                                    <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                                 </button>
                             </div>
 
+                            <!-- Contenedor para Administrar (Ya suscrito) -->
                             <div id="manage-subscription-container" class="hidden">
-                                <button id="manage-billing-btn" class="w-full px-6 py-3 border border-violet-600 text-violet-600 hover:bg-violet-50 font-semibold rounded-lg shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2">
+                                <button id="manage-billing-btn" class="w-full px-6 py-4 border-2 border-violet-600 text-violet-600 hover:bg-violet-50 font-bold rounded-2xl shadow-sm hover:shadow-md transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2">
+                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                                     <span data-lang="manageBillingBtn">Gestionar Facturación y Cancelar</span>
                                 </button>
                             </div>

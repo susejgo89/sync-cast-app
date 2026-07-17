@@ -574,6 +574,37 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
                 
                 updateDashboardCards();
+
+                // Controlar visibilidad de los banners de actualización (Sidebar, Screens, Media)
+                const sidebarUpgradeCard = document.getElementById('sidebar-upgrade-card');
+                const screensUpgradeBanner = document.getElementById('screens-upgrade-banner');
+                const mediaUpgradeBanner = document.getElementById('media-upgrade-banner');
+
+                const isCorporateOrReseller = userData.role === 'reseller' || (userData.role === 'client' && userData.screenLimit > 0 && snapshot.empty);
+                const isPaidSub = !snapshot.empty;
+                const isFree = !isCorporateOrReseller && !isPaidSub;
+                
+                if (sidebarUpgradeCard) {
+                    if (isFree) {
+                        sidebarUpgradeCard.classList.remove('hidden');
+                    } else {
+                        sidebarUpgradeCard.classList.add('hidden');
+                    }
+                }
+                if (screensUpgradeBanner) {
+                    if (isFree) {
+                        screensUpgradeBanner.classList.remove('hidden');
+                    } else {
+                        screensUpgradeBanner.classList.add('hidden');
+                    }
+                }
+                if (mediaUpgradeBanner) {
+                    if (isFree) {
+                        mediaUpgradeBanner.classList.remove('hidden');
+                    } else {
+                        mediaUpgradeBanner.classList.add('hidden');
+                    }
+                }
             }, (error) => {
                 console.error("[Stripe] Error en listener de suscripciones:", error);
             });
