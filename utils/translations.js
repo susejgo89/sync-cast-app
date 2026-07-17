@@ -223,6 +223,7 @@ export const translations = {
                 manageBillingBtn: "Gestionar Facturación y Cancelar",
                 currencyNote: "Precios detectados automáticamente para tu moneda local",
                 redirectingToStripe: "Redirigiendo a Stripe...",
+                assignedPlan: "Plan Corporativo ({qty} Pantallas)",
             },
             en: {
                 loginTitle: "Login",
@@ -448,6 +449,7 @@ export const translations = {
                 manageBillingBtn: "Manage Billing and Cancel",
                 currencyNote: "Prices detected automatically for your local currency",
                 redirectingToStripe: "Redirecting to Stripe...",
+                assignedPlan: "Corporate Plan ({qty} Screens)",
             },
             pt: {
                 loginTitle: "Entrar",
@@ -673,5 +675,6 @@ export const translations = {
                 manageBillingBtn: "Gerenciar Faturamento e Cancelar",
                 currencyNote: "Preços detectados automaticamente para sua moeda local",
                 redirectingToStripe: "Redirecionando para o Stripe...",
+                assignedPlan: "Plano Corporativo ({qty} Telas)",
             }
         };

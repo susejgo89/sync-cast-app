@@ -494,30 +494,50 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 const hasAiAgent = userData.hasAiAgent || false;
 
                 if (snapshot.empty) {
-                    if (currentPlanName) {
-                        currentPlanName.textContent = hasAiAgent 
-                            ? `${translations[currentLang].navScreens}: 1 TV + Agente IA`
-                            : translations[currentLang].none || "Plan Gratuito (0 TVs / 0MB)";
-                        currentPlanName.className = "font-bold text-gray-500";
-                    }
-                    if (checkoutPricingContainer) checkoutPricingContainer.classList.remove('hidden');
-                    if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
-                    
-                    const targetScreenLimit = hasAiAgent ? 1 : 0;
-                    const targetStorageLimit = hasAiAgent ? (100 * 1024 * 1024) : 0;
-                    
-                    if (userData.screenLimit !== targetScreenLimit || userData.storageLimit !== targetStorageLimit) {
-                        try {
-                            await updateDoc(userDocRef, {
-                                screenLimit: targetScreenLimit,
-                                storageLimit: targetStorageLimit
-                            });
-                            if (currentUserData) {
-                                currentUserData.screenLimit = targetScreenLimit;
-                                currentUserData.storageLimit = targetStorageLimit;
+                    if (userData.role === 'reseller') {
+                        if (currentPlanName) {
+                            currentPlanName.textContent = "Plan Distribuidor (Reseller)";
+                            currentPlanName.className = "font-bold text-violet-600";
+                        }
+                        if (checkoutPricingContainer) checkoutPricingContainer.classList.add('hidden');
+                        if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
+                    } else if (userData.screenLimit > 0) {
+                        // Plan Corporativo / Asignado manualmente por un distribuidor
+                        if (currentPlanName) {
+                            currentPlanName.textContent = translations[currentLang].assignedPlan
+                                ? translations[currentLang].assignedPlan.replace('{qty}', userData.screenLimit)
+                                : `Plan Corporativo (${userData.screenLimit} TV(s))`;
+                            currentPlanName.className = "font-bold text-violet-600";
+                        }
+                        if (checkoutPricingContainer) checkoutPricingContainer.classList.add('hidden');
+                        if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
+                    } else {
+                        // Plan Gratuito
+                        if (currentPlanName) {
+                            currentPlanName.textContent = hasAiAgent 
+                                ? `${translations[currentLang].navScreens}: 1 TV + Agente IA`
+                                : translations[currentLang].none || "Plan Gratuito (0 TVs / 0MB)";
+                            currentPlanName.className = "font-bold text-gray-500";
+                        }
+                        if (checkoutPricingContainer) checkoutPricingContainer.classList.remove('hidden');
+                        if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
+                        
+                        const targetScreenLimit = hasAiAgent ? 1 : 0;
+                        const targetStorageLimit = hasAiAgent ? (100 * 1024 * 1024) : 0;
+                        
+                        if (userData.screenLimit !== targetScreenLimit || userData.storageLimit !== targetStorageLimit) {
+                            try {
+                                await updateDoc(userDocRef, {
+                                    screenLimit: targetScreenLimit,
+                                    storageLimit: targetStorageLimit
+                                });
+                                if (currentUserData) {
+                                    currentUserData.screenLimit = targetScreenLimit;
+                                    currentUserData.storageLimit = targetStorageLimit;
+                                }
+                            } catch (err) {
+                                console.warn("Fallo al actualizar límites por defecto en Firestore:", err);
                             }
-                        } catch (err) {
-                            console.warn("Fallo al actualizar límites por defecto en Firestore:", err);
                         }
                     }
                 } else {
@@ -551,6 +571,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
                 
                 updateDashboardCards();
+            }, (error) => {
+                console.error("[Stripe] Error en listener de suscripciones:", error);
             });
         }
 
@@ -961,6 +983,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                             window.location.assign(url);
                         }
                     }
+                }, (error) => {
+                    console.error("[Stripe] Error de permisos en checkout session:", error);
+                    alert("Error de permisos al iniciar el pago.");
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.innerHTML = originalText;
                 });
             } catch (error) {
                 console.error("Error al iniciar checkout:", error);
@@ -1005,6 +1032,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                             window.location.assign(url);
                         }
                     }
+                }, (error) => {
+                    console.error("[Stripe] Error de permisos en portal session:", error);
+                    alert("Error de permisos al acceder al portal de facturación.");
+                    manageBillingBtn.disabled = false;
+                    manageBillingBtn.innerHTML = originalText;
                 });
             } catch (error) {
                 console.error("Error al iniciar portal:", error);
