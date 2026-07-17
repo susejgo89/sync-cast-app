@@ -644,8 +644,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                         }
                         if (checkoutPricingContainer) checkoutPricingContainer.classList.add('hidden');
                         if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
+                    } else if (userData.role === 'client' && !userData.stripeId && userData.screenLimit > 0) {
+                        // Plan Especial / Asignado manualmente por el administrador
+                        if (currentPlanName) {
+                            currentPlanName.textContent = translations[currentLang].assignedPlan
+                                ? translations[currentLang].assignedPlan.replace('{qty}', userData.screenLimit)
+                                : `Plan Corporativo (${userData.screenLimit} TV(s))`;
+                            currentPlanName.className = "font-bold text-violet-600";
+                        }
+                        if (checkoutPricingContainer) checkoutPricingContainer.classList.add('hidden');
+                        if (manageSubscriptionContainer) manageSubscriptionContainer.classList.add('hidden');
+                        
+                        if (currentUserData) {
+                            currentUserData.screenLimit = userData.screenLimit;
+                            currentUserData.storageLimit = userData.storageLimit || (userData.screenLimit * 100 * 1024 * 1024);
+                        }
                     } else {
-                        // Plan Gratuito
+                        // Plan Gratuito (O usuario de Stripe cancelado)
                         if (currentPlanName) {
                             currentPlanName.textContent = hasAiAgent 
                                 ? `${translations[currentLang].navScreens}: 1 TV + Agente IA`
