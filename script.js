@@ -155,12 +155,143 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const langSelectors = document.querySelectorAll('.lang-selector');
         let currentLang = 'es';
 
+        function updateUpgradeBannersContent() {
+            const sidebarUpgradeCard = document.getElementById('sidebar-upgrade-card');
+            const screensUpgradeBanner = document.getElementById('screens-upgrade-banner');
+            const mediaUpgradeBanner = document.getElementById('media-upgrade-banner');
+
+            if (!currentUserData) return;
+
+            const isReseller = currentUserData.role === 'reseller';
+            // Si el límite de pantallas es mayor a 0, significa que tiene un plan de pago o corporativo activo
+            const isPaidOrCorporate = currentUserData.screenLimit > 0;
+            
+            if (isReseller) {
+                if (sidebarUpgradeCard) sidebarUpgradeCard.classList.add('hidden');
+                if (screensUpgradeBanner) screensUpgradeBanner.classList.add('hidden');
+                if (mediaUpgradeBanner) mediaUpgradeBanner.classList.add('hidden');
+            } else {
+                if (sidebarUpgradeCard) {
+                    sidebarUpgradeCard.classList.remove('hidden');
+                    
+                    const titleEl = sidebarUpgradeCard.querySelector('[data-lang="sidebarUpgradeTitle"], [data-lang="sidebarUpgradePaidTitle"]');
+                    const descEl = sidebarUpgradeCard.querySelector('[data-lang="sidebarUpgradeDesc"], [data-lang="sidebarUpgradePaidDesc"]');
+                    const btnTextEl = sidebarUpgradeCard.querySelector('[data-lang="sidebarUpgradeBtn"], [data-lang="sidebarUpgradePaidBtn"]');
+                    
+                    if (isPaidOrCorporate) {
+                        if (titleEl) {
+                            titleEl.setAttribute('data-lang', 'sidebarUpgradePaidTitle');
+                            titleEl.textContent = translations[currentLang].sidebarUpgradePaidTitle;
+                        }
+                        if (descEl) {
+                            descEl.setAttribute('data-lang', 'sidebarUpgradePaidDesc');
+                            descEl.textContent = translations[currentLang].sidebarUpgradePaidDesc;
+                        }
+                        if (btnTextEl) {
+                            btnTextEl.setAttribute('data-lang', 'sidebarUpgradePaidBtn');
+                            btnTextEl.textContent = translations[currentLang].sidebarUpgradePaidBtn;
+                        }
+                    } else {
+                        if (titleEl) {
+                            titleEl.setAttribute('data-lang', 'sidebarUpgradeTitle');
+                            titleEl.textContent = translations[currentLang].sidebarUpgradeTitle;
+                        }
+                        if (descEl) {
+                            descEl.setAttribute('data-lang', 'sidebarUpgradeDesc');
+                            descEl.textContent = translations[currentLang].sidebarUpgradeDesc;
+                        }
+                        if (btnTextEl) {
+                            btnTextEl.setAttribute('data-lang', 'sidebarUpgradeBtn');
+                            btnTextEl.textContent = translations[currentLang].sidebarUpgradeBtn;
+                        }
+                    }
+                }
+                
+                if (screensUpgradeBanner) {
+                    screensUpgradeBanner.classList.remove('hidden');
+                    
+                    const titleEl = screensUpgradeBanner.querySelector('[data-lang="screensUpgradeBannerTitle"], [data-lang="screensUpgradeBannerPaidTitle"]');
+                    const descEl = screensUpgradeBanner.querySelector('[data-lang="screensUpgradeBannerDesc"], [data-lang="screensUpgradeBannerPaidDesc"]');
+                    const btnTextEl = screensUpgradeBanner.querySelector('[data-lang="screensUpgradeBannerBtn"], [data-lang="screensUpgradeBannerPaidBtn"]');
+                    
+                    if (isPaidOrCorporate) {
+                        if (titleEl) {
+                            titleEl.setAttribute('data-lang', 'screensUpgradeBannerPaidTitle');
+                            titleEl.textContent = translations[currentLang].screensUpgradeBannerPaidTitle;
+                        }
+                        if (descEl) {
+                            descEl.setAttribute('data-lang', 'screensUpgradeBannerPaidDesc');
+                            descEl.textContent = translations[currentLang].screensUpgradeBannerPaidDesc;
+                        }
+                        if (btnTextEl) {
+                            btnTextEl.setAttribute('data-lang', 'screensUpgradeBannerPaidBtn');
+                            btnTextEl.textContent = translations[currentLang].screensUpgradeBannerPaidBtn;
+                        }
+                    } else {
+                        if (titleEl) {
+                            titleEl.setAttribute('data-lang', 'screensUpgradeBannerTitle');
+                            titleEl.textContent = translations[currentLang].screensUpgradeBannerTitle;
+                        }
+                        if (descEl) {
+                            descEl.setAttribute('data-lang', 'screensUpgradeBannerDesc');
+                            descEl.textContent = translations[currentLang].screensUpgradeBannerDesc;
+                        }
+                        if (btnTextEl) {
+                            btnTextEl.setAttribute('data-lang', 'screensUpgradeBannerBtn');
+                            btnTextEl.textContent = translations[currentLang].screensUpgradeBannerBtn;
+                        }
+                    }
+                }
+                
+                if (mediaUpgradeBanner) {
+                    mediaUpgradeBanner.classList.remove('hidden');
+                    
+                    const titleEl = mediaUpgradeBanner.querySelector('[data-lang="mediaUpgradeBannerTitle"], [data-lang="mediaUpgradeBannerPaidTitle"]');
+                    const descEl = mediaUpgradeBanner.querySelector('[data-lang="mediaUpgradeBannerDesc"], [data-lang="mediaUpgradeBannerPaidDesc"]');
+                    const btnTextEl = mediaUpgradeBanner.querySelector('[data-lang="sidebarUpgradeBtn"], [data-lang="sidebarUpgradePaidBtn"]');
+                    
+                    if (isPaidOrCorporate) {
+                        if (titleEl) {
+                            titleEl.setAttribute('data-lang', 'mediaUpgradeBannerPaidTitle');
+                            const limitMB = Math.round(currentUserData.storageLimit / (1024 * 1024));
+                            titleEl.textContent = translations[currentLang].mediaUpgradeBannerPaidTitle.replace('{qty}', limitMB);
+                        }
+                        if (descEl) {
+                            descEl.setAttribute('data-lang', 'mediaUpgradeBannerPaidDesc');
+                            descEl.textContent = translations[currentLang].mediaUpgradeBannerPaidDesc;
+                        }
+                        if (btnTextEl) {
+                            btnTextEl.setAttribute('data-lang', 'sidebarUpgradePaidBtn');
+                            btnTextEl.textContent = translations[currentLang].sidebarUpgradePaidBtn;
+                        }
+                    } else {
+                        if (titleEl) {
+                            titleEl.setAttribute('data-lang', 'mediaUpgradeBannerTitle');
+                            titleEl.textContent = translations[currentLang].mediaUpgradeBannerTitle;
+                        }
+                        if (descEl) {
+                            descEl.setAttribute('data-lang', 'mediaUpgradeBannerDesc');
+                            descEl.textContent = translations[currentLang].mediaUpgradeBannerDesc;
+                        }
+                        if (btnTextEl) {
+                            btnTextEl.setAttribute('data-lang', 'sidebarUpgradeBtn');
+                            btnTextEl.textContent = translations[currentLang].sidebarUpgradeBtn;
+                        }
+                    }
+                }
+            }
+        }
+
         function setLanguage(lang) {
             currentLang = lang;
             document.documentElement.lang = lang;
 
             document.querySelectorAll('[data-lang]').forEach(el => {
                 const key = el.getAttribute('data-lang');
+                // Ignorar traducción general para los banners dinámicos, se maneja en updateUpgradeBannersContent
+                if (key.startsWith('sidebarUpgrade') || key.startsWith('screensUpgrade') || key.startsWith('mediaUpgrade')) {
+                    return;
+                }
                 if (translations[lang][key]) {
                     el.textContent = translations[lang][key];
                 }
@@ -183,6 +314,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             if (activePlaylistId) selectPlaylist(activePlaylistId, currentLang);
             if (screensViewInstance) screensViewInstance.rerender();
             updateDashboardCards(); // Actualiza el dashboard al cambiar idioma
+            updateUpgradeBannersContent(); // Actualizar el idioma de los banners
         }
 
         langSelectors.forEach(selector => {
@@ -575,36 +707,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 
                 updateDashboardCards();
 
-                // Controlar visibilidad de los banners de actualización (Sidebar, Screens, Media)
-                const sidebarUpgradeCard = document.getElementById('sidebar-upgrade-card');
-                const screensUpgradeBanner = document.getElementById('screens-upgrade-banner');
-                const mediaUpgradeBanner = document.getElementById('media-upgrade-banner');
-
-                const isCorporateOrReseller = userData.role === 'reseller' || (userData.role === 'client' && userData.ownerId && userData.screenLimit > 0 && snapshot.empty);
-                const isPaidSub = !snapshot.empty;
-                const isFree = !isCorporateOrReseller && !isPaidSub;
-                
-                if (sidebarUpgradeCard) {
-                    if (isFree) {
-                        sidebarUpgradeCard.classList.remove('hidden');
-                    } else {
-                        sidebarUpgradeCard.classList.add('hidden');
-                    }
-                }
-                if (screensUpgradeBanner) {
-                    if (isFree) {
-                        screensUpgradeBanner.classList.remove('hidden');
-                    } else {
-                        screensUpgradeBanner.classList.add('hidden');
-                    }
-                }
-                if (mediaUpgradeBanner) {
-                    if (isFree) {
-                        mediaUpgradeBanner.classList.remove('hidden');
-                    } else {
-                        mediaUpgradeBanner.classList.add('hidden');
-                    }
-                }
+                // Actualizar y controlar visibilidad de los banners de actualización (siempre visibles para clientes)
+                updateUpgradeBannersContent();
             }, (error) => {
                 console.error("[Stripe] Error en listener de suscripciones:", error);
             });
