@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, GoogleAuthProvider, signInWithPopup, applyActionCode, deleteUser, reauthenticateWithCredential, EmailAuthProvider, reauthenticateWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, setLogLevel, collection, addDoc, query, where, onSnapshot, serverTimestamp, doc, deleteDoc, updateDoc, getDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+        import { httpsCallable } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js";
         import { initMediaView } from './views/mediaView.js';
         import { auth, db, storage, functions } from './firebase-config.js';
         import { showConfirmModal } from './utils/modals.js';
@@ -1011,38 +1012,20 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             manageBillingBtn.innerHTML = `<span>${translations[currentLang].redirectingToStripe || 'Redirigiendo a Stripe...'}</span>`;
 
             try {
-                const portalSessionRef = await addDoc(
-                    collection(db, "customers", user.uid, "portal_sessions"),
-                    {
-                        return_url: window.location.origin + "/app.html",
-                    }
-                );
-
-                const unsubPortal = onSnapshot(portalSessionRef, (snap) => {
-                    const data = snap.data();
-                    if (data) {
-                        const { error, url } = data;
-                        if (error) {
-                            console.error("Error del portal de Stripe:", error);
-                            alert(`Error: ${error.message}`);
-                            manageBillingBtn.disabled = false;
-                            manageBillingBtn.innerHTML = originalText;
-                            unsubPortal();
-                        }
-                        if (url) {
-                            unsubPortal();
-                            window.location.assign(url);
-                        }
-                    }
-                }, (error) => {
-                    console.error("[Stripe] Error de permisos en portal session:", error);
-                    alert("Error de permisos al acceder al portal de facturación.");
-                    manageBillingBtn.disabled = false;
-                    manageBillingBtn.innerHTML = originalText;
+                const createPortalLink = httpsCallable(functions, "ext-firestore-stripe-payments-createPortalLink");
+                const response = await createPortalLink({
+                    returnUrl: window.location.origin + "/app.html",
                 });
+                
+                const { url } = response.data;
+                if (url) {
+                    window.location.assign(url);
+                } else {
+                    throw new Error("No se devolvió ninguna URL para el portal.");
+                }
             } catch (error) {
-                console.error("Error al iniciar portal:", error);
-                alert("Error al acceder al portal de facturación.");
+                console.error("[Stripe] Error al iniciar portal de Stripe:", error);
+                alert(`Error al acceder al portal de facturación: ${error.message}`);
                 manageBillingBtn.disabled = false;
                 manageBillingBtn.innerHTML = originalText;
             }
