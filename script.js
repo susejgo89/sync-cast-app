@@ -525,16 +525,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                         const targetScreenLimit = hasAiAgent ? 1 : 0;
                         const targetStorageLimit = hasAiAgent ? (100 * 1024 * 1024) : 0;
                         
+                        if (currentUserData) {
+                            currentUserData.screenLimit = targetScreenLimit;
+                            currentUserData.storageLimit = targetStorageLimit;
+                        }
+
                         if (userData.screenLimit !== targetScreenLimit || userData.storageLimit !== targetStorageLimit) {
                             try {
                                 await updateDoc(userDocRef, {
                                     screenLimit: targetScreenLimit,
                                     storageLimit: targetStorageLimit
                                 });
-                                if (currentUserData) {
-                                    currentUserData.screenLimit = targetScreenLimit;
-                                    currentUserData.storageLimit = targetStorageLimit;
-                                }
                             } catch (err) {
                                 console.warn("Fallo al actualizar límites por defecto en Firestore:", err);
                             }
@@ -554,16 +555,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     const targetScreenLimit = Math.max(quantity, hasAiAgent ? 1 : 0);
                     const targetStorageLimit = targetScreenLimit * 100 * 1024 * 1024;
 
+                    if (currentUserData) {
+                        currentUserData.screenLimit = targetScreenLimit;
+                        currentUserData.storageLimit = targetStorageLimit;
+                    }
+
                     if (userData.screenLimit !== targetScreenLimit || userData.storageLimit !== targetStorageLimit) {
                         try {
                             await updateDoc(userDocRef, {
                                 screenLimit: targetScreenLimit,
                                 storageLimit: targetStorageLimit
                             });
-                            if (currentUserData) {
-                                currentUserData.screenLimit = targetScreenLimit;
-                                currentUserData.storageLimit = targetStorageLimit;
-                            }
                         } catch (err) {
                             console.warn("Fallo al actualizar límites de suscripción en Firestore:", err);
                         }
